@@ -31,6 +31,10 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    # кастомні додатки
+    "financew",
+
+    # дефолтні додатки
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
