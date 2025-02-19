@@ -8,5 +8,6 @@ app_name = "financew"
 urlpatterns = [
     #Головна сторінка
     path("", views.index, name='index'),
+    path("budgets/<int:budget_id>/", views.budget, name='budget'), # сторінка з бюджетами
 
 ]

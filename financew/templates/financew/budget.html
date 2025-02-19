@@ -1,0 +1,8 @@
+{% extends 'financew/base.html' %} {% block content %}
+<p>{{budget.amount}}</p>
+{% for finoperation in finoperations %}
+<p>{{finoperation.fin_operation_type}} - {{finoperation.operation_amount}} - {{finoperation.fin_operation_date}}</p>
+{%empty%}
+<p>Нема фінансових операцій</p>
+{%endfor%} 
+{% endblock content %}

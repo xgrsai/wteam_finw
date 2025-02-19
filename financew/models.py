@@ -41,8 +41,8 @@ class FinOperation(models.Model):
     def __str__(self):
         """Повертаємо величину та тип операції"""
         return f"{self.fin_operation_type} {self.operation_amount}"
+    
 
 
     
-
 

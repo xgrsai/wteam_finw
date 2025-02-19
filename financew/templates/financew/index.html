@@ -1,4 +1,11 @@
 {% extends 'financew/base.html' %}
 {% block content %}
+{% for budget in budgets %}<!-- воно бере по назві ключа -->
+  <li>
+    <a href="{% url 'financew:budget' budget.id %}">{{ budget.amount }}</a>
+  </li> 
+  {% empty %}
+  <li>Бюджети не знайдено</li>
+  {% endfor %}
 <p>Платформа управління особистими фінансами FinW - допомагає користувачам відстежувати витрати, прогнозувати бюджети та аналізувати фінансові звички.</p>
 {% endblock content %}
