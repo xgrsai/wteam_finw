@@ -31,9 +31,9 @@ class FinOperation(models.Model):
     """Фінансова операція яку здійснює користувач"""
     budget = models.ForeignKey(Budget, on_delete=models.CASCADE) # бюджет може мати багато фін. операцій
     FinOperationType = models.TextChoices("FinOperationType", "INCOME EXPENSE") # прибуток та витрати
-    operation_amount = models.DecimalField(max_digits=19,decimal_places=2)
-    fin_operation_type = models.CharField(blank=False, choices=FinOperationType.choices, max_length=7)
-    fin_operation_date = models.DateTimeField(auto_now_add=True)
+    amount = models.DecimalField(max_digits=19,decimal_places=2)
+    type = models.CharField(blank=False, choices=FinOperationType.choices, max_length=7)
+    date_added = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         verbose_name_plural = 'finoperations'

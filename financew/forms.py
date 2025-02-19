@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Budget
+from .models import Budget, FinOperation
 
 class BudgetForm(forms.ModelForm):
     class Meta:
@@ -8,3 +8,8 @@ class BudgetForm(forms.ModelForm):
         fields = ['amount']
         labels = {'amount': ''}
 
+class FinOperationForm(forms.ModelForm):
+    class Meta:
+        model = FinOperation
+        fields = ['amount', 'type']
+        labels = {'amount': 'Сума', 'type': 'Тип операції'}
