@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect
-
 from .models import Budget, FinOperation
 from .forms import BudgetForm, FinOperationForm
+from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.decorators import login_required
+from .forms import CustomUserCreationForm, CustomAuthenticationForm
 
-# Create your views here.
 def index(request):
     """головна сторінка фінансиW з бюджетами"""
     budgets = Budget.objects.all()
@@ -44,3 +45,29 @@ def new_finoperation(request, budget_id):
     context = {'budget': budget, 'form': form}
     return render(request, 'financew/new_finoperation.html', context) # потім дані з context можна використовувати у шаблоні 
 
+def register(request):
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('/index')  # Перенаправлення на головну сторінку після реєстрації
+    else:
+        form = CustomUserCreationForm()
+    return render(request, 'registration/register.html', {'form': form})
+
+def user_login(request):
+    if request.method == 'POST':
+        form = CustomAuthenticationForm(data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+            return redirect('/index')  # Перенаправлення на головну сторінку після входу
+    else:
+        form = CustomAuthenticationForm()
+    return render(request, 'registration/login.html', {'form': form})
+
+@login_required
+def user_logout(request):
+    logout(request)
+    return redirect('login')  # Перенаправлення на сторінку входу після виходу
