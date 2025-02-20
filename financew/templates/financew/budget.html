@@ -1,6 +1,6 @@
 {% extends 'financew/base.html' %} {% block content %}
 <a href="{% url "financew:new_finoperation" budget.id %}"">Додати нову фінансову операцію</a>
-<p>{{budget.amount}}</p>
+<p>{{budget.name}} {{budget.amount}} {{budget.currency}}</p>
 {% for finoperation in finoperations %}
 <p>{{finoperation.type}} - {{finoperation.amount}} - {{finoperation.date_added}}</p>
 {%empty%}
