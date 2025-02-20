@@ -1,0 +1,9 @@
+{% extends 'financew/base.html' %}
+{% block content %}
+{% comment %} <p><a href="{% url 'financew:budget' budget.id %}">{{ budget }}</a></p> {% endcomment %}
+<p>Додати нову фін операцію:</p>
+<form action="{% url 'financew:new_finoperation' budget.id %}" method="post"> <!-- action - куди відправляється форма-->
+  {% csrf_token %} {{ form.as_div }}
+  <button name="submit">Додати фін операцію</button> <!--як зрозумів то при нажиманні воно як раз зробить той action-->
+</form>
+{% endblock content %}
