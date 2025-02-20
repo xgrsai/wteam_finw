@@ -1,34 +1,61 @@
-<!DOCTYPE html>
-<html lang="uk">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Візуалізація</title>
+{% extends 'financew/base.html' %}
+{% block content %}
     <style>
+        /* Стилі */
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 20px;
         }
         h1 {
-            color: #333;
-        }
-        .plot-container {
-            margin-top: 20px;
             text-align: center;
         }
-        img {
-            max-width: 100%;
-            height: auto;
+        .plot-container {
+            background-color: #fff;
             border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 5px;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: 20px auto;
+        }
+        .form-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        select, button {
+            padding: 8px;
+            margin: 5px;
+            font-size: 16px;
         }
     </style>
-</head>
-<body>
+
     <h1>Візуалізація даних</h1>
-    <div class="plot-container">
-        <img src="data:image/png;base64,{{ plot_image }}" alt="Графік">
+
+    <!-- Форма для вибору категорій -->
+    <div class="form-container">
+        <form method="GET">
+            <label for="x_category">Виберіть X:</label>
+            <select name="x_category" id="x_category">
+                {% for key, value in data_options.x.items %}
+                    <option value="{{ key }}" {% if key == selected_x %}selected{% endif %}>{{ key }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="y_category">Виберіть Y:</label>
+            <select name="y_category" id="y_category">
+                {% for key, value in data_options.y.items %}
+                    <option value="{{ key }}" {% if key == selected_y %}selected{% endif %}>{{ key }}</option>
+                {% endfor %}
+            </select>
+
+            <button type="submit">Підтвердити</button>
+        </form>
     </div>
-</body>
-</html>
+
+    <!-- Контейнер для графіка -->
+    <div class="plot-container">
+        {{ plot_html|safe }}
+    </div>
+{% endblock content %}

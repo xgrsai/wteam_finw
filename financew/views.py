@@ -6,31 +6,48 @@ def index(request):
     return render(request, "financew/index.html")
 
 
-#частина з візуалізацією 
-import matplotlib.pyplot as plt
-import io
-import urllib, base64
+import plotly.express as px
+import pandas as pd
 
 def visualisation(request):
-    """Сторінка візуалізації"""
+    """Сторінка візуалізації з вибором категорій"""
 
-    # Створення графіку
-    plt.plot([1, 2, 3, 4], [10, 20, 25, 30], marker='o')
-    plt.title('Приклад графіку')
-    plt.xlabel('Вісь X')
-    plt.ylabel('Вісь Y')
+    # Дані для вибору категорій
+    data_options = {
+        'x': {
+            'x1': [1, 2, 3, 4],
+            'x2': [10, 20, 30, 40]
+        },
+        'y': {
+            'y1': [10, 20, 25, 30],
+            'y2': [5, 15, 35, 50]
+        }
+    }
 
-    # Збереження графіку в буфер
-    buf = io.BytesIO()
-    plt.savefig(buf, format='png')
-    plt.close()
+    # Отримання вибраних категорій від користувача
+    selected_x = request.GET.get("x_category", "x1")  # За замовчуванням x1
+    selected_y = request.GET.get("y_category", "y1")  # За замовчуванням y1
 
-    # Кодування графіку в base64 для передачі у шаблон
-    image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
-    buf.close()
+    # Створення DataFrame на основі вибору
+    df = pd.DataFrame({
+        'x': data_options['x'][selected_x],
+        'y': data_options['y'][selected_y]
+    })
 
-    # Передача графіку у шаблон
+    # Побудова графіка
+    fig = px.line(df, x='x', y='y', title='Динамічний графік', markers=True)
+    fig.update_layout(
+        xaxis_title='Вісь X',
+        yaxis_title='Вісь Y'
+    )
+
+    # Конвертація графіка у HTML
+    plot_html = fig.to_html(full_html=False)
+
     context = {
-        'plot_image': image_base64
+        'plot_html': plot_html,
+        'data_options': data_options,
+        'selected_x': selected_x,
+        'selected_y': selected_y
     }
     return render(request, "visual/visual.html", context)
