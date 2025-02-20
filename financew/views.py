@@ -32,9 +32,9 @@ def new_finoperation(request, budget_id):
         if form.is_valid():
             new_finoperation = form.save(commit=False) # commit=false не записує об'єкт в базу даних
             new_finoperation.budget = budget # зберегти запис за бюджетом який ми витягли з БД (на початку функції)
-            if new_finoperation.type == "EXPENSE":
+            if new_finoperation.type == "expense":
                 budget.amount = budget.amount - new_finoperation.amount
-            else:
+            elif new_finoperation.type == "income":
                 budget.amount = budget.amount + new_finoperation.amount
             budget.save()
             new_finoperation.save() # тут воно вже зберігає з правильним бюджетом
