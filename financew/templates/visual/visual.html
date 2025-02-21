@@ -1,52 +1,39 @@
 {% extends 'financew/base.html' %}
 {% block content %}
     <style>
-        /* Стилі */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
-            margin: 0;
-            padding: 20px;
-        }
-        h1 {
+        .form-container {
+            margin-bottom: 20px;
             text-align: center;
+        }
+        .form-container select, .form-container button {
+            padding: 10px;
+            margin: 5px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        .form-container button {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+        .form-container button:hover {
+            background-color: #0056b3;
         }
         .plot-container {
-            background-color: #fff;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            max-width: 800px;
-            margin: 20px auto;
-        }
-        .form-container {
+            margin-top: 20px;
             text-align: center;
-            margin-bottom: 20px;
-        }
-        select, button {
-            padding: 8px;
-            margin: 5px;
-            font-size: 16px;
         }
     </style>
 
-    <h1>Візуалізація даних</h1>
+    <h1>Візуалізація фінансових операцій</h1>
 
-    <!-- Форма для вибору категорій -->
+    <!-- Форма для вибору інтервалу часу -->
     <div class="form-container">
-        <form method="GET">
-            <label for="x_category">Виберіть X:</label>
-            <select name="x_category" id="x_category">
-                {% for key, value in data_options.x.items %}
-                    <option value="{{ key }}" {% if key == selected_x %}selected{% endif %}>{{ key }}</option>
-                {% endfor %}
-            </select>
-
-            <label for="y_category">Виберіть Y:</label>
-            <select name="y_category" id="y_category">
-                {% for key, value in data_options.y.items %}
-                    <option value="{{ key }}" {% if key == selected_y %}selected{% endif %}>{{ key }}</option>
+        <form method="GET" action="{% url 'plots:visualisation' %}">
+            <label for="time_interval">Оберіть інтервал:</label>
+            <select name="time_interval" id="time_interval">
+                {% for key, value in data_options.time_intervals.items %}
+                    <option value="{{ key }}" {% if selected_interval == key %}selected{% endif %}>{{ value }}</option>
                 {% endfor %}
             </select>
 
@@ -54,7 +41,7 @@
         </form>
     </div>
 
-    <!-- Контейнер для графіка -->
+    <!-- Графік -->
     <div class="plot-container">
         {{ plot_html|safe }}
     </div>

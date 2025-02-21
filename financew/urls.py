@@ -1,7 +1,7 @@
 """Ввзначає URL шаблони для financew"""
 
-from django.urls import path
-
+# from django.urls import path
+from django.urls import path, include
 from . import views
 
 app_name = "financew"
@@ -13,9 +13,6 @@ urlpatterns = [
     path("new_finoperation/<int:budget_id>/", views.new_finoperation, name='new_finoperation'),
     path('register/', views.register, name='register'),
     path('login/', views.user_login, name='login'),
-    path('logout/', views.user_logout, name='logout'),
-
-    path("visualisation/", views.visualisation, name='visualisation'),
-
+    path('logout/', views.user_logout, name='logout')
 
 ]
