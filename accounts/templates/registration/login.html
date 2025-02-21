@@ -1,9 +1,29 @@
 {% extends 'financew/base.html' %}
+
 {% block content %}
-<h2>Вхід</h2>
-<form method="post">
+  <h2>Вхід</h2>
+
+  <form method="post">
     {% csrf_token %}
+
+    <!-- Перевірка на помилки -->
+    {% if form.errors %}
+      <div class="errors">
+        <p>Будь ласка, виправте помилки у формі:</p>
+        <ul>
+          {% for field in form %}
+            {% for error in field.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
     {{ form.as_p }}
     <button type="submit">Увійти</button>
-</form>
+  </form>
+
+  <p>Не маєте акаунту? <a href="{% url 'accounts:register' %}">Зареєструйтесь тут</a></p>
+  <p><a href="#">Забули пароль?</a></p>
 {% endblock %}

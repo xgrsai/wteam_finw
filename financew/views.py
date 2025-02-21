@@ -3,7 +3,7 @@ from .models import Budget, FinOperation
 from .forms import BudgetForm, FinOperationForm
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
-from .forms import CustomUserCreationForm, CustomAuthenticationForm
+#from .forms import CustomUserCreationForm, CustomAuthenticationForm
 
 def index(request):
     """головна сторінка фінансиW з бюджетами"""
