@@ -2,7 +2,7 @@
 {% block content %}
 
 <!-- Кнопка для редагування бюджету -->
-<a href="{% url "financew:new_finoperation" budget.id %}"">Додати нову фінансову операцію</a>
+<a href="{% url "financew:new_finoperation" budget.id %}">Додати нову фінансову операцію</a>
 
 <!-- Форма для редагування бюджету (спочатку прихована) -->
 <div id="edit-budget-form" style="display: none;">
@@ -45,7 +45,7 @@
         </form>
     </div>
 
-    <!-- Посилання на видалення операції -->
+    <!-- видалення операції -->
     <a href="{% url 'financew:delete_finoperation' finoperation.id %}" style="color: red; text-decoration: none;">🗑 Видалити</a>
 </div>
 {% empty %}

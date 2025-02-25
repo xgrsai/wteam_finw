@@ -117,7 +117,7 @@ def edit_budget(request, budget_id):
         return redirect('financew:budget', budget_id=budget.id)
 
     context = {'budget': budget}
-    return render(request, 'financew/edit_budget.html', context)
+    return render(request, 'financew/budget.html', context)
 
 @login_required
 def edit_finoperation(request, finoperation_id):
@@ -141,5 +141,5 @@ def edit_finoperation(request, finoperation_id):
         return redirect('financew:budget', budget_id=budget.id)
 
     context = {'finoperation': finoperation, 'budget': budget}
-    return render(request, 'financew/edit_finoperation.html', context)
+    return render(request, 'financew/budget.html', context)
 
