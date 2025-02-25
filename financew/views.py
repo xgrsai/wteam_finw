@@ -1,24 +1,23 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
+from decimal import Decimal
+from django.contrib.auth.decorators import login_required
+
 from .models import Budget, FinOperation
 from .forms import BudgetForm, FinOperationForm
 
-from django.contrib.auth import login, authenticate, logout
-from django.contrib.auth.decorators import login_required
-#from .forms import CustomUserCreationForm, CustomAuthenticationForm
-
-from django.shortcuts import render, get_object_or_404, redirect
-
-from decimal import Decimal
-
-
-
 def index(request):
+    """головна сторінка фінансиW з бюджетами"""
+    # budgets = Budget.objects.all()
+    # context = {'budgets': budgets}
 
+    return render(request, "financew/index.html")
+
+def my(request):
     """головна сторінка фінансиW з бюджетами"""
     budgets = Budget.objects.all()
     context = {'budgets': budgets}
 
-    return render(request, "financew/index.html", context)
+    return render(request, "financew/my.html", context)
 
 def budget(request, budget_id):
     """сторінка з бюджетами"""
@@ -54,33 +53,6 @@ def new_finoperation(request, budget_id):
     return render(request, 'financew/new_finoperation.html', context) # потім дані з context можна використовувати у шаблоні 
 
 
-# def register(request):
-#     if request.method == 'POST':
-#         form = CustomUserCreationForm(request.POST)
-#         if form.is_valid():
-#             user = form.save()
-#             login(request, user)
-#             return redirect('/index')  # Перенаправлення на головну сторінку після реєстрації
-#     else:
-#         form = CustomUserCreationForm()
-#     return render(request, 'registration/register.html', {'form': form})
-#
-# def user_login(request):
-#     if request.method == 'POST':
-#         form = CustomAuthenticationForm(data=request.POST)
-#         if form.is_valid():
-#             user = form.get_user()
-#             login(request, user)
-#             return redirect('/index')  # Перенаправлення на головну сторінку після входу
-#     else:
-#         form = CustomAuthenticationForm()
-#     return render(request, 'registration/login.html', {'form': form})
-#
-# @login_required
-# def user_logout(request):
-#     logout(request)
-#     return redirect('login')  # Перенаправлення на сторінку входу після виходу
-
 def delete_finoperation(request, finoperation_id):
     """Видалення фінансової операції та оновлення бюджету"""
     finoperation = FinOperation.objects.get(id=finoperation_id)
@@ -110,9 +82,8 @@ def edit_budget(request, budget_id):
     context = {'budget': budget}
     return render(request, 'financew/edit_budget.html', context)
 
-# Редагування фінансової операції
-
 def edit_finoperation(request, finoperation_id):
+    """Редагування фінансової операції"""
     finoperation = get_object_or_404(FinOperation, id=finoperation_id)
     budget = finoperation.budget
 

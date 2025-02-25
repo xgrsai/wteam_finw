@@ -1,0 +1,10 @@
+{% extends 'financew/base.html' %}
+{% block content %}
+{% for budget in budgets %}<!-- воно бере по назві ключа -->
+  <li>
+    <a href="{% url 'financew:budget' budget.id %}">{{ budget.name }} {{ budget.amount }} {{ budget.currency }}</a>
+  </li> 
+  {% empty %}
+  <li>Бюджети не знайдено</li>
+  {% endfor %}
+{% endblock content %}

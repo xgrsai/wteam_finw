@@ -34,9 +34,11 @@ INSTALLED_APPS = [
     # кастомні додатки
     "financew",
     "plots",
-    'django_extensions',
     "accounts",
 
+    #сторонні додатки
+    "django_extensions",
+    
     # дефолтні додатки
     "django.contrib.admin",
     "django.contrib.auth",
