@@ -1,0 +1,41 @@
+{% extends 'financew/base.html' %}
+
+{% block content %}
+  <h2>Реєстрація</h2>
+
+  <form method="post">
+    {% csrf_token %}
+
+    <!-- Перевірка на помилки -->
+    {% if form.errors %}
+      <div class="errors">
+        <p>Будь ласка, виправте помилки у формі:</p>
+        <ul>
+          {% for field in form %}
+            {% for error in field.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    <div>
+        <label for="{{ form.username.id_for_label }}">Username:</label>
+        {{ form.username }}
+    </div>
+    <div>
+        <label for="{{ form.email.id_for_label }}">Email:</label>
+        {{ form.email }}
+    </div>
+    <div>
+        <label for="{{ form.password1.id_for_label }}">Password:</label>
+        {{ form.password1 }}
+    </div>
+    <div>
+        <label for="{{ form.password2.id_for_label }}">Password confirmation:</label>
+        {{ form.password2 }}
+    </div>
+    <button type="submit">Зареєструватися</button>
+  </form>
+{% endblock %}
