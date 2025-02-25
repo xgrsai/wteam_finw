@@ -1,0 +1,17 @@
+{% extends 'financew/base.html' %}
+{% block content %}
+    <h2>Редагувати фінансову операцію</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <label for="amount">Сума операції:</label>
+        <input type="number" name="amount" value="{{ finoperation.amount }}" required>
+
+        <label for="type">Тип операції:</label>
+        <select name="type">
+            <option value="expense" {% if finoperation.type == 'expense' %}selected{% endif %}>Витрата</option>
+            <option value="income" {% if finoperation.type == 'income' %}selected{% endif %}>Прибуток</option>
+        </select>
+
+        <button type="submit">Зберегти зміни</button>
+    </form>
+{% endblock content %}
