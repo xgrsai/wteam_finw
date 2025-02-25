@@ -1,9 +1,16 @@
 from django.shortcuts import render, redirect
 from .models import Budget, FinOperation
 from .forms import BudgetForm, FinOperationForm
+
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
-from .forms import CustomUserCreationForm, CustomAuthenticationForm
+#from .forms import CustomUserCreationForm, CustomAuthenticationForm
+
+from django.shortcuts import render, get_object_or_404, redirect
+
+from decimal import Decimal
+
+
 
 def index(request):
 
@@ -46,79 +53,84 @@ def new_finoperation(request, budget_id):
     context = {'budget': budget, 'form': form}
     return render(request, 'financew/new_finoperation.html', context) # потім дані з context можна використовувати у шаблоні 
 
-def register(request):
+
+# def register(request):
+#     if request.method == 'POST':
+#         form = CustomUserCreationForm(request.POST)
+#         if form.is_valid():
+#             user = form.save()
+#             login(request, user)
+#             return redirect('/index')  # Перенаправлення на головну сторінку після реєстрації
+#     else:
+#         form = CustomUserCreationForm()
+#     return render(request, 'registration/register.html', {'form': form})
+#
+# def user_login(request):
+#     if request.method == 'POST':
+#         form = CustomAuthenticationForm(data=request.POST)
+#         if form.is_valid():
+#             user = form.get_user()
+#             login(request, user)
+#             return redirect('/index')  # Перенаправлення на головну сторінку після входу
+#     else:
+#         form = CustomAuthenticationForm()
+#     return render(request, 'registration/login.html', {'form': form})
+#
+# @login_required
+# def user_logout(request):
+#     logout(request)
+#     return redirect('login')  # Перенаправлення на сторінку входу після виходу
+
+def delete_finoperation(request, finoperation_id):
+    """Видалення фінансової операції та оновлення бюджету"""
+    finoperation = FinOperation.objects.get(id=finoperation_id)
+    budget = finoperation.budget
+
+    # Оновлення бюджету при видаленні операції
+    if finoperation.type == "expense":
+        budget.amount += finoperation.amount
+    elif finoperation.type == "income":
+        budget.amount -= finoperation.amount
+    budget.save()
+
+    finoperation.delete()
+    return redirect('financew:budget', budget_id=budget.id)
+
+def edit_budget(request, budget_id):
+    budget = get_object_or_404(Budget, id=budget_id)
+    
     if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request, user)
-            return redirect('/index')  # Перенаправлення на головну сторінку після реєстрації
-    else:
-        form = CustomUserCreationForm()
-    return render(request, 'registration/register.html', {'form': form})
+        # Редагувати дані бюджету
+        budget.name = request.POST.get('name')
+        budget.amount = float(request.POST.get('amount'))
+        budget.currency = request.POST.get('currency')
+        budget.save()
+        return redirect('financew:budget', budget_id=budget.id)
 
-def user_login(request):
+    context = {'budget': budget}
+    return render(request, 'financew/edit_budget.html', context)
+
+# Редагування фінансової операції
+
+def edit_finoperation(request, finoperation_id):
+    finoperation = get_object_or_404(FinOperation, id=finoperation_id)
+    budget = finoperation.budget
+
     if request.method == 'POST':
-        form = CustomAuthenticationForm(data=request.POST)
-        if form.is_valid():
-            user = form.get_user()
-            login(request, user)
-            return redirect('/index')  # Перенаправлення на головну сторінку після входу
-    else:
-        form = CustomAuthenticationForm()
-    return render(request, 'registration/login.html', {'form': form})
+        # Перетворення суми на Decimal
+        finoperation.amount = Decimal(request.POST.get('amount'))
+        finoperation.type = request.POST.get('type')
+        finoperation.save()
 
-@login_required
-def user_logout(request):
-    logout(request)
-    return redirect('login')  # Перенаправлення на сторінку входу після виходу
+        # Оновлення бюджету після зміни операції
+        if finoperation.type == "expense":
+            budget.amount -= finoperation.amount
+        elif finoperation.type == "income":
+            budget.amount += finoperation.amount
+        budget.save()
 
+        return redirect('financew:budget', budget_id=budget.id)
 
-
-
-import plotly.express as px
-import pandas as pd
-
-def visualisation(request):
-    """Сторінка візуалізації з вибором категорій"""
-
-    # Дані для вибору категорій
-    data_options = {
-        'x': {
-            'x1': [1, 2, 3, 4],
-            'x2': [10, 20, 30, 40]
-        },
-        'y': {
-            'y1': [10, 20, 25, 30],
-            'y2': [5, 15, 35, 50]
-        }
-    }
-
-    # Отримання вибраних категорій від користувача
-    selected_x = request.GET.get("x_category", "x1")  # За замовчуванням x1
-    selected_y = request.GET.get("y_category", "y1")  # За замовчуванням y1
-
-    # Створення DataFrame на основі вибору
-    df = pd.DataFrame({
-        'x': data_options['x'][selected_x],
-        'y': data_options['y'][selected_y]
-    })
-
-    # Побудова графіка
-    fig = px.line(df, x='x', y='y', title='Динамічний графік', markers=True)
-    fig.update_layout(
-        xaxis_title='Вісь X',
-        yaxis_title='Вісь Y'
-    )
-
-    # Конвертація графіка у HTML
-    plot_html = fig.to_html(full_html=False)
-
-    context = {
-        'plot_html': plot_html,
-        'data_options': data_options,
-        'selected_x': selected_x,
-        'selected_y': selected_y
-    }
-    return render(request, "visual/visual.html", context)
+    context = {'finoperation': finoperation, 'budget': budget}
+    return render(request, 'financew/edit_finoperation.html', context)
 

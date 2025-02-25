@@ -35,6 +35,8 @@ INSTALLED_APPS = [
     "financew",
     "plots",
     'django_extensions',
+    "accounts",
+
     # дефолтні додатки
     "django.contrib.admin",
     "django.contrib.auth",
@@ -60,7 +62,7 @@ ROOT_URLCONF = "finw_project.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        'DIRS': [BASE_DIR / 'financew' / 'templates'],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
