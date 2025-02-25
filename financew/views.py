@@ -1,9 +1,16 @@
 from django.shortcuts import render, redirect
 from .models import Budget, FinOperation
 from .forms import BudgetForm, FinOperationForm
+
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 #from .forms import CustomUserCreationForm, CustomAuthenticationForm
+
+from django.shortcuts import render, get_object_or_404, redirect
+
+from decimal import Decimal
+
+
 
 def index(request):
     """головна сторінка фінансиW з бюджетами"""
@@ -45,6 +52,7 @@ def new_finoperation(request, budget_id):
     context = {'budget': budget, 'form': form}
     return render(request, 'financew/new_finoperation.html', context) # потім дані з context можна використовувати у шаблоні 
 
+
 # def register(request):
 #     if request.method == 'POST':
 #         form = CustomUserCreationForm(request.POST)
@@ -71,3 +79,57 @@ def new_finoperation(request, budget_id):
 # def user_logout(request):
 #     logout(request)
 #     return redirect('login')  # Перенаправлення на сторінку входу після виходу
+
+def delete_finoperation(request, finoperation_id):
+    """Видалення фінансової операції та оновлення бюджету"""
+    finoperation = FinOperation.objects.get(id=finoperation_id)
+    budget = finoperation.budget
+
+    # Оновлення бюджету при видаленні операції
+    if finoperation.type == "expense":
+        budget.amount += finoperation.amount
+    elif finoperation.type == "income":
+        budget.amount -= finoperation.amount
+    budget.save()
+
+    finoperation.delete()
+    return redirect('financew:budget', budget_id=budget.id)
+
+def edit_budget(request, budget_id):
+    budget = get_object_or_404(Budget, id=budget_id)
+    
+    if request.method == 'POST':
+        # Редагувати дані бюджету
+        budget.name = request.POST.get('name')
+        budget.amount = float(request.POST.get('amount'))
+        budget.currency = request.POST.get('currency')
+        budget.save()
+        return redirect('financew:budget', budget_id=budget.id)
+
+    context = {'budget': budget}
+    return render(request, 'financew/edit_budget.html', context)
+
+# Редагування фінансової операції
+
+def edit_finoperation(request, finoperation_id):
+    finoperation = get_object_or_404(FinOperation, id=finoperation_id)
+    budget = finoperation.budget
+
+    if request.method == 'POST':
+        # Перетворення суми на Decimal
+        finoperation.amount = Decimal(request.POST.get('amount'))
+        finoperation.type = request.POST.get('type')
+        finoperation.save()
+
+        # Оновлення бюджету після зміни операції
+        if finoperation.type == "expense":
+            budget.amount -= finoperation.amount
+        elif finoperation.type == "income":
+            budget.amount += finoperation.amount
+        budget.save()
+
+        return redirect('financew:budget', budget_id=budget.id)
+
+    context = {'finoperation': finoperation, 'budget': budget}
+    return render(request, 'financew/edit_finoperation.html', context)
+
