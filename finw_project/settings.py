@@ -33,6 +33,8 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     # кастомні додатки
     "financew",
+    "plots",
+    'django_extensions',
     "accounts",
 
     # дефолтні додатки

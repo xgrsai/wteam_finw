@@ -13,6 +13,7 @@ from decimal import Decimal
 
 
 def index(request):
+
     """головна сторінка фінансиW з бюджетами"""
     budgets = Budget.objects.all()
     context = {'budgets': budgets}
