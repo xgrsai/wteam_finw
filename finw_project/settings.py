@@ -131,3 +131,8 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# мої налаштування
+LOGIN_REDIRECT_URL = 'financew:my'
+LOGOUT_REDIRECT_URL = 'financew:index'
+LOGIN_URL = 'accounts:login'

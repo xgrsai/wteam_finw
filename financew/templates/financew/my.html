@@ -7,4 +7,36 @@
   {% empty %}
   <li>Бюджети не знайдено</li>
   {% endfor %}
+  <!-- Кнопка для додавання нового бюджету -->
+<button id="add-budget-btn">Додати новий бюджет</button>
+
+<!-- Форма для додавання нового бюджету (спочатку прихована) -->
+<div id="add-budget-form" style="display: none;">
+  <form action="{% url 'financew:my' %}" method="post"> <!-- action - куди відправляється форма-->
+    {% csrf_token %} <!--токен CSRF, який додається до кожної форми, що дозволяє серверу перевіряти, чи запит дійсно надійшов з авторизованого джерела (тобто з вашого веб-сайту, а не з якогось іншого, створеного зловмисником).-->
+    {{ form.as_div }}
+    <button name="submit">Додати бюджет</button>
+    <button id="cancel-btn">Скасувати</button>
+  </form> </div>
+
+  <script>
+    // Отримуємо елементи
+    const addBudgetBtn = document.getElementById("add-budget-btn");
+    const addBudgetForm = document.getElementById("add-budget-form");
+    const cancelBtn = document.getElementById("cancel-btn");
+
+    // Показуємо форму для додавання бюджету
+    addBudgetBtn.addEventListener("click", function(event) {
+        event.preventDefault();
+        addBudgetForm.style.display = "block"; // Показуємо форму
+        addBudgetBtn.style.display = "none"; // Приховуємо кнопку додавання
+    });
+
+    // Скасувати додавання бюджету
+    cancelBtn.addEventListener("click", function() {
+        addBudgetForm.style.display = "none"; // Приховуємо форму
+        addBudgetBtn.style.display = "inline"; // Показуємо кнопку додавання
+    });
+</script>
+
 {% endblock content %}

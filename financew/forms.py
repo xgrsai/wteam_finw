@@ -7,7 +7,7 @@ class BudgetForm(forms.ModelForm):
     class Meta:
         model = Budget
         fields = ['name','amount','currency']
-        labels = {'name':'Ім\'я','amount': '', 'currency': 'Валюта' }
+        labels = {'name':'Ім\'я','amount': 'Сума', 'currency': 'Валюта' }
 
 class FinOperationForm(forms.ModelForm):
     class Meta:

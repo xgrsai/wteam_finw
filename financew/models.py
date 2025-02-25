@@ -1,19 +1,5 @@
 from django.db import models
-"""1. Категорія (Category)
-name — Назва категорії (наприклад, "Ресторан", "Магазин", "Заробітня плата", "Віддали борг") [користувач може сам створювати категорії]
-user_id (FK) - якому користувачу належить категорія
-
-2. Фінансова операція (Fin Opration)
-user_id (FK) — Ідентифікатор користувача (зв'язок з User).
-category_id (FK) — Ідентифікатор категорії (зв'язок з Category).
-budget_id (FK) — одна операція може бути частиною конкретного бюджету
-operation_amount — Сума операції.
-transaction_type — Тип операції: 'income' або 'expense' (лише дві)
-transaction_date — Дата та час транзакції.
-
-3. Бюджет (Budget) - бюджет один
-user_id (FK)
-budget_amount — Загальна сума бюджету."""
+from django.contrib.auth.models import User
 
 # Create your models here.
 class Budget(models.Model):
@@ -27,6 +13,7 @@ class Budget(models.Model):
     amount = models.DecimalField(max_digits=19,decimal_places=2)
     name = models.CharField(max_length=200, null=True) # імя гаманця
     currency = models.CharField(blank=False, choices=CURRENCIES, default="UAH", max_length=17)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE) # зовнішній ключ на користувача (власника бюджет)
 
     class Meta:
         verbose_name_plural = 'budgets'
@@ -38,7 +25,8 @@ class Budget(models.Model):
 class Category(models.Model):
     """категорії для фін операцій (напр. їжа, магазин, розваги (користувач сам їх дає))"""
     name = models.CharField(max_length=200)
-    
+    owner = models.ForeignKey(User, on_delete=models.CASCADE) # зовнішній ключ на користувача (власника категорії)
+
     class Meta:
         verbose_name_plural = 'categories'
     
