@@ -45,7 +45,7 @@ def budget(request, budget_id):
     if budget.owner != request.user: # для того щоб не переглядати чужі бюджети
         raise Http404
 
-    # форма 
+    # форма для зміни поточного бюджету
     if request.method != 'POST':
         # No data submitted; create a blank form.
         form = BudgetForm(instance=budget)
