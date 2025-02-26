@@ -41,12 +41,12 @@
                 <option value="expense" {% if finoperation.type == 'expense' %}selected{% endif %}>Витрата</option>
                 <option value="income" {% if finoperation.type == 'income' %}selected{% endif %}>Прибуток</option>
             </select>
-            <button type="submit" style="color: green;">Змінити</button>
+            <button type="submit" >Змінити</button>
         </form>
     </div>
 
     <!-- видалення операції -->
-    <a href="{% url 'financew:delete_finoperation' finoperation.id %}" style="color: red; text-decoration: none;">🗑 Видалити</a>
+    <a href="{% url 'financew:delete_finoperation' finoperation.id %}" >🗑 Видалити</a>
 </div>
 {% empty %}
 <p>Нема фінансових операцій</p>

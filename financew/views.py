@@ -127,15 +127,17 @@ def edit_finoperation(request, finoperation_id):
 
     if request.method == 'POST':
         # Перетворення суми на Decimal
+        finop_amount_old = finoperation.amount
         finoperation.amount = Decimal(request.POST.get('amount'))
         finoperation.type = request.POST.get('type')
-        finoperation.save()
 
         # Оновлення бюджету після зміни операції
         if finoperation.type == "expense":
-            budget.amount -= finoperation.amount
+            budget.amount += finoperation.amount - finop_amount_old
         elif finoperation.type == "income":
-            budget.amount += finoperation.amount
+            budget.amount += finoperation.amount - finop_amount_old
+
+        finoperation.save() # ніби тут краще
         budget.save()
 
         return redirect('financew:budget', budget_id=budget.id)
