@@ -1,33 +1,30 @@
 {% extends 'financew/base.html' %} 
 {% block content %}
-
-<!-- Кнопка для редагування бюджету -->
-<a href="{% url "financew:new_finoperation" budget.id %}">Додати нову фінансову операцію</a>
+<p>{{ budget.name }} {{ budget.amount }} {{ budget.currency }} <!-- Кнопка для редагування бюджету --><button id="edit-budget-btn">Змінити дані</button></p>
 
 <!-- Форма для редагування бюджету (спочатку прихована) -->
 <div id="edit-budget-form" style="display: none;">
-    <form method="POST" action="{% url 'financew:edit_budget' budget.id %}">
+    <form method="post" action="{% url 'financew:budget' budget.id %}">
         {% csrf_token %}
-        <label for="name">Назва бюджету:</label>
+        {{form.as_div}}
+        {% comment %} <label for="name">Назва бюджету:</label>
         <input type="text" name="name" value="{{ budget.name }}" required>
         <label for="amount">Сума:</label>
         <input type="number" name="amount" value="{{ budget.amount }}" required>
         <label for="currency">Валюта:</label>
-        <input type="text" name="currency" value="{{ budget.currency }}" required>
+        <input type="text" name="currency" value="{{ budget.currency }}" required> {% endcomment %}
         
-        <button type="submit" style="color: green;">Зберегти зміни</button>
-        <button type="button" id="cancel-edit-btn" style="color: red;">Скасувати</button>
+        <button type="submit">Зберегти зміни</button>
+        <button type="button" id="cancel-edit-btn">Скасувати</button>
     </form>
 </div>
 
-<p>{{ budget.name }} {{ budget.amount }} {{ budget.currency }}</p>
-<a href="#" id="edit-budget-btn" style="color: blue; text-decoration: none;">Змінити дані</a>
+<a href="{% url "financew:new_finoperation" budget.id %}">Додати нову фінансову операцію</a>
 {% for finoperation in finoperations %}
 <div style="display: flex; align-items: center; gap: 10px;">
 
     <!-- Виведення фінансової операції -->
     <span>{{ finoperation.get_type_display }} - {{ finoperation.amount }} - {{ finoperation.date_added }}</span>
-    
 
     <!-- Кнопка для редагування фінансової операції -->
     <a href="#" class="edit-finoperation-btn" data-finoperation-id="{{ finoperation.id }}" style="color: blue; text-decoration: none;">Змінити операцію</a>
