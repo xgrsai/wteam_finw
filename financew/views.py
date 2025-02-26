@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from decimal import Decimal
 from django.contrib.auth.decorators import login_required
+from django.http import Http404
 
 from .models import Budget, FinOperation
 from .forms import BudgetForm, FinOperationForm
@@ -16,7 +17,7 @@ def index(request):
 def my(request):
     """головна сторінка фінансиW з бюджетами та додати новий бюджет"""
     budgets = Budget.objects.filter(owner=request.user).all() # взяти всі бюджети що належать цьому користувачу
-
+    
     if request.method != 'POST':
         # No data submitted; create a blank form.
         form = BudgetForm()
@@ -55,8 +56,11 @@ def new_budget(request):
 
 @login_required
 def budget(request, budget_id):
-    """сторінка з бюджетами"""
+    """сторінка бюджету з фінопераціями"""
     budget = Budget.objects.get(id=budget_id) 
+
+    if budget.owner != request.user: # для того щоб не переглядати чужі бюджети
+        raise Http404
 
     finoperations = budget.finoperation_set.order_by('-date_added') # мінус означає від найновіших до старіших
     context = {'budget': budget, 'finoperations': finoperations}
@@ -66,6 +70,9 @@ def budget(request, budget_id):
 def new_finoperation(request, budget_id):
     """додати нову фіноперацію для бюджету"""
     budget = Budget.objects.get(id=budget_id)
+
+    if budget.owner != request.user:
+        raise Http404
 
     if request.method != 'POST':
         # No data submitted; create a blank form.
@@ -94,6 +101,9 @@ def delete_finoperation(request, finoperation_id):
     finoperation = FinOperation.objects.get(id=finoperation_id)
     budget = finoperation.budget
 
+    if budget.owner != request.user:
+        raise Http404
+
     # Оновлення бюджету при видаленні операції
     if finoperation.type == "expense":
         budget.amount += finoperation.amount
@@ -107,7 +117,10 @@ def delete_finoperation(request, finoperation_id):
 @login_required
 def edit_budget(request, budget_id):
     budget = get_object_or_404(Budget, id=budget_id)
-    
+
+    if budget.owner != request.user:
+        raise Http404
+
     if request.method == 'POST':
         # Редагувати дані бюджету
         budget.name = request.POST.get('name')
@@ -125,18 +138,26 @@ def edit_finoperation(request, finoperation_id):
     finoperation = get_object_or_404(FinOperation, id=finoperation_id)
     budget = finoperation.budget
 
+    if budget.owner != request.user:
+        raise Http404
+
     if request.method == 'POST':
         # Перетворення суми на Decimal
         finop_amount_old = finoperation.amount
+        finop_type_old = finoperation.type
         finoperation.amount = Decimal(request.POST.get('amount'))
         finoperation.type = request.POST.get('type')
 
         # Оновлення бюджету після зміни операції
-        if finoperation.type == "expense":
+        if finoperation.type == "expense" and finop_type_old == "expense":
+            budget.amount += finop_amount_old - finoperation.amount
+        elif finoperation.type == "income" and finop_type_old == "income":
             budget.amount += finoperation.amount - finop_amount_old
-        elif finoperation.type == "income":
-            budget.amount += finoperation.amount - finop_amount_old
-
+        elif finoperation.type == "income" and finop_type_old == "expense":
+            budget.amount += finoperation.amount + finop_amount_old
+        else: #якщо нова операція це витрати а стара операція це прибуток
+            budget.amount -= finoperation.amount + finop_amount_old
+        
         finoperation.save() # ніби тут краще
         budget.save()
 
