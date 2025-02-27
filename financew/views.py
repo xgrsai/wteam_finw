@@ -1,27 +1,74 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
+from decimal import Decimal
+from django.contrib.auth.decorators import login_required
+from django.http import Http404
 
 from .models import Budget, FinOperation
 from .forms import BudgetForm, FinOperationForm
 
-# Create your views here.
 def index(request):
     """головна сторінка фінансиW з бюджетами"""
-    budgets = Budget.objects.all()
-    context = {'budgets': budgets}
+    # budgets = Budget.objects.all()
+    # context = {'budgets': budgets}
 
-    return render(request, "financew/index.html", context)
+    return render(request, "financew/index.html")
 
+@login_required
+def my(request):
+    """головна сторінка фінансиW з бюджетом"""
+    budgets = Budget.objects.filter(owner=request.user).all() # взяти всі бюджети що належать цьому користувачу
+    
+    # форма для додавання нового бюджету
+    if request.method != 'POST':
+        # No data submitted; create a blank form.
+        form = BudgetForm()
+    else:
+        form = BudgetForm(data=request.POST) # аргумент передає значення полів форми
+        if form.is_valid():
+            new_budget = form.save(commit=False) # не зберігати одразу до бд
+            new_budget.owner = request.user #додати власником поточного залогіненого користувача
+            new_budget.save() # зберегти в бд
+            return redirect('financew:my')
+        
+        # Display a blank or invalid form.
+        
+    context = {'budgets': budgets, 'form':form }
+    return render(request, 'financew/my.html', context) # потім дані з context можна використовувати у шаблоні 
+
+ 
+
+@login_required
 def budget(request, budget_id):
-    """сторінка з бюджетами"""
-    budget = Budget.objects.get(id=budget_id)
+    """сторінка бюджету з фінопераціями"""
+    budget = Budget.objects.get(id=budget_id) 
+
+    if budget.owner != request.user: # для того щоб не переглядати чужі бюджети
+        raise Http404
+
+    # форма для зміни поточного бюджету
+    if request.method != 'POST':
+        # No data submitted; create a blank form.
+        form = BudgetForm(instance=budget)
+    else:
+        form = BudgetForm(instance=budget, data=request.POST) # бере існуючий запис і дані який надіслав користуввач (типу змінив текст)
+        if form.is_valid():
+            form.save() # типу запис до бд
+            return redirect('financew:budget', budget_id=budget.id)
+
 
     finoperations = budget.finoperation_set.order_by('-date_added') # мінус означає від найновіших до старіших
-    context = {'budget': budget, 'finoperations': finoperations}
+    context = {'budget': budget, 'finoperations': finoperations, 'form': form}
     return render(request, 'financew/budget.html', context)
 
+
+
+@login_required
 def new_finoperation(request, budget_id):
     """додати нову фіноперацію для бюджету"""
     budget = Budget.objects.get(id=budget_id)
+
+    if budget.owner != request.user:
+        raise Http404
 
     if request.method != 'POST':
         # No data submitted; create a blank form.
@@ -43,4 +90,116 @@ def new_finoperation(request, budget_id):
     # Display a blank or invalid form.
     context = {'budget': budget, 'form': form}
     return render(request, 'financew/new_finoperation.html', context) # потім дані з context можна використовувати у шаблоні 
+
+@login_required
+def delete_finoperation(request, finoperation_id):
+    """Видалення фінансової операції та оновлення бюджету"""
+    finoperation = FinOperation.objects.get(id=finoperation_id)
+    budget = finoperation.budget
+
+    if budget.owner != request.user:
+        raise Http404
+
+    # Оновлення бюджету при видаленні операції
+    if finoperation.type == "expense":
+        budget.amount += finoperation.amount
+    elif finoperation.type == "income":
+        budget.amount -= finoperation.amount
+    budget.save()
+
+    finoperation.delete()
+    return redirect('financew:budget', budget_id=budget.id)
+
+
+@login_required
+def edit_finoperation(request, finoperation_id):
+    """Редагування фінансової операції"""
+    finoperation = get_object_or_404(FinOperation, id=finoperation_id)
+    budget = finoperation.budget
+
+    if budget.owner != request.user:
+        raise Http404
+
+    if request.method == 'POST':
+        # Перетворення суми на Decimal
+        finop_amount_old = finoperation.amount
+        finop_type_old = finoperation.type
+        finoperation.amount = Decimal(request.POST.get('amount'))
+        finoperation.type = request.POST.get('type')
+
+        # Оновлення бюджету після зміни операції
+        if finoperation.type == "expense" and finop_type_old == "expense":
+            budget.amount += finop_amount_old - finoperation.amount
+        elif finoperation.type == "income" and finop_type_old == "income":
+            budget.amount += finoperation.amount - finop_amount_old
+        elif finoperation.type == "income" and finop_type_old == "expense":
+            budget.amount += finoperation.amount + finop_amount_old
+        else: #якщо нова операція це витрати а стара операція це прибуток
+            budget.amount -= finoperation.amount + finop_amount_old
+        
+        finoperation.save() # ніби тут краще
+        budget.save()
+
+        return redirect('financew:budget', budget_id=budget.id)
+
+    context = {'finoperation': finoperation, 'budget': budget}
+    return render(request, 'financew/budget.html', context)
+
+# @login_required
+# def new_budget(request):
+#     """додати новий бюджет"""
+#     if request.method != 'POST':
+#         # No data submitted; create a blank form.
+#         form = BudgetForm()
+#     else:
+#         # POST data submitted; process data.
+#         form = BudgetForm(data=request.POST) # аргумент передає значення полів форми
+#         if form.is_valid():
+#             new_budget = form.save(commit=False) # не зберігати одразу до бд
+#             new_budget.owner = request.user #додати власником поточного залогіненого користувача
+#             new_budget.save() # зберегти в бд
+#             return redirect('financew:my')
+    
+#     # Display a blank or invalid form.
+#     context = {'form': form}
+#     return render(request, 'financew/my.html', context) # потім дані з context можна використовувати у шаблоні
+
+# @login_required
+# def edit_budget(request, budget_id):
+#     """Edit an existing entry."""
+#     budget = Budget.objects.get(id=budget_id) # отримання запису по id
+    
+#     if budget.owner != request.user:
+#         raise Http404
+
+#     if request.method != 'POST':
+#         # Initial request; pre-fill form with the current entry.
+#         form = BudgetForm(instance=budget) # означає, що форма буде заповнена даними з конкретного entry, який ми передали як instance
+#     else:
+#         # POST data submitted; process data.
+#         form = BudgetForm(instance=budget, data=request.POST) # бере існуючий запис і дані який надіслав користуввач (типу змінив текст)
+#         if form.is_valid():
+#             form.save() # типу запис до бд
+#             return redirect('financew:budget', budget_id=budget.id)
+        
+#     context = {'budget': budget, 'form': form}
+#     return render(request, 'financew/budget.html', context)
+
+# @login_required
+# def edit_budget(request, budget_id):
+#     budget = get_object_or_404(Budget, id=budget_id)
+    
+#     if budget.owner != request.user:
+#         raise Http404
+
+#     if request.method == 'POST':
+#         # Редагувати дані бюджету
+#         budget.name = request.POST.get('name')
+#         budget.amount = float(request.POST.get('amount'))
+#         budget.currency = request.POST.get('currency')
+#         budget.save()
+#         return redirect('financew:budget', budget_id=budget.id)
+
+#     context = {'budget': budget}
+#     return render(request, 'financew/budget.html', context)
 

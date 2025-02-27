@@ -20,5 +20,10 @@ from django.urls import path, include
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("", include('financew.urls'))
+    # підключення графіків
+    path("", include('plots.urls')),
+    # Підключення financew
+    path('', include('financew.urls', namespace='financew')),
+    # Підключення модулю: accounts
+    path('accounts/', include('accounts.urls', namespace='accounts')),
 ]
