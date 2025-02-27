@@ -15,12 +15,25 @@ class Budget(models.Model):
     currency = models.CharField(blank=False, choices=CURRENCIES, default="UAH", max_length=17)
     owner = models.ForeignKey(User, on_delete=models.CASCADE) # зовнішній ключ на користувача (власника бюджет)
 
+
     class Meta:
         verbose_name_plural = 'budgets'
     
     def __str__(self):
         """Повернути нормальним текстом"""
         return f"{self.name} {self.amount}"
+
+class GoalBudget(Budget):
+    """бюджет-ціль, тобто сума яку користувач хоче назбирати"""
+    target_amount = models.DecimalField(max_digits=19,decimal_places=2)
+
+    class Meta:
+        verbose_name_plural = 'budgets'
+    
+    def __str__(self):
+        """Повернути нормальним текстом"""
+        return f"{self.name} {self.amount}"
+
 
 class Category(models.Model):
     """категорії для фін операцій (напр. їжа, магазин, розваги (користувач сам їх дає))"""

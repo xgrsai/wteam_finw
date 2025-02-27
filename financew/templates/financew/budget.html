@@ -1,5 +1,9 @@
-{% extends 'financew/base.html' %} 
+{% extends 'financew/base.html' %}
+{% load static %}
+
 {% block content %}
+<link rel="stylesheet" href="{% static 'styles.css' %}"> 
+
 <p>{{ budget.name }} {{ budget.amount }} {{ budget.currency }} <!-- Кнопка для редагування бюджету --><button id="edit-budget-btn">Змінити дані</button></p>
 
 <!-- Форма для редагування бюджету (спочатку прихована) -->
@@ -7,6 +11,7 @@
     <form method="post" action="{% url 'financew:budget' budget.id %}">
         {% csrf_token %}
         {{form.as_div}}
+        
         {% comment %} <label for="name">Назва бюджету:</label>
         <input type="text" name="name" value="{{ budget.name }}" required>
         <label for="amount">Сума:</label>
@@ -14,6 +19,13 @@
         <label for="currency">Валюта:</label>
         <input type="text" name="currency" value="{{ budget.currency }}" required> {% endcomment %}
         
+        {% for fm in form %}
+        <div class="form-group" style="border: 2px solid red; padding: 10px;">
+            <label>{{fm.label}}</label>
+            <div>{{fm}} </div>
+        </div>
+        {% endfor %} 
+
         <button type="submit">Зберегти зміни</button>
         <button type="button" id="cancel-edit-btn">Скасувати</button>
     </form>

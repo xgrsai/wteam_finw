@@ -3,8 +3,8 @@ from decimal import Decimal
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 
-from .models import Budget, FinOperation
-from .forms import BudgetForm, FinOperationForm
+from .models import Budget, FinOperation, GoalBudget
+from .forms import BudgetForm, FinOperationForm, GoalBudgetForm
 
 def index(request):
     """головна сторінка фінансиW з бюджетами"""
@@ -15,7 +15,7 @@ def index(request):
 
 @login_required
 def my(request):
-    """головна сторінка фінансиW з бюджетом"""
+    """головна сторінка фінансиW з бюджетом та додавання нового бюджету"""
     budgets = Budget.objects.filter(owner=request.user).all() # взяти всі бюджети що належать цьому користувачу
     
     # форма для додавання нового бюджету
@@ -31,7 +31,9 @@ def my(request):
             return redirect('financew:my')
         
         # Display a blank or invalid form.
-        
+    
+    new_goalbudget(request)    
+
     context = {'budgets': budgets, 'form':form }
     return render(request, 'financew/my.html', context) # потім дані з context можна використовувати у шаблоні 
 
@@ -144,6 +146,30 @@ def edit_finoperation(request, finoperation_id):
 
     context = {'finoperation': finoperation, 'budget': budget}
     return render(request, 'financew/budget.html', context)
+
+@login_required
+def goalbudgets(request):
+    goalbudgets = GoalBudget.objects.filter(owner=request.user).all() # взяти всі бюджети що належать цьому користувачу
+        
+    context = {'goalbudgets': goalbudgets}
+    return render(request, 'financew/my.html', context) # потім дані з context можна використовувати у шаблоні  
+
+def new_goalbudget(request):
+    """додавання бюджету-цілі"""
+    if request.method != 'POST':
+        form = GoalBudgetForm()
+    else:
+        form = GoalBudgetForm(data=request.POST) # аргумент передає значення полів форми
+        if form.is_valid():
+            new_goalbudget = form.save(commit=False) # не зберігати одразу до бд
+            new_goalbudget.owner = request.user #додати власником поточного залогіненого користувача
+            new_goalbudget.save() # зберегти в бд
+            return redirect('financew:my')
+    
+    
+    context = {'goalbudget_form': form}    
+    return render(request,"financew/my.html",context)
+
 
 # @login_required
 # def new_budget(request):
