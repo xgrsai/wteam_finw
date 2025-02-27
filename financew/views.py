@@ -6,6 +6,8 @@ from django.http import Http404
 from .models import Budget, FinOperation
 from .forms import BudgetForm, FinOperationForm
 
+from django.utils import timezone
+
 def index(request):
     """головна сторінка фінансиW з бюджетами"""
     # budgets = Budget.objects.all()
