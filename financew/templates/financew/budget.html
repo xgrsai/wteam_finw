@@ -10,19 +10,6 @@
 <div id="edit-budget-form" style="display: none;">
     <form method="post" action="{% url 'financew:budget' budget.id %}">
         {% csrf_token %}
-<!--ПЕРЕНЕСТИ В MY.HTML--> 
-        {{ form.as_div }}
-
-        <label for="category">Категорія:</label>
-        <select name="category">
-            {% for category in categories %}
-                <option value="{{ category.id }}" {% if budget.category.id == category.id %}selected{% endif %}>
-                    {{ category.name }}
-                </option>
-            {% endfor %}
-        </select>
-<!--ПЕРЕНЕСТИ В MY.HTML-->  
-
         {{form.as_div}}
         
         {% comment %} <label for="name">Назва бюджету:</label>
@@ -32,12 +19,12 @@
         <label for="currency">Валюта:</label>
         <input type="text" name="currency" value="{{ budget.currency }}" required> {% endcomment %}
         
-        {% for fm in form %}
+        {% comment %} {% for fm in form %}
         <div class="form-group" style="border: 2px solid red; padding: 10px;">
             <label>{{fm.label}}</label>
             <div>{{fm}} </div>
         </div>
-        {% endfor %} 
+        {% endfor %}  {% endcomment %}
 
 
         <button type="submit">Зберегти зміни</button>
