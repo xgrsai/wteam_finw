@@ -1,23 +1,75 @@
-{% extends 'financew/base.html' %}
-{% block content %}
-{% for budget in budgets %}<!-- воно бере по назві ключа -->
-  <li>
-    <a href="{% url 'financew:budget' budget.id %}">{{ budget.name }} {{ budget.amount }} {{ budget.currency }}</a>
-  </li> 
-  {% empty %}
-  <li>Бюджети не знайдено</li>
-  {% endfor %}
-  <!-- Кнопка для додавання нового бюджету -->
-<button id="add-budget-btn">Додати новий бюджет</button>
+{% extends 'financew/base.html' %} {% block content %} 
+{% for budget in budgets%}<!-- воно бере по назві ключа -->
 
+<!--показати бюджети користувача-->
+<li>
+  <a href="{% url 'financew:budget' budget.id %}"
+    >{{ budget.name }} {{ budget.amount }} {{ budget.currency }}</a
+  >
+</li>
+{% empty %}
+<li>Бюджети не знайдено</li>
+{% endfor %}
+
+<!-- Кнопка для додавання нового бюджету -->
+<button id="add-budget-btn">Додати новий бюджет</button>
 <!-- Форма для додавання нового бюджету (спочатку прихована) -->
-<div id="add-budget-form" style="display: none;">
-  <form action="{% url 'financew:my' %}" method="post"> <!-- action - куди відправляється форма-->
-    {% csrf_token %} <!--токен CSRF, який додається до кожної форми, що дозволяє серверу перевіряти, чи запит дійсно надійшов з авторизованого джерела (тобто з вашого веб-сайту, а не з якогось іншого, створеного зловмисником).-->
-    {{ form.as_div }}
-    <button name="submit">Додати бюджет</button>
-    <button id="cancel-btn">Скасувати</button>
-  </form> </div>
+<div id="add-budget-form" style="display: none">
+  <form action="{% url 'financew:my' %}" method="post">
+    <!-- action - куди відправляється форма-->
+    {% csrf_token %}
+    <!--токен CSRF, який додається до кожної форми, що дозволяє серверу перевіряти, чи запит дійсно надійшов з авторизованого джерела (тобто з вашого веб-сайту, а не з якогось іншого, створеного зловмисником).-->
+    
+    {% comment %} <div class="form-group" style="border: 2px solid red; padding: 10px">
+      <label for="{{ budget_form.name.id_for_label }}">{{ budget_form.name.label }}</label>
+      {{ budget_form.name }}
+    </div>
+
+    <div class="form-group" style="border: 2px solid red; padding: 10px">
+      <label for="{{ budget_form.amount.id_for_label }}"
+        >{{ budget_form.amount.label }}</label
+      >
+      {{ budget_form.amount }}
+    </div>
+
+    <div class="form-group" style="border: 2px solid red; padding: 10px">
+      <label for="{{ budget_form.currency.id_for_label }}"
+        >{{ budget_form.currency.label }}</label
+      >
+      {{ budget_form.currency }}
+    </div> {% endcomment %}
+
+    {{budgetform.as_div}} <!--форма для вводу бюджету-цілі все що зверху це то саме-->
+
+
+    <button button type="submit" name="action" value="budget">Додати бюджет</button>
+    <button id="cancel-btn-budget">Скасувати</button>
+  </form>
+</div>
+
+
+<!--бюджетицілі-->
+{% for goalbudget in goalbudgets%}<!-- воно бере по назві ключа -->
+<li>
+    {{ goalbudget.name }} {{ goalbudget.amount }}/{{ goalbudget.target_amount }} {{ goalbudget.currency }}
+</li>
+{% empty %}
+<li>Бюджети-цілі не знайдено</li>
+{% endfor %}
+
+<!-- Кнопка для додавання нового бюджету-цілі -->
+<button id="add-goalbudget-btn">Додати нову бюджет-ціль</button>
+<!-- Форма для додавання нового бюджету (спочатку прихована) -->
+<div id="add-goalbudget-form" style="display: none">
+   <form action="{% url 'financew:my' %}" method="post">
+    {%csrf_token%}
+    
+    {{goalbudgetform.as_div}} <!--форма для вводу бюджету цілі-->
+
+    <button button type="submit" name="action" value="goalbudget">Додати бюджет-ціль</button>
+    <button id="cancel-btn-goalbudget">Скасувати</button>
+  </form> 
+</div>
 
   
 
@@ -76,23 +128,42 @@ document.getElementById("category-form").addEventListener("submit", function(eve
   
 
   <script>
-    // Отримуємо елементи
-    const addBudgetBtn = document.getElementById("add-budget-btn");
-    const addBudgetForm = document.getElementById("add-budget-form");
-    const cancelBtn = document.getElementById("cancel-btn");
+  // Отримуємо елементи
+  const addBudgetBtn = document.getElementById("add-budget-btn");
+  const addBudgetForm = document.getElementById("add-budget-form");
+  const cancelBtnBudget = document.getElementById("cancel-btn-budget");
+  
+  const addGoalBudgetForm = document.getElementById("add-goalbudget-form");
+  const addGoalBudgetBtn = document.getElementById("add-goalbudget-btn");
+  const cancelBtnGoalBudget = document.getElementById("cancel-btn-goalbudget");
 
-    // Показуємо форму для додавання бюджету
-    addBudgetBtn.addEventListener("click", function(event) {
-        event.preventDefault();
-        addBudgetForm.style.display = "block"; // Показуємо форму
-        addBudgetBtn.style.display = "none"; // Приховуємо кнопку додавання
-    });
+  // Показуємо форму для додавання бюджету
+  addBudgetBtn.addEventListener("click", function (event) {
+    event.preventDefault();
+    addBudgetForm.style.display = "block"; // Показуємо форму
+    addBudgetBtn.style.display = "none"; // Приховуємо кнопку додавання
+  });
 
-    // Скасувати додавання бюджету
-    cancelBtn.addEventListener("click", function() {
-        addBudgetForm.style.display = "none"; // Приховуємо форму
-        addBudgetBtn.style.display = "inline"; // Показуємо кнопку додавання
-    });
+  // Скасувати додавання бюджету
+  cancelBtnBudget.addEventListener("click", function () {
+    addBudgetForm.style.display = "none"; // Приховуємо форму
+    addBudgetBtn.style.display = "inline"; // Показуємо кнопку додавання
+  });
+
+
+  // Показуємо форму для додавання бюджету-цілі
+  addGoalBudgetBtn.addEventListener("click", function (event) {
+    event.preventDefault();
+    addGoalBudgetForm.style.display = "block"; // Показуємо форму
+    addGoalBudgetBtn.style.display = "none"; // Приховуємо кнопку додавання
+  });
+
+  // Скасувати додавання бюджету-цілі
+  cancelBtnGoalBudget.addEventListener("click", function () {
+    addGoalBudgetForm.style.display = "none"; // Приховуємо форму
+    addGoalBudgetBtn.style.display = "inline"; // Показуємо кнопку додавання
+  });
+
 </script>
 
 {% endblock content %}

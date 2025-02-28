@@ -1,16 +1,17 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.validators import MinValueValidator
 
-# Create your models here.
-class Budget(models.Model):
-    """Бюджет яким володіє користувач"""
-    CURRENCIES = {
+CURRENCIES = {
         "UAH": "UAH",
         "USD": "USD",
         "EUR": "EUR",
     }
 
-    amount = models.DecimalField(max_digits=19,decimal_places=2)
+# Create your models here.
+class Budget(models.Model):
+    """Бюджет яким володіє користувач"""
+    amount = models.DecimalField(max_digits=19,decimal_places=2,default=0,validators=[MinValueValidator(0)])
     name = models.CharField(max_length=200, null=True) # імя гаманця
     currency = models.CharField(blank=False, choices=CURRENCIES, default="UAH", max_length=17)
     owner = models.ForeignKey(User, on_delete=models.CASCADE) # зовнішній ключ на користувача (власника бюджет)
@@ -21,6 +22,22 @@ class Budget(models.Model):
     def __str__(self):
         """Повернути нормальним текстом"""
         return f"{self.name} {self.amount}"
+
+class GoalBudget(models.Model):
+    """бюджет-ціль, тобто сума яку користувач хоче назбирати"""
+    target_amount = models.DecimalField(max_digits=19,decimal_places=2)
+    amount = models.DecimalField(max_digits=19,decimal_places=2,default=0,validators=[MinValueValidator(0)])
+    name = models.CharField(max_length=200, null=True, blank=True) # імя гаманця
+    currency = models.CharField(blank=False, choices=CURRENCIES, default="UAH", max_length=17)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE) # зовнішній ключ на користувача (власника бюджет)
+
+    class Meta:
+        verbose_name_plural = 'goalbudgets'
+    
+    def __str__(self):
+        """Повернути нормальним текстом"""
+        return f"{self.name} {self.amount}"
+
 
 class Category(models.Model):
     """категорії для фін операцій (напр. їжа, магазин, розваги (користувач сам їх дає))"""
