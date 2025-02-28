@@ -1,7 +1,9 @@
 {% extends 'financew/base.html' %} {% block content %} 
-{% for budget in budgets%}<!-- воно бере по назві ключа -->
+
 
 <!--показати бюджети користувача-->
+<div>Мої бюджети
+{% for budget in budgets%}<!-- воно бере по назві ключа -->
 <li>
   <a href="{% url 'financew:budget' budget.id %}"
     >{{ budget.name }} {{ budget.amount }} {{ budget.currency }}</a
@@ -42,13 +44,14 @@
     {{budgetform.as_div}} <!--форма для вводу бюджету-цілі все що зверху це то саме-->
 
 
-    <button button type="submit" name="action" value="budget">Додати бюджет</button>
+    <button type="submit">Додати бюджет</button>
     <button id="cancel-btn-budget">Скасувати</button>
   </form>
 </div>
-
+</div>
 
 <!--бюджетицілі-->
+<div>Мої бюджети-цілі
 {% for goalbudget in goalbudgets%}<!-- воно бере по назві ключа -->
 <li>
     {{ goalbudget.name }} {{ goalbudget.amount }}/{{ goalbudget.target_amount }} {{ goalbudget.currency }}
@@ -66,32 +69,62 @@
     
     {{goalbudgetform.as_div}} <!--форма для вводу бюджету цілі-->
 
-    <button button type="submit" name="action" value="goalbudget">Додати бюджет-ціль</button>
+    <button button type="submit">Додати бюджет-ціль</button>
     <button id="cancel-btn-goalbudget">Скасувати</button>
   </form> 
 </div>
-
+</div>
   
 
- <!-- Кнопка для додавання категорії -->
-<button id="show-category-form-btn">Додати категорію</button>
 
-<!-- Форма для введення нової категорії (спочатку прихована) -->
-<div id="add-category-form" style="display: none; margin-top: 10px;">
-    <form id="category-form">
-        {% csrf_token %}
-        <input type="text" id="category-name" placeholder="Введіть назву категорії" required>
-        <button type="submit">Додати</button>
-        <button type="button" id="cancel-category-btn">Скасувати</button>
-    </form>
+{% comment %} А ТУТ ДОДАТИ ПЕРЕГЛЯД КАТЕГОРІЙ І ТАКОЖ ЇХ ДОДАВАВННЯ {% endcomment %}
+<!--категорії-->
+<div>Мої категорії
+{% for category in categories%}<!-- воно бере по назві ключа -->
+<li>
+    {{ category.name }}
+</li>
+{% empty %}
+<li>категорії не знайдено</li>
+{% endfor %}
 </div>
+
+
+ <!-- Кнопка для додавання категорії -->
+ <button id="show-category-form-btn">Додати категорію</button>
+
+ <!-- Форма для введення нової категорії (спочатку прихована) -->
+ <div id="add-category-form" style="display: none; margin-top: 10px;">
+     <form id="category-form">
+         {% csrf_token %}
+         <input type="text" id="category-name" placeholder="Введіть назву категорії" required>
+         <button type="submit">Додати</button>
+         <button type="button" id="cancel-category-btn">Скасувати</button>
+     </form>
+ </div> 
+
+{% comment %} <!-- Кнопка для додавання нової категорії -->
+<button id="add-category-btn">Додати нову бюджет-ціль</button>
+<!-- Форма для додавання нового бюджету (спочатку прихована) -->
+<div id="add-category-form" style="display: none">
+   <form action="{% url 'financew:my' %}" method="post">
+    {%csrf_token%}
+    
+    {{categoryform.as_div}} <!--форма для вводу категорії-->
+
+    <button type="submit">Додати категорію</button>
+    <button id="cancel-btn-category">Скасувати</button>
+  </form> 
+</div> {% endcomment %}
+
+
+
 
 {% comment %} ТУТ ТИПУ ГРАФІКИ (НАПЕВНО PIECHART із ЗАГАЛЬНИМИ ВИТРАТАМИ ПО моїх категоріями) {% endcomment %}
 
 
-{% comment %} А ТУТ ДОДАТИ ПЕРЕГЛЯ {% endcomment %}
 
-
+<!--AJAX - запит-->
 <script>
 document.getElementById("show-category-form-btn").addEventListener("click", function() {
     document.getElementById("add-category-form").style.display = "block";  // Показати форму

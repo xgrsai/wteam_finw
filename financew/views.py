@@ -23,6 +23,9 @@ def my(request):
     budgets = Budget.objects.filter(owner=request.user).all() # взяти всі бюджети що належать цьому користувачу
     goalbudgets = GoalBudget.objects.filter(owner=request.user).all()
 
+    #наявнi категорій користувача
+    categories = Category.objects.filter(owner=request.user).all()
+
     # форма для додавання нового бюджету та бюджету цілі
     if request.method != 'POST':
         # No data submitted; create a blank form.
@@ -47,7 +50,9 @@ def my(request):
         return redirect('financew:my')
     
     # Display a blank or invalid form.
-    context = {'budgets': budgets, 'goalbudgets': goalbudgets,'goalbudgetform':goalbudgetform, 'budgetform': budgetform}
+    context = {'budgets': budgets, 'goalbudgets': goalbudgets, 'categories': categories, 'goalbudgetform':goalbudgetform, 'budgetform': budgetform, }
+                
+               
     return render(request, 'financew/my.html', context) # потім дані з context можна використовувати у шаблоні 
 
  
@@ -179,10 +184,10 @@ def add_category(request):
             )
 
             if created:
-                return JsonResponse({"message": "Категорію додано успішно!"})
+                return redirect('financew:my') #JsonResponse({"message": "Категорію додано успішно!"})
             else:
                 return JsonResponse({"message": "Така категорія вже існує!"}, status=400)
-
+            
         except Exception as e:
             return JsonResponse({"message": f"Помилка: {str(e)}"}, status=500)
 

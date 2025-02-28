@@ -46,7 +46,9 @@ class Category(models.Model):
 
     class Meta:
         verbose_name_plural = 'categories'
-    
+        constraints = [
+            models.UniqueConstraint(fields=['name', 'owner'], name='unique_category_for_user')
+        ] # для того щоб користувач мав унікальні категорії
     def __str__(self):
         """Повернути нормальним текстом"""
         return f"{self.name}"
