@@ -1,0 +1,52 @@
+{% extends 'financew/base.html' %}
+{% block content %}
+HELLO    
+
+
+
+{% comment %} <style>
+        .form-container {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .form-container select, .form-container button {
+            padding: 10px;
+            margin: 5px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        .form-container button {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+        .form-container button:hover {
+            background-color: #0056b3;
+        }
+        .plot-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+
+    <h1>Візуалізація фінансових операцій</h1>
+
+    <!-- Форма для вибору інтервалу часу -->
+    <div class="form-container">
+        <form method="GET" action="{% url 'plots:visualisation' %}">
+            <label for="time_interval">Оберіть інтервал:</label>
+            <select name="time_interval" id="time_interval">
+                {% for key, value in data_options.time_intervals.items %}
+                    <option value="{{ key }}" {% if selected_interval == key %}selected{% endif %}>{{ value }}</option>
+                {% endfor %}
+            </select>
+
+            <button type="submit">Підтвердити</button>
+        </form>
+    </div>
+
+    <!-- Графік -->
+    <div class="plot-container">
+        {{ plot_html|safe }}
+    </div> {% endcomment %}
+{% endblock content %}
