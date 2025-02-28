@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 
 from .models import Budget, FinOperation, Category, GoalBudget
 
@@ -21,7 +22,13 @@ class CategoryForm(forms.ModelForm):
         model = Category
         fields = ['name']
         labels = {'name': 'Назва категорії'}
-
+    
+    # def clean_name(self):
+    #     name = self.cleaned_data['name']
+    #     if Category.objects.filter(name=name).exists():
+    #         raise forms.ValidationError("Категорія з таким ім'ям вже існує.")
+    #     return name
+    
 class GoalBudgetForm(forms.ModelForm):
     class Meta:
         model = GoalBudget

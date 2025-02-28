@@ -93,13 +93,30 @@
 
 
  <!-- Кнопка для додавання категорії -->
- <button id="show-category-form-btn">Додати категорію</button>
-
+ <button id="add-category-btn">Додати категорію</button>
+ {% if messages %}
+ <div>
+     {% for message in messages %}
+         <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+             {{ message }}
+         </div>
+     {% endfor %}
+ </div>
+{% endif %}
  <!-- Форма для введення нової категорії (спочатку прихована) -->
  <div id="add-category-form" style="display: none; margin-top: 10px;">
-     <form id="category-form">
+     <form action="{% url 'financew:my' %}" method="post">
          {% csrf_token %}
-         <input type="text" id="category-name" placeholder="Введіть назву категорії" required>
+         {% comment %} <input type="text" id="category-name" placeholder="Введіть назву категорії" required> {% endcomment %}
+         {{ categoryform.as_div }}
+         <!-- Виведення помилки під полем "name" -->
+         {% if categoryform.name.errors %}
+         <div style="color: red;">
+            {% for error in categoryform.name.errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+          {% endif %}
          <button type="submit">Додати</button>
          <button type="button" id="cancel-category-btn">Скасувати</button>
      </form>
@@ -126,7 +143,7 @@
 
 
 
-<!--AJAX - запит-->
+{% comment %} <!--AJAX - запит-->
 <script>
 document.getElementById("show-category-form-btn").addEventListener("click", function() {
     document.getElementById("add-category-form").style.display = "block";  // Показати форму
@@ -137,7 +154,7 @@ document.getElementById("cancel-category-btn").addEventListener("click", functio
     document.getElementById("add-category-form").style.display = "none";  // Сховати форму
     document.getElementById("show-category-form-btn").style.display = "block";  // Повернути кнопку
 });
-
+]
 // Обробник подачі форми
 document.getElementById("category-form").addEventListener("submit", function(event) {
     event.preventDefault();  // Відмінити перезавантаження сторінки
@@ -164,19 +181,25 @@ document.getElementById("category-form").addEventListener("submit", function(eve
     })
     .catch(error => console.error("Помилка:", error));
 });
-</script>
+</script> {% endcomment %}
 
   
 
   <script>
-  // Отримуємо елементи
+  //для бюджету
   const addBudgetBtn = document.getElementById("add-budget-btn");
   const addBudgetForm = document.getElementById("add-budget-form");
   const cancelBtnBudget = document.getElementById("cancel-btn-budget");
   
+  //для бюджету-цілі
   const addGoalBudgetForm = document.getElementById("add-goalbudget-form");
   const addGoalBudgetBtn = document.getElementById("add-goalbudget-btn");
   const cancelBtnGoalBudget = document.getElementById("cancel-btn-goalbudget");
+
+  //для категорій
+  const addCategoryForm = document.getElementById("add-category-form");
+  const addCategoryBtn = document.getElementById("add-category-btn");
+  const cancelBtnCategory = document.getElementById("cancel-btn-category");  
 
   // Показуємо форму для додавання бюджету
   addBudgetBtn.addEventListener("click", function (event) {
@@ -203,6 +226,19 @@ document.getElementById("category-form").addEventListener("submit", function(eve
   cancelBtnGoalBudget.addEventListener("click", function () {
     addGoalBudgetForm.style.display = "none"; // Приховуємо форму
     addGoalBudgetBtn.style.display = "inline"; // Показуємо кнопку додавання
+  });
+
+  // Показуємо форму для додавання категорії
+  addCategoryBtn.addEventListener("click", function (event) {
+    event.preventDefault();
+    addCategoryForm.style.display = "block"; // Показуємо форму
+    addCategoryBtn.style.display = "none"; // Приховуємо кнопку додавання
+  });
+
+  // Скасувати додавання категорії
+  cancelBtnCategory.addEventListener("click", function () {
+    addCategoryForm.style.display = "none"; // Приховуємо форму
+    addCategoryBtn.style.display = "inline"; // Показуємо кнопку додавання
   });
 
 </script>

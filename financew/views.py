@@ -2,13 +2,11 @@ from django.shortcuts import render, redirect, get_object_or_404
 from decimal import Decimal
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
-from django.http import JsonResponse  # Імпорт JsonResponse для відповіді JSON
-from django.views.decorators.csrf import csrf_exempt  # Якщо потрібно відключати CSRF
-import json 
-from .models import Category
+from django.contrib import messages
+from django.db.utils import IntegrityError
 
-from .models import Budget, FinOperation, GoalBudget
-from .forms import BudgetForm, FinOperationForm, GoalBudgetForm
+from .models import Budget, FinOperation, GoalBudget, Category
+from .forms import BudgetForm, FinOperationForm, GoalBudgetForm, CategoryForm
 
 def index(request):
     """головна сторінка фінансиW з бюджетами"""
@@ -31,6 +29,7 @@ def my(request):
         # No data submitted; create a blank form.
         budgetform = BudgetForm()
         goalbudgetform = GoalBudgetForm()
+        categoryform = CategoryForm()
 
     else:
         #для форми бюджетів
@@ -47,10 +46,21 @@ def my(request):
             new_goalbudget.owner = request.user #додати власником поточного залогіненого користувача
             new_goalbudget.save() # зберегти в бд
         
+        #для форми категорії
+        categoryform = CategoryForm(data=request.POST) # аргумент передає значення полів форми
+        if categoryform.is_valid():
+            new_category = categoryform.save(commit=False) # не зберігати одразу до бд
+            new_category.owner = request.user #додати власником поточного залогіненого користувача
+            # try:    
+            new_category.save()  # зберегти в БД
+            #     messages.success(request, "Категорія успішно створена!")
+            # except IntegrityError:
+            #     messages.error(request, "Категорія з таким ім'ям вже існує.")
+
         return redirect('financew:my')
     
     # Display a blank or invalid form.
-    context = {'budgets': budgets, 'goalbudgets': goalbudgets, 'categories': categories, 'goalbudgetform':goalbudgetform, 'budgetform': budgetform, }
+    context = {'budgets': budgets, 'goalbudgets': goalbudgets, 'categories': categories, 'goalbudgetform':goalbudgetform, 'budgetform': budgetform, 'categoryform':categoryform,}
                 
                
     return render(request, 'financew/my.html', context) # потім дані з context можна використовувати у шаблоні 
@@ -165,34 +175,6 @@ def edit_finoperation(request, finoperation_id):
     context = {'finoperation': finoperation, 'budget': budget}
     return render(request, 'financew/budget.html', context)
 
-
-
-@login_required
-def add_category(request):
-    """Додає нову категорію для користувача"""
-    if request.method == "POST":
-        try:
-            data = json.loads(request.body)  # Отримуємо JSON-дані
-            category_name = data.get("name").strip()  # Очищаємо пробіли
-
-            if not category_name:
-                return JsonResponse({"message": "Назва категорії не може бути пустою"}, status=400)
-
-            # Перевіряємо, чи така категорія вже існує для цього користувача
-            category, created = Category.objects.get_or_create(
-                name=category_name, owner=request.user
-            )
-
-            if created:
-                return redirect('financew:my') #JsonResponse({"message": "Категорію додано успішно!"})
-            else:
-                return JsonResponse({"message": "Така категорія вже існує!"}, status=400)
-            
-        except Exception as e:
-            return JsonResponse({"message": f"Помилка: {str(e)}"}, status=500)
-
-    return JsonResponse({"message": "Дозволено тільки POST-запити"}, status=405)
-
 @login_required
 def goalbudgets(request):
     goalbudgets = GoalBudget.objects.filter(owner=request.user).all() # взяти всі бюджети що належать цьому користувачу
@@ -200,6 +182,35 @@ def goalbudgets(request):
     context = {'goalbudgets': goalbudgets}
     return render(request, 'financew/my.html', context) # потім дані з context можна використовувати у шаблоні  
   
+
+
+# @login_required
+# def add_category(request):
+#     """Додає нову категорію для користувача"""
+#     if request.method == "POST":
+#         try:
+#             data = json.loads(request.body)  # Отримуємо JSON-дані
+#             category_name = data.get("name").strip()  # Очищаємо пробіли
+
+#             if not category_name:
+#                 return JsonResponse({"message": "Назва категорії не може бути пустою"}, status=400)
+
+#             # Перевіряємо, чи така категорія вже існує для цього користувача
+#             category, created = Category.objects.get_or_create(
+#                 name=category_name, owner=request.user
+#             )
+
+#             if created:
+#                 return redirect('financew:my') #JsonResponse({"message": "Категорію додано успішно!"})
+#             else:
+#                 return JsonResponse({"message": "Така категорія вже існує!"}, status=400)
+            
+#         except Exception as e:
+#             return JsonResponse({"message": f"Помилка: {str(e)}"}, status=500)
+
+#     return JsonResponse({"message": "Дозволено тільки POST-запити"}, status=405)
+
+
 # def new_goalbudget(request):
 #     """додавання бюджету-цілі"""
 #     if request.method != 'POST':
