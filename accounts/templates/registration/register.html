@@ -1,9 +1,22 @@
-{% extends "financew/base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registration</title>
+</head>
+<body>
+  
+  {% extends "financew/base.html" %}
 
-{% block content %}
- <form action="{% url 'accounts:register' %}" method='post'>
- {% csrf_token %}
- {{ form.as_div }}
- <button name="submit">Реєстрація</button>
- </form>
-{% endblock content %}
+  {% block content %}
+   <form action="{% url 'accounts:register' %}" method='post'>
+   {% csrf_token %}
+   {{ form.as_div }}
+   <button name="submit">Реєстрація</button>
+   </form>
+  {% endblock content %}
+  
+
+</body>
+</html>
