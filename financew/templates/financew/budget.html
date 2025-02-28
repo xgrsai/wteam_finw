@@ -10,6 +10,19 @@
 <div id="edit-budget-form" style="display: none;">
     <form method="post" action="{% url 'financew:budget' budget.id %}">
         {% csrf_token %}
+<!--ПЕРЕНЕСТИ В MY.HTML--> 
+        {{ form.as_div }}
+
+        <label for="category">Категорія:</label>
+        <select name="category">
+            {% for category in categories %}
+                <option value="{{ category.id }}" {% if budget.category.id == category.id %}selected{% endif %}>
+                    {{ category.name }}
+                </option>
+            {% endfor %}
+        </select>
+<!--ПЕРЕНЕСТИ В MY.HTML-->  
+
         {{form.as_div}}
         
         {% comment %} <label for="name">Назва бюджету:</label>
@@ -26,17 +39,19 @@
         </div>
         {% endfor %} 
 
+
         <button type="submit">Зберегти зміни</button>
         <button type="button" id="cancel-edit-btn">Скасувати</button>
     </form>
 </div>
+
 
 <a href="{% url "financew:new_finoperation" budget.id %}">Додати нову фінансову операцію</a>
 {% for finoperation in finoperations %}
 <div style="display: flex; align-items: center; gap: 10px;">
 
     <!-- Виведення фінансової операції -->
-    <span>{{ finoperation.get_type_display }} - {{ finoperation.amount }} - {{ finoperation.date_added }}</span>
+    <span>{{ finoperation.get_type_display }} - {{ finoperation.amount }} - {{ finoperation.date_added }} - {{ finoperation.category }}</span>
 
     <!-- Кнопка для редагування фінансової операції -->
     <a href="#" class="edit-finoperation-btn" data-finoperation-id="{{ finoperation.id }}" style="color: blue; text-decoration: none;">Змінити операцію</a>
@@ -57,6 +72,8 @@
     <!-- видалення операції -->
     <a href="{% url 'financew:delete_finoperation' finoperation.id %}" >🗑 Видалити</a>
 </div>
+
+
 {% empty %}
 <p>Нема фінансових операцій</p>
 {% endfor %}
