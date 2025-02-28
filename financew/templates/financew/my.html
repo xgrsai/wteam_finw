@@ -1,52 +1,59 @@
 {% extends 'financew/base.html' %}
 {% block content %}
-{% for budget in budgets %}<!-- воно бере по назві ключа -->
-  <li>
-    <a href="{% url 'financew:budget' budget.id %}">{{ budget.name }} {{ budget.amount }} {{ budget.currency }}</a>
-  </li> 
+<!-- Список бюджетів -->
+<ul style="list-style-type: none; padding: 0; margin: 0;">
+  {% for budget in budgets %}
+  <li style="background-color: #f7f7f7; margin: 10px 0; padding: 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+    <a href="{% url 'financew:budget' budget.id %}" style="font-size: 16px; font-weight: 500; color: #4CAF50; text-decoration: none;">{{ budget.name }} - {{ budget.amount }} {{ budget.currency }}</a>
+  </li>
   {% empty %}
-  <li>Бюджети не знайдено</li>
+  <li style="color: #ff5722; font-size: 16px; font-weight: 600;">Бюджети не знайдено</li>
   {% endfor %}
-  <!-- Кнопка для додавання нового бюджету -->
-<button id="add-budget-btn">Додати новий бюджет</button>
+</ul>
+
+<!-- Кнопка для додавання нового бюджету -->
+<button id="add-budget-btn" style="background-color: #4CAF50; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">
+    Додати новий бюджет
+</button>
 
 <!-- Форма для додавання нового бюджету (спочатку прихована) -->
-<div id="add-budget-form" style="display: none;">
-  <form action="{% url 'financew:my' %}" method="post"> <!-- action - куди відправляється форма-->
-    {% csrf_token %} <!--токен CSRF, який додається до кожної форми, що дозволяє серверу перевіряти, чи запит дійсно надійшов з авторизованого джерела (тобто з вашого веб-сайту, а не з якогось іншого, створеного зловмисником).-->
+<div id="add-budget-form" style="display: none; margin-top: 20px; background-color: #f7f7f7; padding: 20px; border-radius: 8px;">
+  <form action="{% url 'financew:my' %}" method="post">
+    {% csrf_token %}
     {{ form.as_div }}
-    <button name="submit">Додати бюджет</button>
-    <button id="cancel-btn">Скасувати</button>
-  </form> </div>
+    <button name="submit" style="background-color: #4CAF50; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">Додати бюджет</button>
+    <button id="cancel-btn" type="button" style="background-color: #f44336; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">Скасувати</button>
+  </form>
+</div>
 
-  
-
- <!-- Кнопка для додавання категорії -->
-<button id="show-category-form-btn">Додати категорію</button>
+<!-- Кнопка для додавання категорії -->
+<button id="show-category-form-btn" style="background-color: #2196F3; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin-top: 20px;">
+    Додати категорію
+</button>
 
 <!-- Форма для введення нової категорії (спочатку прихована) -->
-<div id="add-category-form" style="display: none; margin-top: 10px;">
+<div id="add-category-form" style="display: none; margin-top: 10px; background-color: #f7f7f7; padding: 20px; border-radius: 8px;">
     <form id="category-form">
         {% csrf_token %}
-        <input type="text" id="category-name" placeholder="Введіть назву категорії" required>
-        <button type="submit">Додати</button>
-        <button type="button" id="cancel-category-btn">Скасувати</button>
+        <input type="text" id="category-name" placeholder="Введіть назву категорії" required style="padding: 10px; font-size: 16px; margin-right: 10px; border-radius: 5px;">
+        <button type="submit" style="background-color: #4CAF50; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">Додати</button>
+        <button type="button" id="cancel-category-btn" style="background-color: #f44336; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">Скасувати</button>
     </form>
 </div>
 
 <script>
-document.getElementById("show-category-form-btn").addEventListener("click", function() {
+  document.getElementById("show-category-form-btn").addEventListener("click", function() {
     document.getElementById("add-category-form").style.display = "block";  // Показати форму
     document.getElementById("show-category-form-btn").style.display = "none";  // Сховати кнопку
-});
+  });
 
-document.getElementById("cancel-category-btn").addEventListener("click", function() {
+  document.getElementById("cancel-category-btn").addEventListener("click", function() {
     document.getElementById("add-category-form").style.display = "none";  // Сховати форму
     document.getElementById("show-category-form-btn").style.display = "block";  // Повернути кнопку
-});
+  });
 
-// Обробник подачі форми
-document.getElementById("category-form").addEventListener("submit", function(event) {
+  // Обробник подачі форми для категорії
+  document.getElementById("category-form").addEventListener("submit", function(event) {
     event.preventDefault();  // Відмінити перезавантаження сторінки
 
     const categoryName = document.getElementById("category-name").value;
@@ -73,26 +80,24 @@ document.getElementById("category-form").addEventListener("submit", function(eve
 });
 </script>
 
-  
+<script>
+  // Отримуємо елементи для бюджету
+  const addBudgetBtn = document.getElementById("add-budget-btn");
+  const addBudgetForm = document.getElementById("add-budget-form");
+  const cancelBtn = document.getElementById("cancel-btn");
 
-  <script>
-    // Отримуємо елементи
-    const addBudgetBtn = document.getElementById("add-budget-btn");
-    const addBudgetForm = document.getElementById("add-budget-form");
-    const cancelBtn = document.getElementById("cancel-btn");
+  // Показуємо форму для додавання бюджету
+  addBudgetBtn.addEventListener("click", function(event) {
+    event.preventDefault();
+    addBudgetForm.style.display = "block"; // Показуємо форму
+    addBudgetBtn.style.display = "none"; // Приховуємо кнопку додавання
+  });
 
-    // Показуємо форму для додавання бюджету
-    addBudgetBtn.addEventListener("click", function(event) {
-        event.preventDefault();
-        addBudgetForm.style.display = "block"; // Показуємо форму
-        addBudgetBtn.style.display = "none"; // Приховуємо кнопку додавання
-    });
-
-    // Скасувати додавання бюджету
-    cancelBtn.addEventListener("click", function() {
-        addBudgetForm.style.display = "none"; // Приховуємо форму
-        addBudgetBtn.style.display = "inline"; // Показуємо кнопку додавання
-    });
+  // Скасувати додавання бюджету
+  cancelBtn.addEventListener("click", function() {
+    addBudgetForm.style.display = "none"; // Приховуємо форму
+    addBudgetBtn.style.display = "inline"; // Показуємо кнопку додавання
+  });
 </script>
 
 {% endblock content %}

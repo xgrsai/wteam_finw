@@ -1,9 +1,15 @@
 {% extends "financew/base.html" %}
 
 {% block content %}
- <form action="{% url 'accounts:register' %}" method='post'>
- {% csrf_token %}
- {{ form.as_div }}
- <button name="submit">Реєстрація</button>
- </form>
+<div style="font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f9; border-radius: 8px; width: 100%; max-width: 400px; margin: 0 auto; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+    <form action="{% url 'accounts:register' %}" method="post" style="display: flex; flex-direction: column;">
+        {% csrf_token %}
+        <div style="margin-bottom: 15px;">
+            {{ form.as_div }}
+        </div>
+        <button name="submit" style="background-color: #4CAF50; color: white; padding: 10px 20px; font-size: 16px; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.3s;">
+            Реєстрація
+        </button>
+    </form>
+</div>
 {% endblock content %}

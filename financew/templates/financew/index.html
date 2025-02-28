@@ -1,12 +1,18 @@
 {% extends 'financew/base.html' %}
 {% block content %}
-<p>Платформа управління особистими фінансами FinW - допомагає користувачам відстежувати витрати, прогнозувати бюджети та аналізувати фінансові звички.</p>
-{% endblock content %}
 
-{% comment %} {% for budget in budgets %}<!-- воно бере по назві ключа -->
-  <li>
-    <a href="{% url 'financew:budget' budget.id %}">{{ budget.name }} {{ budget.amount }} {{ budget.currency }}</a>
-  </li> 
+<p style="font-size: 18px; font-weight: 600; color: #333;">Платформа управління особистими фінансами FinW - допомагає користувачам відстежувати витрати, прогнозувати бюджети та аналізувати фінансові звички.</p>
+
+<!-- Список бюджетів -->
+<ul style="list-style-type: none; padding: 0;">
+  {% for budget in budgets %}
+  <li style="background-color: #f7f7f7; margin: 10px 0; padding: 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+    <a href="{% url 'financew:budget' budget.id %}" style="font-size: 16px; font-weight: 500; color: #4CAF50; text-decoration: none;">{{ budget.name }} - {{ budget.amount }} {{ budget.currency }}</a>
+    <a href="{% url 'financew:budget' budget.id %}" style="color: #1e88e5; text-decoration: none; font-size: 14px;">Переглянути</a>
+  </li>
   {% empty %}
-  <li>Бюджети не знайдено</li>
-  {% endfor %} {% endcomment %}
+  <li style="color: #ff5722; font-size: 16px; font-weight: 600;">Бюджети не знайдено</li>
+  {% endfor %}
+</ul>
+
+{% endblock content %}

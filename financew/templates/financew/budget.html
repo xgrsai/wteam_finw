@@ -1,59 +1,80 @@
 {% extends 'financew/base.html' %} 
 {% block content %}
-<p>{{ budget.name }} {{ budget.amount }} {{ budget.currency }} <!-- Кнопка для редагування бюджету --><button id="edit-budget-btn">Змінити дані</button></p>
+<div style="font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f9; border-radius: 8px; max-width: 800px; margin: 0 auto; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+    <p style="font-size: 18px; color: #333;">
+        {{ budget.name }} {{ budget.amount }} {{ budget.currency }} 
+        <!-- Кнопка для редагування бюджету -->
+        <button id="edit-budget-btn" style="background-color: #4CAF50; color: white; padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.3s;">
+            Змінити дані
+        </button>
+    </p>
 
-<!-- Форма для редагування бюджету (спочатку прихована) -->
-<div id="edit-budget-form" style="display: none;">
-    <form method="post" action="{% url 'financew:budget' budget.id %}">
-        {% csrf_token %}
-        {{ form.as_div }}
-
-        <label for="category">Категорія:</label>
-        <select name="category">
-            {% for category in categories %}
-                <option value="{{ category.id }}" {% if budget.category.id == category.id %}selected{% endif %}>
-                    {{ category.name }}
-                </option>
-            {% endfor %}
-        </select>
-
-        <button type="submit">Зберегти зміни</button>
-        <button type="button" id="cancel-edit-btn">Скасувати</button>
-    </form>
-</div>
-
-
-<a href="{% url "financew:new_finoperation" budget.id %}">Додати нову фінансову операцію</a>
-{% for finoperation in finoperations %}
-<div style="display: flex; align-items: center; gap: 10px;">
-
-    <!-- Виведення фінансової операції -->
-    <span>{{ finoperation.get_type_display }} - {{ finoperation.amount }} - {{ finoperation.date_added }} - {{ finoperation.category }}</span>
-
-    <!-- Кнопка для редагування фінансової операції -->
-    <a href="#" class="edit-finoperation-btn" data-finoperation-id="{{ finoperation.id }}" style="color: blue; text-decoration: none;">Змінити операцію</a>
-
-    <!-- Форма для редагування фінансової операції (спочатку прихована) -->
-    <div id="edit-finoperation-form-{{ finoperation.id }}" class="edit-finoperation-form" style="display: none;">
-        <form method="POST" action="{% url 'financew:edit_finoperation' finoperation.id %}">
+    <!-- Форма для редагування бюджету (спочатку прихована) -->
+    <div id="edit-budget-form" style="display: none; margin-top: 20px; padding: 20px; background-color: #fff; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+        <form method="post" action="{% url 'financew:budget' budget.id %}">
             {% csrf_token %}
-            <input type="number" name="amount" value="{{ finoperation.amount }}" placeholder="Сума операції" required>
-            <select name="type">
-                <option value="expense" {% if finoperation.type == 'expense' %}selected{% endif %}>Витрата</option>
-                <option value="income" {% if finoperation.type == 'income' %}selected{% endif %}>Прибуток</option>
+            <div style="margin-bottom: 15px;">
+                {{ form.as_div }}
+            </div>
+
+            <label for="category" style="font-size: 16px; margin-bottom: 8px; display: block;">Категорія:</label>
+            <select name="category" style="padding: 8px; font-size: 14px; width: 100%; border-radius: 5px; border: 1px solid #ddd; margin-bottom: 15px;">
+                {% for category in categories %}
+                    <option value="{{ category.id }}" {% if budget.category.id == category.id %}selected{% endif %}>
+                        {{ category.name }}
+                    </option>
+                {% endfor %}
             </select>
-            <button type="submit" >Змінити</button>
+
+            <button type="submit" style="background-color: #4CAF50; color: white; padding: 8px 16px; font-size: 16px; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.3s;">
+                Зберегти зміни
+            </button>
+            <button type="button" id="cancel-edit-btn" style="background-color: #f44336; color: white; padding: 8px 16px; font-size: 16px; border: none; border-radius: 5px; cursor: pointer; margin-left: 10px; transition: background-color 0.3s;">
+                Скасувати
+            </button>
         </form>
     </div>
 
-    <!-- видалення операції -->
-    <a href="{% url 'financew:delete_finoperation' finoperation.id %}" >🗑 Видалити</a>
+    <a href="{% url 'financew:new_finoperation' budget.id %}" style="color: #4CAF50; text-decoration: none; font-size: 16px; display: inline-block; margin-top: 20px;">
+        Додати нову фінансову операцію
+    </a>
+
+    {% for finoperation in finoperations %}
+    <div style="display: flex; align-items: center; gap: 10px; margin-top: 20px; background-color: #fff; padding: 10px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+        <!-- Виведення фінансової операції -->
+        <span style="font-size: 16px; color: #333;">
+            {{ finoperation.get_type_display }} - {{ finoperation.amount }} - {{ finoperation.date_added }} - {{ finoperation.category }}
+        </span>
+
+        <!-- Кнопка для редагування фінансової операції -->
+        <a href="#" class="edit-finoperation-btn" data-finoperation-id="{{ finoperation.id }}" style="color: #2196F3; text-decoration: none; font-size: 14px;">
+            Змінити операцію
+        </a>
+
+        <!-- Форма для редагування фінансової операції (спочатку прихована) -->
+        <div id="edit-finoperation-form-{{ finoperation.id }}" class="edit-finoperation-form" style="display: none; margin-top: 10px;">
+            <form method="POST" action="{% url 'financew:edit_finoperation' finoperation.id %}" style="display: flex; gap: 10px;">
+                {% csrf_token %}
+                <input type="number" name="amount" value="{{ finoperation.amount }}" placeholder="Сума операції" required style="padding: 8px; font-size: 14px; width: 200px; border-radius: 5px; border: 1px solid #ddd;">
+                <select name="type" style="padding: 8px; font-size: 14px; border-radius: 5px; border: 1px solid #ddd;">
+                    <option value="expense" {% if finoperation.type == 'expense' %}selected{% endif %}>Витрата</option>
+                    <option value="income" {% if finoperation.type == 'income' %}selected{% endif %}>Прибуток</option>
+                </select>
+                <button type="submit" style="background-color: #4CAF50; color: white; padding: 8px 16px; font-size: 16px; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.3s;">
+                    Змінити
+                </button>
+            </form>
+        </div>
+
+        <!-- Видалення операції -->
+        <a href="{% url 'financew:delete_finoperation' finoperation.id %}" style="color: #f44336; font-size: 14px; margin-left: 10px;">
+            🗑 Видалити
+        </a>
+    </div>
+    {% empty %}
+        <p style="color: #333; font-size: 16px;">Нема фінансових операцій</p>
+    {% endfor %}
 </div>
-
-
-{% empty %}
-<p>Нема фінансових операцій</p>
-{% endfor %}
 
 <script>
     // Отримуємо елементи сторінки для бюджету
