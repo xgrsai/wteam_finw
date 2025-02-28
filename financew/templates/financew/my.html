@@ -51,7 +51,7 @@
 <!--бюджетицілі-->
 {% for goalbudget in goalbudgets%}<!-- воно бере по назві ключа -->
 <li>
-    {{ goalbudget.name }} {{ goalbudget.amount }} {{ goalbudget.currency }}
+    {{ goalbudget.name }} {{ goalbudget.amount }}/{{ goalbudget.target_amount }} {{ goalbudget.currency }}
 </li>
 {% empty %}
 <li>Бюджети-цілі не знайдено</li>
