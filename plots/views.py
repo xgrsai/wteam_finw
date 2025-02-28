@@ -3,9 +3,6 @@ import plotly.express as px
 from django.shortcuts import render
 from financew.models import Budget, FinOperation
 
-def some(request):
-    return render(request, 'plots/report.html')
-
 
 def visualisation(request):
     """Сторінка візуалізації з вибором інтервалу часу"""
@@ -22,7 +19,7 @@ def visualisation(request):
     }
 
     # Отримання вибраного інтервалу
-    selected_interval = request.GET.get("time_interval", "monthly")
+    selected_interval = request.GET.get("time_interval", "one_time")
 
     # Обробка даних
     data = []

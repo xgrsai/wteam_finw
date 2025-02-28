@@ -1,10 +1,7 @@
 {% extends 'financew/base.html' %}
 {% block content %}
-HELLO    
 
-
-
-{% comment %} <style>
+<style>
         .form-container {
             margin-bottom: 20px;
             text-align: center;
@@ -33,7 +30,7 @@ HELLO
 
     <!-- Форма для вибору інтервалу часу -->
     <div class="form-container">
-        <form method="GET" action="{% url 'plots:visualisation' %}">
+        <form method="GET" action="{% url 'plots:report' %}">
             <label for="time_interval">Оберіть інтервал:</label>
             <select name="time_interval" id="time_interval">
                 {% for key, value in data_options.time_intervals.items %}
@@ -48,5 +45,5 @@ HELLO
     <!-- Графік -->
     <div class="plot-container">
         {{ plot_html|safe }}
-    </div> {% endcomment %}
+    </div> 
 {% endblock content %}
