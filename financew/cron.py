@@ -1,14 +1,17 @@
 from django.utils import timezone
 from .models import FinOperation, Budget
+from .utils import get_exchange_rates
 
 
 def check_and_execute_operations():
     """
     Автоматично перевіряє і виконує фінансові операції залежно від інтервалів.
     Враховує валюти, категорії та обробляє помилки.
+    Конвертує суми з USD/EUR в UAH перед списанням.
     """
     now = timezone.now()
     operations = FinOperation.objects.filter(is_active=True)
+    rates = get_exchange_rates()  # Отримуємо актуальні курси валют
 
     for operation in operations:
         try:
@@ -21,13 +24,22 @@ def check_and_execute_operations():
                     print(f"Несумісність валюти для операції {operation} у бюджеті {budget}")
                     continue
 
+                # Конвертуємо суму операції в UAH, якщо бюджет у USD або EUR
+                amount_in_uah = operation.amount
+                if budget.currency != "UAH":
+                    if budget.currency in rates:
+                        amount_in_uah = operation.amount * rates[budget.currency]
+                    else:
+                        print(f"Курс для валюти {budget.currency} не знайдено")
+                        continue
+
                 # Перевіряємо, чи є достатньо коштів для списання
-                if budget.amount >= operation.amount:
+                if budget.amount >= amount_in_uah:
                     # Списуємо кошти з бюджету
                     if operation.type == 'expense':
-                        budget.amount -= operation.amount
+                        budget.amount -= amount_in_uah
                     elif operation.type == 'income':
-                        budget.amount += operation.amount
+                        budget.amount += amount_in_uah
 
                     budget.save()
 

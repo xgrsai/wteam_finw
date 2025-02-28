@@ -1,10 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_UP
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 
 from .models import Budget, FinOperation
 from .forms import BudgetForm, FinOperationForm
+from .utils import get_exchange_rates, convert_to_currency
 
 from django.utils import timezone
 
@@ -17,9 +18,39 @@ def index(request):
 
 @login_required
 def my(request):
-    """головна сторінка фінансиW з бюджетом"""
+    """
+    Головна сторінка ФінансиW з бюджетом та загальним балансом у вибраній валюті.
+    Відображає особистий кабінет користувача та дозволяє додавати нові бюджети.
+    """
     budgets = Budget.objects.filter(owner=request.user).all() # взяти всі бюджети що належать цьому користувачу
-    
+    rates = get_exchange_rates(request)
+
+    # Отримуємо валюту відображення з GET-параметра або сесії
+    display_currency = request.GET.get('currency', request.session.get('display_currency', 'UAH'))
+    if display_currency not in ['UAH', 'USD', 'EUR']:
+        display_currency = 'UAH'
+
+    # Зберігаємо вибір валюти у сесії
+    request.session['display_currency'] = display_currency
+
+    # Обчислення загального балансу і конвертованих сум у вибраній валюті
+    total_in_uah = Decimal('0')
+    budgets_with_converted = []
+    for budget in budgets:
+        balance_in_uah = budget.total_balance_in_uah(request)
+        print(
+            f"Budget: {budget.name}, Currency: {budget.currency}, Amount: {budget.amount}, Balance in UAH: {balance_in_uah}")
+        total_in_uah += balance_in_uah
+
+        # Конвертуємо баланс бюджету у вибрану валюту
+        converted_balance = convert_to_currency(balance_in_uah, display_currency, rates)
+        budgets_with_converted.append({
+            'budget': budget,
+            'converted_balance': converted_balance
+        })
+
+    total_balance = convert_to_currency(total_in_uah, display_currency, rates)
+
     # форма для додавання нового бюджету
     if request.method != 'POST':
         # No data submitted; create a blank form.
@@ -34,7 +65,7 @@ def my(request):
         
         # Display a blank or invalid form.
         
-    context = {'budgets': budgets, 'form':form }
+    context = {'budgets_with_converted': budgets_with_converted, 'budgets': budgets, 'total_balance': total_balance, 'display_currency': display_currency, 'form':form, 'currencies': ['UAH', 'USD', 'EUR'],}
     return render(request, 'financew/my.html', context) # потім дані з context можна використовувати у шаблоні 
 
  
@@ -61,7 +92,6 @@ def budget(request, budget_id):
     finoperations = budget.finoperation_set.order_by('-date_added') # мінус означає від найновіших до старіших
     context = {'budget': budget, 'finoperations': finoperations, 'form': form}
     return render(request, 'financew/budget.html', context)
-
 
 
 @login_required

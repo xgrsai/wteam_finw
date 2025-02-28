@@ -1,12 +1,28 @@
 {% extends 'financew/base.html' %}
 {% block content %}
-{% for budget in budgets %}<!-- воно бере по назві ключа -->
-  <li>
-    <a href="{% url 'financew:budget' budget.id %}">{{ budget.name }} {{ budget.amount }} {{ budget.currency }}</a>
-  </li> 
-  {% empty %}
-  <li>Бюджети не знайдено</li>
-  {% endfor %}
+
+<!-- Вибір валюти відображення -->
+<form method="get" action="{% url 'financew:my' %}">
+    <label for="currency">Валюта відображення:</label>
+    <select name="currency" id="currency" onchange="this.form.submit()">
+        {% for currency in currencies %}
+            <option value="{{ currency }}" {% if currency == display_currency %}selected{% endif %}>{{ currency }}</option>
+        {% endfor %}
+    </select>
+</form>
+
+<p>Загальний баланс у {{ display_currency }}: {% if total_balance != 0 %}{{ total_balance|floatformat:2 }} {{ display_currency }}{% else %}Немає даних{% endif %}</p>
+<ul>
+
+{% for item in budgets_with_converted %}
+    <li>
+      <a href="{% url 'financew:budget' item.budget.id %}">{{ item.budget.name }}: {{ item.budget.amount|floatformat:2 }} {{ item.budget.currency }} ({{ item.converted_balance|floatformat:2 }} {{ display_currency }})</a>
+    </li>
+{% empty %}
+    <li>Бюджети не знайдено</li>
+{% endfor %}
+</ul>
+
   <!-- Кнопка для додавання нового бюджету -->
 <button id="add-budget-btn">Додати новий бюджет</button>
 
