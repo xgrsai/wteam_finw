@@ -15,26 +15,35 @@ def index(request):
 
 @login_required
 def my(request):
-    """головна сторінка фінансиW з бюджетом та додавання нового бюджету"""
+    """головна сторінка фінансиW з бюджетом та додавання нового бюджету (те саме стосується і бюджетів-цілей)"""
     budgets = Budget.objects.filter(owner=request.user).all() # взяти всі бюджети що належать цьому користувачу
-    
-    # форма для додавання нового бюджету
+    goalbudgets = GoalBudget.objects.filter(owner=request.user).all()
+
+    # форма для додавання нового бюджету та бюджету цілі
     if request.method != 'POST':
         # No data submitted; create a blank form.
-        form = BudgetForm()
+        budgetform = BudgetForm()
+        goalbudgetform = GoalBudgetForm()
+
     else:
-        form = BudgetForm(data=request.POST) # аргумент передає значення полів форми
-        if form.is_valid():
-            new_budget = form.save(commit=False) # не зберігати одразу до бд
+        #для форми бюджетів
+        budgetform = BudgetForm(data=request.POST) # аргумент передає значення полів форми
+        if budgetform.is_valid():
+            new_budget = budgetform.save(commit=False) # не зберігати одразу до бд
             new_budget.owner = request.user #додати власником поточного залогіненого користувача
             new_budget.save() # зберегти в бд
-            return redirect('financew:my')
+                
+        #для форми бюджету-цілі
+        goalbudgetform = GoalBudgetForm(data=request.POST) # аргумент передає значення полів форми
+        if goalbudgetform.is_valid():
+            new_goalbudget = goalbudgetform.save(commit=False) # не зберігати одразу до бд
+            new_goalbudget.owner = request.user #додати власником поточного залогіненого користувача
+            new_goalbudget.save() # зберегти в бд
         
-        # Display a blank or invalid form.
+        return redirect('financew:my')
     
-    new_goalbudget(request)    
-
-    context = {'budgets': budgets, 'form':form }
+    # Display a blank or invalid form.
+    context = {'budgets': budgets, 'goalbudgets': goalbudgets,'goalbudgetform':goalbudgetform, 'budgetform': budgetform}
     return render(request, 'financew/my.html', context) # потім дані з context можна використовувати у шаблоні 
 
  
@@ -154,21 +163,21 @@ def goalbudgets(request):
     context = {'goalbudgets': goalbudgets}
     return render(request, 'financew/my.html', context) # потім дані з context можна використовувати у шаблоні  
 
-def new_goalbudget(request):
-    """додавання бюджету-цілі"""
-    if request.method != 'POST':
-        form = GoalBudgetForm()
-    else:
-        form = GoalBudgetForm(data=request.POST) # аргумент передає значення полів форми
-        if form.is_valid():
-            new_goalbudget = form.save(commit=False) # не зберігати одразу до бд
-            new_goalbudget.owner = request.user #додати власником поточного залогіненого користувача
-            new_goalbudget.save() # зберегти в бд
-            return redirect('financew:my')
+# def new_goalbudget(request):
+#     """додавання бюджету-цілі"""
+#     if request.method != 'POST':
+#         form = GoalBudgetForm()
+#     else:
+#         form = GoalBudgetForm(data=request.POST) # аргумент передає значення полів форми
+#         if form.is_valid():
+#             new_goalbudget = form.save(commit=False) # не зберігати одразу до бд
+#             new_goalbudget.owner = request.user #додати власником поточного залогіненого користувача
+#             new_goalbudget.save() # зберегти в бд
+#             return redirect('financew:my')
     
     
-    context = {'goalbudget_form': form}    
-    return render(request,"financew/my.html",context)
+#     context = {'goalbudget_form': form}    
+#     return render(request,"financew/my.html",context)
 
 
 # @login_required

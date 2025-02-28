@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
+
 from .models import Budget, FinOperation, Category, GoalBudget
 
 class BudgetForm(forms.ModelForm):
@@ -24,8 +25,8 @@ class CategoryForm(forms.ModelForm):
 class GoalBudgetForm(forms.ModelForm):
     class Meta:
         model = GoalBudget
-        fields = ['name', 'currency', 'target_amount']
-        labels = {'name':'Ім\'я для бюджету-цілі', 'currency': 'Валюта', 'target_amount': 'Ціль' }
+        fields = ['name', 'currency', 'target_amount', 'amount']
+        labels = {'name':'Ім\'я для бюджету-цілі', 'currency': 'Валюта', 'target_amount': 'Ціль' , 'amount': 'Поточна сума'}
 
 
 # class CustomUserCreationForm(UserCreationForm):
