@@ -19,6 +19,62 @@
     <button id="cancel-btn">Скасувати</button>
   </form> </div>
 
+  
+
+ <!-- Кнопка для додавання категорії -->
+<button id="show-category-form-btn">Додати категорію</button>
+
+<!-- Форма для введення нової категорії (спочатку прихована) -->
+<div id="add-category-form" style="display: none; margin-top: 10px;">
+    <form id="category-form">
+        {% csrf_token %}
+        <input type="text" id="category-name" placeholder="Введіть назву категорії" required>
+        <button type="submit">Додати</button>
+        <button type="button" id="cancel-category-btn">Скасувати</button>
+    </form>
+</div>
+
+<script>
+document.getElementById("show-category-form-btn").addEventListener("click", function() {
+    document.getElementById("add-category-form").style.display = "block";  // Показати форму
+    document.getElementById("show-category-form-btn").style.display = "none";  // Сховати кнопку
+});
+
+document.getElementById("cancel-category-btn").addEventListener("click", function() {
+    document.getElementById("add-category-form").style.display = "none";  // Сховати форму
+    document.getElementById("show-category-form-btn").style.display = "block";  // Повернути кнопку
+});
+
+// Обробник подачі форми
+document.getElementById("category-form").addEventListener("submit", function(event) {
+    event.preventDefault();  // Відмінити перезавантаження сторінки
+
+    const categoryName = document.getElementById("category-name").value;
+    const csrfToken = document.querySelector("input[name='csrfmiddlewaretoken']").value;
+
+    fetch("{% url 'financew:add_category' %}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrfToken
+        },
+        body: JSON.stringify({ name: categoryName })
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+        if (data.message === "Категорію додано успішно!") {
+            document.getElementById("category-form").reset();  // Очистити поле вводу
+            document.getElementById("add-category-form").style.display = "none";  // Сховати форму
+            document.getElementById("show-category-form-btn").style.display = "block";  // Повернути кнопку
+        }
+    })
+    .catch(error => console.error("Помилка:", error));
+});
+</script>
+
+  
+
   <script>
     // Отримуємо елементи
     const addBudgetBtn = document.getElementById("add-budget-btn");

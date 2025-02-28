@@ -2,6 +2,10 @@ from django.shortcuts import render, redirect, get_object_or_404
 from decimal import Decimal
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
+from django.http import JsonResponse  # Імпорт JsonResponse для відповіді JSON
+from django.views.decorators.csrf import csrf_exempt  # Якщо потрібно відключати CSRF
+import json 
+from .models import Category
 
 from .models import Budget, FinOperation
 from .forms import BudgetForm, FinOperationForm
@@ -144,6 +148,34 @@ def edit_finoperation(request, finoperation_id):
 
     context = {'finoperation': finoperation, 'budget': budget}
     return render(request, 'financew/budget.html', context)
+
+
+@login_required
+def add_category(request):
+    """Додає нову категорію для користувача"""
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)  # Отримуємо JSON-дані
+            category_name = data.get("name").strip()  # Очищаємо пробіли
+
+            if not category_name:
+                return JsonResponse({"message": "Назва категорії не може бути пустою"}, status=400)
+
+            # Перевіряємо, чи така категорія вже існує для цього користувача
+            category, created = Category.objects.get_or_create(
+                name=category_name, owner=request.user
+            )
+
+            if created:
+                return JsonResponse({"message": "Категорію додано успішно!"})
+            else:
+                return JsonResponse({"message": "Така категорія вже існує!"}, status=400)
+
+        except Exception as e:
+            return JsonResponse({"message": f"Помилка: {str(e)}"}, status=500)
+
+    return JsonResponse({"message": "Дозволено тільки POST-запити"}, status=405)
+
 
 # @login_required
 # def new_budget(request):
