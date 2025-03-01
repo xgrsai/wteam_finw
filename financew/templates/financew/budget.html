@@ -68,18 +68,39 @@
 
 
 Трансфери з бюджету в бюджет:
-{% for finoperation in finoperations %}
-<div style="display: flex; align-items: center; gap: 10px;">
+<table border="1">
+    <thead>
+        <tr>
+            <th>Дата</th>
+            <th>З бюджету</th>
+            <th>У бюджет</th>
+            <th>Сума</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for transfer in transfers %}
+        <tr>
+            <td>{{ transfer.date_added }}</td>
+            <td>{{ transfer.from_budget.name }}</td>
+            <td>
+                {% if transfer.to_budget %}
+                    {{ transfer.to_budget.name }}
+                    {% else %}
+                    {{ transfer.to_goalbudget.name }}
+                {% endif %}
+            </td>
+            <td>{{ transfer.amount }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4">Немає переказів</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 
-    <!-- Виведення фінансової операції -->
-    <span>{{ finoperation.get_type_display }} - {{ finoperation.amount }} - {{ finoperation.date_added }} - {{ finoperation.category }}</span>
-
-</div>
 
 
-{% empty %}
-<p>Нема трансферів з бюджету в бюджет</p>
-{% endfor %}
 
 
 

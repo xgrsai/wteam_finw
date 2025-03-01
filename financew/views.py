@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.contrib import messages
 from django.db.utils import IntegrityError
+from itertools import chain
 
 from .models import Budget, FinOperation, GoalBudget, Category, TransferBudget, TransferGoalBudget
 from .forms import BudgetForm, FinOperationForm, GoalBudgetForm, CategoryForm
@@ -72,6 +73,7 @@ def budget(request, budget_id):
     """сторінка бюджету з фінопераціями"""
     budget = Budget.objects.get(id=budget_id) 
 
+
     if budget.owner != request.user: # для того щоб не переглядати чужі бюджети
         raise Http404
 
@@ -89,15 +91,18 @@ def budget(request, budget_id):
     finoperations = budget.finoperation_set.order_by('-date_added') # мінус означає від найновіших до старіших
 
     #для показу переведень бюджетів
-    transferoutbudgets = budget.budget_out_set.all()
-    transferinbudgets = budget.budget_in_set.all()
-
-    transferoutgoalbudgets = budget.budget_set.all()
-    transferingoalbudgets = budget.goalbudget_set.all()
     
-    
+    transfers_out = budget.budget_out_set.all() # Отримати всі перекази між бюджетами, де цей бюджет є відправником
+    transfers_in = budget.budget_in_set.all() # Отримати всі перекази між бюджетами, де цей бюджет є отримувачем
+    goal_transfers = TransferGoalBudget.objects.filter(from_budget=budget) # Отримати всі перекази, де цей бюджет надсилає гроші у цільовий бюджет
 
-    context = {'budget': budget, 'finoperations': finoperations, 'form': form}
+    # Об'єднуємо всі перекази
+    all_transfers = chain(transfers_out, transfers_in, goal_transfers)
+        
+    # Відсортувати за датою
+    transfers = sorted(all_transfers, key=lambda x: x.date_added, reverse=True)
+
+    context = {'budget': budget, 'finoperations': finoperations, 'transfers': transfers,'form': form}
     return render(request, 'financew/budget.html', context)
 
 
