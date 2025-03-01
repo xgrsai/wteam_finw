@@ -89,6 +89,35 @@
 {% comment %} ТУТ ТИПУ ГРАФІКИ (НАПЕВНО PIECHART із ЗАГАЛЬНИМИ ВИТРАТАМИ ПО моїх категоріями) {% endcomment %}
 
 
+<style>
+  .plot-container {
+      margin-top: 20px;
+      text-align: center;
+  }
+  h1 {
+      color: #333;
+      text-align: center;
+  }
+</style>
+
+<h1>Графік бюджетів</h1>
+<div class="plot-container">
+  {{ budget_plot_html|safe }}  <!-- Графік бюджетів -->
+</div>
+
+<h1>Графік бюджетів-цілей</h1>
+<div class="plot-container">
+  {{ goal_budget_plot_html|safe }}  <!-- Графік бюджетів-цілей -->
+</div>
+
+<h1>Розподіл фінансових операцій за категоріями</h1>
+<div class="plot-container">
+  {{ fin_operation_plot_html|safe }}  <!-- Графік фінансових операцій -->
+</div>
+
+<!-- Інший вміст сторінки my.html -->
+
+
 {% comment %} А ТУТ ДОДАТИ ПЕРЕГЛЯ {% endcomment %}
 
 
