@@ -5,7 +5,7 @@ from django.http import Http404
 from django.contrib import messages
 from django.db.utils import IntegrityError
 
-from .models import Budget, FinOperation, GoalBudget, Category
+from .models import Budget, FinOperation, GoalBudget, Category, TransferBudget, TransferGoalBudget
 from .forms import BudgetForm, FinOperationForm, GoalBudgetForm, CategoryForm
 
 def index(request):
@@ -87,6 +87,16 @@ def budget(request, budget_id):
 
 
     finoperations = budget.finoperation_set.order_by('-date_added') # мінус означає від найновіших до старіших
+
+    #для показу переведень бюджетів
+    transferoutbudgets = budget.budget_out_set.all()
+    transferinbudgets = budget.budget_in_set.all()
+
+    transferoutgoalbudgets = budget.budget_set.all()
+    transferingoalbudgets = budget.goalbudget_set.all()
+    
+    
+
     context = {'budget': budget, 'finoperations': finoperations, 'form': form}
     return render(request, 'financew/budget.html', context)
 

@@ -65,6 +65,32 @@
 <p>Нема фінансових операцій</p>
 {% endfor %}
 
+
+
+Трансфери з бюджету в бюджет:
+{% for finoperation in finoperations %}
+<div style="display: flex; align-items: center; gap: 10px;">
+
+    <!-- Виведення фінансової операції -->
+    <span>{{ finoperation.get_type_display }} - {{ finoperation.amount }} - {{ finoperation.date_added }} - {{ finoperation.category }}</span>
+
+</div>
+
+
+{% empty %}
+<p>Нема трансферів з бюджету в бюджет</p>
+{% endfor %}
+
+
+
+
+
+
+
+
+
+
+
 <script>
     // Отримуємо елементи сторінки для бюджету
     const editBudgetBtn = document.getElementById("edit-budget-btn");

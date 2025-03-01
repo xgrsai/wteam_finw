@@ -79,11 +79,41 @@ class FinOperation(models.Model):
         verbose_name_plural = 'finoperations'
     
     def __str__(self):
-        """Повертаємо величину та тип операції"""
         return f"{self.category} {self.type} {self.amount} {self.time_interval}"
+
+class TransferBudget(models.Model):
+    """Переведення з одного бюджету в інший та можливо переведеня в бюджет ціль"""
+    from_budget = models.ForeignKey(Budget, on_delete=models.CASCADE, related_name="budget_out_set") # переведення з якого бюджету
+    to_budget = models.ForeignKey(Budget, on_delete=models.CASCADE,related_name="budget_in_set") # переведення в який бюджет
+    #related_name треба давати хоча б для одного, якби зовнішній ключ був один воно створило би автоматичне related_name "transfer_set", тобто приклад: some_budget = Budget.objects.get(id=1) тут беремо один бюджет, далі some_budget.transfer_set.all() це виведе всі перекази, де цей бюджет є відповідним (тобто transferи для бюджету в якому id=1)
     
+    #to_goalbudget = models.ForeignKey(GoalBudget, on_delete=models.CASCADE, related_name="goal_transfers", null=True, blank=True)
+    amount = models.DecimalField(max_digits=19, decimal_places=2, validators=[MinValueValidator(0.01)])
+    date_added = models.DateTimeField(auto_now_add=True)
 
+    # class Meta:
+    #     verbose_name_plural = 'transfers'
+    
+    def __str__(self):
+        """"""
+        return f"{self.amount} "
 
+class TransferGoalBudget(models.Model):
+    """Переведення з одного бюджету в інший та можливо переведеня в бюджет ціль"""
+    from_budget = models.ForeignKey(Budget, on_delete=models.CASCADE)
+    to_goalbudget = models.ForeignKey(GoalBudget, on_delete=models.CASCADE)
+    #related_name треба давати хоча б для одного, якби зовнішній ключ був один воно створило би автоматичне related_name "transfer_set", тобто приклад: some_budget = Budget.objects.get(id=1) тут беремо один бюджет, далі some_budget.transfer_set.all() це виведе всі перекази, де цей бюджет є відповідним (тобто transferи для бюджету в якому id=1)
+    
+    #to_goalbudget = models.ForeignKey(GoalBudget, on_delete=models.CASCADE, related_name="goal_transfers", null=True, blank=True)
+    amount = models.DecimalField(max_digits=19, decimal_places=2, validators=[MinValueValidator(0.01)])
+    date_added = models.DateTimeField(auto_now_add=True)
+
+    # class Meta:
+    #     verbose_name_plural = 'transfers'
+    
+    def __str__(self):
+        """"""
+        return f"{self.amount} "
 
     
 
