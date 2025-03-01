@@ -1,7 +1,10 @@
 import pandas as pd
 import plotly.express as px
 from django.shortcuts import render
-from financew.models import Budget, FinOperation
+
+from django.contrib.auth.decorators import login_required
+import pandas as pd
+from financew.models import Budget, GoalBudget, FinOperation  # Імпорт моделей з financew
 
 def visualisation(request):
     """Сторінка візуалізації з вибором інтервалу часу"""
@@ -10,10 +13,10 @@ def visualisation(request):
     budgets = Budget.objects.all()
     data_options = {
         'time_intervals': {
-        "one_time": "Одноразовий",
-        "weekly": "Щотижня",
-        "monthly": "Щомісяця",
-        "annually": "Щорічно",
+            "one_time": "Одноразовий",
+            "weekly": "Щотижня",
+            "monthly": "Щомісяця",
+            "annually": "Щорічно",
     }
     }
 
@@ -56,3 +59,78 @@ def visualisation(request):
         'selected_interval': selected_interval
     }
     return render(request, "visual/visual.html", context)
+
+
+
+
+
+def budget_chart(request):
+    """Сторінка з графіками бюджетів, бюджетів-цілей та фінансових операцій"""
+
+    # Отримуємо всі бюджети, бюджети-цілі та фінансові операції для поточного користувача
+    budgets = Budget.objects.filter(owner=request.user)
+    goal_budgets = GoalBudget.objects.filter(owner=request.user)
+    fin_operations = FinOperation.objects.filter(budget__owner=request.user)
+
+    # Створюємо DataFrame для графіку бюджетів
+    budget_data = {
+        'Назва бюджету': [budget.name for budget in budgets],
+        'Сума': [float(budget.amount) for budget in budgets],  # Перетворюємо Decimal на float
+        'Валюта': [budget.currency for budget in budgets]
+    }
+    budget_df = pd.DataFrame(budget_data)
+
+    # Створюємо стовпчастий графік для бюджетів
+    if not budget_df.empty:
+        budget_fig = px.bar(budget_df, x='Назва бюджету', y='Сума', color='Валюта', title='Графік бюджетів')
+        budget_plot_html = budget_fig.to_html(full_html=False)
+    else:
+        budget_plot_html = "<p>Немає даних для відображення графіку бюджетів.</p>"
+
+    # Створюємо DataFrame для графіку бюджетів-цілей
+    goal_budget_data = {
+        'Назва бюджету-цілі': [goal.name for goal in goal_budgets],
+        'Поточна сума': [float(goal.amount) for goal in goal_budgets],  # Перетворюємо Decimal на float
+        'Цільова сума': [float(goal.target_amount) for goal in goal_budgets],  # Перетворюємо Decimal на float
+        'Валюта': [goal.currency for goal in goal_budgets]
+    }
+    goal_budget_df = pd.DataFrame(goal_budget_data)
+
+    # Створюємо стовпчастий графік для бюджетів-цілей
+    if not goal_budget_df.empty:
+        goal_budget_fig = px.bar(goal_budget_df, x='Назва бюджету-цілі', y=['Поточна сума', 'Цільова сума'], 
+                                title='Графік бюджетів-цілей', barmode='overlay',
+                                color_discrete_map={
+                                    'Поточна сума': 'blue',  # Колір для "Поточної суми"
+                                    'Цільова сума': 'green'  # Колір для "Цільової суми"
+                                })
+        goal_budget_plot_html = goal_budget_fig.to_html(full_html=False)
+    else:
+        goal_budget_plot_html = "<p>Немає даних для відображення графіку бюджетів-цілей.</p>"
+
+    # Створюємо DataFrame для графіку фінансових операцій
+    fin_operation_data = {
+        'Категорія': [operation.category.name if operation.category else "Без категорії" for operation in fin_operations],
+        'Сума': [float(operation.amount) for operation in fin_operations],  # Перетворюємо Decimal на float
+        'Тип операції': [operation.type for operation in fin_operations],
+        'Валюта': [operation.budget.currency for operation in fin_operations]
+    }
+    fin_operation_df = pd.DataFrame(fin_operation_data)
+
+    # Створюємо круговий графік для фінансових операцій
+    if not fin_operation_df.empty:
+        fin_operation_fig = px.pie(fin_operation_df, names='Категорія', values='Сума', 
+                                   title='Розподіл фінансових операцій за категоріями')
+        fin_operation_plot_html = fin_operation_fig.to_html(full_html=False)
+    else:
+        fin_operation_plot_html = "<p>Немає даних для відображення графіку фінансових операцій.</p>"
+
+    # Передаємо всі графіки у шаблон
+    context = {
+        'budget_plot_html': budget_plot_html,
+        'goal_budget_plot_html': goal_budget_plot_html,
+        'fin_operation_plot_html': fin_operation_plot_html,
+    }
+
+    return render(request, 'financew/my.html', context)
+

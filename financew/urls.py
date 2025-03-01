@@ -14,7 +14,6 @@ urlpatterns = [
     # path("edit_budget/<int:budget_id>/", views.edit_budget, name='edit_budget'),
     path("edit_finoperation/<int:finoperation_id>/", views.edit_finoperation, name='edit_finoperation'),
     path("add-category/", views.add_category, name="add_category"),
-    path('my2/', views.budget_chart, name='my'),  # Новий шлях для сторінки my/
 
 ]
 
