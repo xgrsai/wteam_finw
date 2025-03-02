@@ -1,6 +1,9 @@
 {% extends 'financew/base.html' %}
 {% load static %}
 <!DOCTYPE html>
+
+
+{% block content %} 
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -11,11 +14,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
+
 <body>
-
-
-{% block content %} 
-  
   <div class="container-left">
     <div class="left-mini-logo">
       <img src="{% static 'img/Logo.svg'%}" alt="">
@@ -27,7 +27,15 @@
     <h1>Log in</h1>
     <form action="{% url 'accounts:login' %}" method='post'>
 {% csrf_token %}
-{{ form.as_div }}
+<!--{{ form.as_div }}-->
+      <div>
+        <label for="username">Username:</label><br>
+        <input type="text" name="username" id="username" placeholder="">
+      </div>
+      <div>
+        <label for="password">Password:</label><br>
+        <input type="password" name="password" id="pass" placeholder="">
+      </div>
       <div>
         <label for="email">Your Email:</label><br>
         <input type="text" name="email" id="email" placeholder="finance@forecast.com">
@@ -46,7 +54,5 @@
 {% endblock content %} 
   </div>
 
-
-  
 </body>
 </html>

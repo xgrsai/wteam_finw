@@ -1,9 +1,9 @@
-<p><a href="{% url 'financew:index' %}">FinanceW</a> -
+<!--<p><a href="{% url 'financew:index' %}">FinanceW</a> - -->
 {% if user.is_authenticated %}
   <a href="{% url 'financew:my' %}">Мій кабінет</a> - Привіт {{ user.username }}
 {% else %}
-    <a href="{% url 'accounts:register' %}">Реєстрація</a> - 
-    <a href="{% url 'accounts:login' %}">Вхід</a>
+<!--    <a href="{% url 'accounts:register' %}">Реєстрація</a> - -->
+<!--    <a href="{% url 'accounts:login' %}">Вхід</a>-->
 {% endif %}
 </p>
 {% block content %}{% endblock content %}
