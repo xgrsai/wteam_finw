@@ -28,27 +28,27 @@ def my(request):
     # форма для додавання нового бюджету та бюджету цілі
     if request.method != 'POST':
         # No data submitted; create a blank form.
-        budgetform = BudgetForm()
-        goalbudgetform = GoalBudgetForm()
-        categoryform = CategoryForm()
+        budgetform = BudgetForm(prefix='budget')
+        goalbudgetform = GoalBudgetForm(prefix='goalbudget')
+        categoryform = CategoryForm(prefix='categorybudget')
 
     else:
         #для форми бюджетів
-        budgetform = BudgetForm(data=request.POST) # аргумент передає значення полів форми
+        budgetform = BudgetForm(data=request.POST,prefix='budget' ) # аргумент передає значення полів форми
         if budgetform.is_valid():
             new_budget = budgetform.save(commit=False) # не зберігати одразу до бд
             new_budget.owner = request.user #додати власником поточного залогіненого користувача
             new_budget.save() # зберегти в бд
                 
         #для форми бюджету-цілі
-        goalbudgetform = GoalBudgetForm(data=request.POST) # аргумент передає значення полів форми
+        goalbudgetform = GoalBudgetForm(data=request.POST,prefix='goalbudget') # аргумент передає значення полів форми
         if goalbudgetform.is_valid():
             new_goalbudget = goalbudgetform.save(commit=False) # не зберігати одразу до бд
             new_goalbudget.owner = request.user #додати власником поточного залогіненого користувача
             new_goalbudget.save() # зберегти в бд
         
         #для форми категорії
-        categoryform = CategoryForm(data=request.POST) # аргумент передає значення полів форми
+        categoryform = CategoryForm(data=request.POST,prefix='categorybudget') # аргумент передає значення полів форми
         if categoryform.is_valid():
             new_category = categoryform.save(commit=False) # не зберігати одразу до бд
             new_category.owner = request.user #додати власником поточного залогіненого користувача
