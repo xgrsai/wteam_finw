@@ -5,24 +5,45 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 </head>
 <body>
 
-  {% extends 'financew/base.html' %}
+{% extends 'financew/base.html' %}
 
-  {% block content %}
+{% block content %} 
   
-  {% if form.errors %}
-   <p>Your username and password didn't match. Please try again.</p>
-  {% endif %} 
-  
-   <form action="{% url 'accounts:login' %}" method='post'>
-   {% csrf_token %}
-   {{ form.as_div }}
-   <button name="submit">Log in</button>
-   </form>
-  
-  {% endblock content %}
+  <div class="container-left">
+    <div class="left-mini-logo">
+      <img src="Logo.svg" alt="">
+      <h3>FinW</h3>
+    </div>
+    <img id="image" src="Image.svg" alt="">
+  </div>
+  <div class="form-container">
+    <h1>Log in</h1>
+    <form action="{% url 'accounts:login' %}" method='post'>
+{% csrf_token %}
+{{ form.as_div }}
+      <div>
+        <label for="email">Your Email:</label><br>
+        <input type="text" name="email" id="email" placeholder="finance@forecast.com">
+      </div>
+      <br>
+      <div>
+        <label for="password">Password</label><br>
+        <input type="password" name="pass" id="password" placeholder="***********">
+      </div>
+{% if form.errors %}
+      <p>Your username and password didn't match. Please try again.</p>
+{% endif %}  
+      <br><button name="submit">Log in</button>
+    </form>
+    
+{% endblock content %} 
+  </div>
 
 
   
