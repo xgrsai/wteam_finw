@@ -29,4 +29,4 @@ urlpatterns = [
     path('plots/', include('plots.urls', namespace='plots')),
     # Підключення модулю: accounts
     path('accounts/', include('accounts.urls', namespace='accounts')),
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+] #+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
