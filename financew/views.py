@@ -28,27 +28,27 @@ def my(request):
     # форма для додавання нового бюджету та бюджету цілі
     if request.method != 'POST':
         # No data submitted; create a blank form.
-        budgetform = BudgetForm()
-        goalbudgetform = GoalBudgetForm()
-        categoryform = CategoryForm()
+        budgetform = BudgetForm(prefix='budget')
+        goalbudgetform = GoalBudgetForm(prefix='goal')
+        categoryform = CategoryForm(prefix='category')
 
     else:
         #для форми бюджетів
-        budgetform = BudgetForm(data=request.POST) # аргумент передає значення полів форми
+        budgetform = BudgetForm(data=request.POST, prefix='budget') # аргумент передає значення полів форми
         if budgetform.is_valid():
             new_budget = budgetform.save(commit=False) # не зберігати одразу до бд
             new_budget.owner = request.user #додати власником поточного залогіненого користувача
             new_budget.save() # зберегти в бд
                 
         #для форми бюджету-цілі
-        goalbudgetform = GoalBudgetForm(data=request.POST) # аргумент передає значення полів форми
+        goalbudgetform = GoalBudgetForm(data=request.POST, prefix='goal') # аргумент передає значення полів форми
         if goalbudgetform.is_valid():
             new_goalbudget = goalbudgetform.save(commit=False) # не зберігати одразу до бд
             new_goalbudget.owner = request.user #додати власником поточного залогіненого користувача
             new_goalbudget.save() # зберегти в бд
         
         #для форми категорії
-        categoryform = CategoryForm(data=request.POST) # аргумент передає значення полів форми
+        categoryform = CategoryForm(data=request.POST, prefix='category') # аргумент передає значення полів форми
         if categoryform.is_valid():
             new_category = categoryform.save(commit=False) # не зберігати одразу до бд
             new_category.owner = request.user #додати власником поточного залогіненого користувача
@@ -155,6 +155,37 @@ def delete_finoperation(request, finoperation_id):
     finoperation.delete()
     return redirect('financew:budget', budget_id=budget.id)
 
+@login_required
+def delete_budget(request, budget_id):
+    """
+    Видаляє бюджет за його ID. Доступно лише власнику бюджету.
+    """
+    budget = get_object_or_404(Budget, id=budget_id, owner=request.user)
+    if request.method == 'POST':
+        budget.delete()
+        return redirect('financew:my')
+
+@login_required
+def delete_goalbudget(request, goalbudget_id):
+    """
+    Видаляє бюджет-ціль за її ID. Доступно лише власнику бюджету-цілі.
+    """
+    goalbudget = get_object_or_404(GoalBudget, id=goalbudget_id, owner=request.user)
+    if request.method == 'POST':
+        goalbudget.delete()
+        return redirect('financew:my')
+
+
+@login_required
+def delete_category(request, category_id):
+    """
+    Видаляє категорію за її ID. Доступно лише власнику категорії.
+    """
+    category = get_object_or_404(Category, id=category_id, owner=request.user)
+    if request.method == 'POST':
+        category.delete()
+        return redirect('financew:my')
+
 
 @login_required
 def edit_finoperation(request, finoperation_id):
@@ -193,7 +224,7 @@ def edit_finoperation(request, finoperation_id):
 @login_required
 def goalbudgets(request):
     goalbudgets = GoalBudget.objects.filter(owner=request.user).all() # взяти всі бюджети що належать цьому користувачу
-        
+
     context = {'goalbudgets': goalbudgets}
     return render(request, 'financew/my.html', context) # потім дані з context можна використовувати у шаблоні  
   
