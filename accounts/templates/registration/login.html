@@ -1,15 +1,15 @@
 {% extends 'financew/base.html' %}
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login</title>
-{% load static %}
-  <link rel="stylesheet" href="{% static 'accounts/templates/registration/style.css' %}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
 
@@ -18,10 +18,10 @@
   
   <div class="container-left">
     <div class="left-mini-logo">
-      <img src="Logo.svg" alt="">
+      <img src="{% static 'img/Logo.svg'%}" alt="">
       <h3>FinW</h3>
     </div>
-    <img id="image" src="Image.svg" alt="">
+    <img id="image" src="{% static 'img/Image.svg'%}" alt="">
   </div>
   <div class="form-container">
     <h1>Log in</h1>
