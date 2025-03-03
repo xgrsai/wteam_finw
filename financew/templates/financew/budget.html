@@ -1,12 +1,18 @@
-{% extends 'financew/base.html' %} 
+{% extends 'financew/base.html' %}
+{% load static %}
+
 {% block content %}
-<p>{{ budget.name }} {{ budget.amount }} {{ budget.currency }} <!-- Кнопка для редагування бюджету --><button id="edit-budget-btn">Змінити дані</button></p>
+<link rel="stylesheet" href="{% static 'styles.css' %}"> 
+
+<p>{{ budget.name }} {{ budget.amount }} {{ budget.currency }} <!-- Кнопка для редагування бюджету -->
+    <button id="edit-budget-btn">Змінити дані</button></p>
 
 <!-- Форма для редагування бюджету (спочатку прихована) -->
 <div id="edit-budget-form" style="display: none;">
     <form method="post" action="{% url 'financew:budget' budget.id %}">
         {% csrf_token %}
         {{form.as_div}}
+        
         {% comment %} <label for="name">Назва бюджету:</label>
         <input type="text" name="name" value="{{ budget.name }}" required>
         <label for="amount">Сума:</label>
@@ -14,17 +20,26 @@
         <label for="currency">Валюта:</label>
         <input type="text" name="currency" value="{{ budget.currency }}" required> {% endcomment %}
         
+        {% comment %} {% for fm in form %}
+        <div class="form-group" style="border: 2px solid red; padding: 10px;">
+            <label>{{fm.label}}</label>
+            <div>{{fm}} </div>
+        </div>
+        {% endfor %}  {% endcomment %}
+
+
         <button type="submit">Зберегти зміни</button>
         <button type="button" id="cancel-edit-btn">Скасувати</button>
     </form>
 </div>
+
 
 <a href="{% url "financew:new_finoperation" budget.id %}">Додати нову фінансову операцію</a>
 {% for finoperation in finoperations %}
 <div style="display: flex; align-items: center; gap: 10px;">
 
     <!-- Виведення фінансової операції -->
-    <span>{{ finoperation.get_type_display }} - {{ finoperation.amount }} - {{ finoperation.date_added }}</span>
+    <span>{{ finoperation.get_type_display }} - {{ finoperation.amount }} - {{ finoperation.date_added }} - {{ finoperation.category }}</span>
 
     <!-- Кнопка для редагування фінансової операції -->
     <a href="#" class="edit-finoperation-btn" data-finoperation-id="{{ finoperation.id }}" style="color: blue; text-decoration: none;">Змінити операцію</a>
@@ -45,9 +60,59 @@
     <!-- видалення операції -->
     <a href="{% url 'financew:delete_finoperation' finoperation.id %}" >🗑 Видалити</a>
 </div>
+
+
 {% empty %}
 <p>Нема фінансових операцій</p>
 {% endfor %}
+
+
+
+Трансфери з бюджету в бюджет:
+{% comment %} Кнопки для додавання транзакцій {% endcomment %}
+
+
+<table border="1">
+    <thead>
+        <tr>
+            <th>Дата</th>
+            <th>З бюджету</th>
+            <th>У бюджет</th>
+            <th>Сума</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for transfer in transfers %}
+        <tr>
+            <td>{{ transfer.date_added }}</td>
+            <td>{{ transfer.from_budget.name }}</td>
+            <td>
+                {% if transfer.to_budget %}
+                    {{ transfer.to_budget.name }}
+                    {% else %}
+                    {{ transfer.to_goalbudget.name }}
+                {% endif %}
+            </td>
+            <td>{{ transfer.amount }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4">Немає переказів</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<button id="add-budget-transfer-form">Здійснити транзакцію до бюджету</button>
+<button id="add-goalbudget-transfer-form">Здійснити транзакцію до бюджету-цілі</button>
+
+<div style = "display:block">
+<form action="{% url 'financew:budget' budget.id %}" method="post">
+    {%csrf_token%}
+    {{transferbudgetform.as_div}}
+    <button type="submit">Здійснити трансфер</button>
+</form>
+</div>
 
 <script>
     // Отримуємо елементи сторінки для бюджету
@@ -73,7 +138,7 @@
 
     editFinoperationBtns.forEach(function(button) {
         button.addEventListener("click", function(event) {
-            event.preventDefault();
+            event.preventDefault(); // Це блокує стандартну поведінку форми (без перенапрвлень) (поястення ЧАТГПТ -  блокує стандартну поведінку події, тобто він не дозволяє браузеру автоматично відправити форму, не перезавантажує сторінку і не виконує перенаправлення, яке зазвичай відбувається при натисканні на кнопку відправлення.)
 
             // Отримуємо ID фінансової операції
             const finoperationId = button.getAttribute("data-finoperation-id");

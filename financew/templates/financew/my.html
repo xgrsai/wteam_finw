@@ -1,5 +1,11 @@
-{% extends 'financew/base.html' %}
+{% extends 'financew/base.html' %} 
+{% load static %} 
+
 {% block content %}
+<link rel="stylesheet" href="{% static 'financew/style.css' %}">
+<a href="{% url 'plots:report' %}"
+    >Візуалізація (чи звіти) </a>
+
 
 <!-- Вибір валюти відображення -->
 <form method="get" action="{% url 'financew:my' %}">
@@ -17,23 +23,198 @@
 {% for item in budgets_with_converted %}
     <li>
       <a href="{% url 'financew:budget' item.budget.id %}">{{ item.budget.name }}: {{ item.budget.amount|floatformat:2 }} {{ item.budget.currency }} ({{ item.converted_balance|floatformat:2 }} {{ display_currency }})</a>
+</ul>
+ 
+<div>Мої бюджети
+{% for budget in budgets%}<!-- воно бере по назві ключа -->
+    <li>
+        <a href="{% url 'financew:budget' budget.id %}">{{ budget.name }} {{ budget.amount }} {{ budget.currency }}</a>
+        <form action="{% url 'financew:delete_budget' budget.id %}" method="post" style="display:inline;">
+            {% csrf_token %}
+            <button id="delete-budget-btn">Видалити</button>
+        </form>
     </li>
 {% empty %}
     <li>Бюджети не знайдено</li>
 {% endfor %}
-</ul>
 
-  <!-- Кнопка для додавання нового бюджету -->
+<!-- Кнопка для додавання нового бюджету -->
 <button id="add-budget-btn">Додати новий бюджет</button>
-
 <!-- Форма для додавання нового бюджету (спочатку прихована) -->
-<div id="add-budget-form" style="display: none;">
-  <form action="{% url 'financew:my' %}" method="post"> <!-- action - куди відправляється форма-->
-    {% csrf_token %} <!--токен CSRF, який додається до кожної форми, що дозволяє серверу перевіряти, чи запит дійсно надійшов з авторизованого джерела (тобто з вашого веб-сайту, а не з якогось іншого, створеного зловмисником).-->
-    {{ form.as_div }}
-    <button name="submit">Додати бюджет</button>
-    <button id="cancel-btn">Скасувати</button>
-  </form> </div>
+<div id="add-budget-form" style="display: none">
+  <form action="{% url 'financew:my' %}" method="post">
+    <!-- action - куди відправляється форма-->
+    {% csrf_token %}
+    <!--токен CSRF, який додається до кожної форми, що дозволяє серверу перевіряти, чи запит дійсно надійшов з авторизованого джерела (тобто з вашого веб-сайту, а не з якогось іншого, створеного зловмисником).-->
+    
+    {% comment %} <div class="form-group" style="border: 2px solid red; padding: 10px">
+      <label for="{{ budget_form.name.id_for_label }}">{{ budget_form.name.label }}</label>
+      {{ budget_form.name }}
+    </div>
+
+    <div class="form-group" style="border: 2px solid red; padding: 10px">
+      <label for="{{ budget_form.amount.id_for_label }}"
+        >{{ budget_form.amount.label }}</label
+      >
+      {{ budget_form.amount }}
+    </div>
+
+    <div class="form-group" style="border: 2px solid red; padding: 10px">
+      <label for="{{ budget_form.currency.id_for_label }}"
+        >{{ budget_form.currency.label }}</label
+      >
+      {{ budget_form.currency }}
+    </div> {% endcomment %}
+
+    {{budgetform.as_div}} <!--форма для вводу бюджету-цілі все що зверху це то саме-->
+
+
+    <button type="submit">Додати бюджет</button>
+    <button id="cancel-btn-budget">Скасувати</button>
+  </form>
+</div>
+</div>
+
+<!--бюджетицілі-->
+<div>Мої бюджети-цілі
+{% for goalbudget in goalbudgets%}<!-- воно бере по назві ключа -->
+<li>
+    {{ goalbudget.name }} {{ goalbudget.amount }}/{{ goalbudget.target_amount }} {{ goalbudget.currency }}
+    <form action="{% url 'financew:delete_goalbudget' goalbudget.id %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        <button id="delete-goalbudget-btn">Видалити</button>
+    </form>
+</li>
+{% empty %}
+<li>Бюджети-цілі не знайдено</li>
+{% endfor %}
+
+<!-- Кнопка для додавання нового бюджету-цілі -->
+<button id="add-goalbudget-btn">Додати нову бюджет-ціль</button>
+<!-- Форма для додавання нового бюджету (спочатку прихована) -->
+<div id="add-goalbudget-form" style="display: none">
+   <form action="{% url 'financew:my' %}" method="post">
+    {%csrf_token%}
+    
+    {{goalbudgetform.as_div}} <!--форма для вводу бюджету цілі-->
+
+    <button button type="submit">Додати бюджет-ціль</button>
+    <button id="cancel-btn-goalbudget">Скасувати</button>
+  </form> 
+</div>
+</div>
+  
+
+
+{% comment %} А ТУТ ДОДАТИ ПЕРЕГЛЯД КАТЕГОРІЙ І ТАКОЖ ЇХ ДОДАВАВННЯ {% endcomment %}
+<!--категорії-->
+<div>Мої категорії
+{% for category in categories%}<!-- воно бере по назві ключа -->
+<li>
+    {{ category.name }}
+    <form action="{% url 'financew:delete_category' category.id %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        <button id="delete-category-btn">Видалити</button>
+    </form>
+</li>
+{% empty %}
+<li>Категорії не знайдено</li>
+{% endfor %}
+</div>
+
+
+ <!-- Кнопка для додавання категорії -->
+ <button id="add-category-btn">Додати категорію</button>
+ {% if messages %}
+ <div>
+     {% for message in messages %}
+         <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+             {{ message }}
+         </div>
+     {% endfor %}
+ </div>
+{% endif %}
+ <!-- Форма для введення нової категорії (спочатку прихована) -->
+ <div id="add-category-form" style="display: none; margin-top: 10px;">
+     <form action="{% url 'financew:my' %}" method="post">
+         {% csrf_token %}
+         {% comment %} <input type="text" id="category-name" placeholder="Введіть назву категорії" required> {% endcomment %}
+         {{ categoryform.as_div }}
+         <!-- Виведення помилки під полем "name" -->
+         {% if categoryform.name.errors %}
+         <div style="color: red;">
+            {% for error in categoryform.name.errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+          {% endif %}
+         <button type="submit">Додати</button>
+         <button type="button" id="cancel-category-btn">Скасувати</button>
+     </form>
+ </div> 
+
+{% comment %} <!-- Кнопка для додавання нової категорії -->
+<button id="add-category-btn">Додати нову бюджет-ціль</button>
+<!-- Форма для додавання нового бюджету (спочатку прихована) -->
+<div id="add-category-form" style="display: none">
+   <form action="{% url 'financew:my' %}" method="post">
+    {%csrf_token%}
+    
+    {{categoryform.as_div}} <!--форма для вводу категорії-->
+
+    <button type="submit">Додати категорію</button>
+    <button id="cancel-btn-category">Скасувати</button>
+  </form> 
+</div> {% endcomment %}
+
+
+
+
+{% comment %} ТУТ ТИПУ ГРАФІКИ (НАПЕВНО PIECHART із ЗАГАЛЬНИМИ ВИТРАТАМИ ПО моїх категоріями) {% endcomment %}
+
+
+
+{% comment %} <!--AJAX - запит-->
+<script>
+document.getElementById("show-category-form-btn").addEventListener("click", function() {
+    document.getElementById("add-category-form").style.display = "block";  // Показати форму
+    document.getElementById("show-category-form-btn").style.display = "none";  // Сховати кнопку
+});
+
+document.getElementById("cancel-category-btn").addEventListener("click", function() {
+    document.getElementById("add-category-form").style.display = "none";  // Сховати форму
+    document.getElementById("show-category-form-btn").style.display = "block";  // Повернути кнопку
+});
+]
+// Обробник подачі форми
+document.getElementById("category-form").addEventListener("submit", function(event) {
+    event.preventDefault();  // Відмінити перезавантаження сторінки
+
+    const categoryName = document.getElementById("category-name").value;
+    const csrfToken = document.querySelector("input[name='csrfmiddlewaretoken']").value;
+
+    fetch("{% url 'financew:add_category' %}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrfToken
+        },
+        body: JSON.stringify({ name: categoryName })
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+        if (data.message === "Категорію додано успішно!") {
+            document.getElementById("category-form").reset();  // Очистити поле вводу
+            document.getElementById("add-category-form").style.display = "none";  // Сховати форму
+            document.getElementById("show-category-form-btn").style.display = "block";  // Повернути кнопку
+        }
+    })
+    .catch(error => console.error("Помилка:", error));
+});
+</script> {% endcomment %}
+
+  
 
 <!-- Останні операції -->
 <h3>Останні 5 операцій</h3>
@@ -51,23 +232,61 @@
 <p><a href="{% url 'financew:transactions' %}">Переглянути всі транзакції</a></p>
 
   <script>
-    // Отримуємо елементи
-    const addBudgetBtn = document.getElementById("add-budget-btn");
-    const addBudgetForm = document.getElementById("add-budget-form");
-    const cancelBtn = document.getElementById("cancel-btn");
+  //для бюджету
+  const addBudgetBtn = document.getElementById("add-budget-btn");
+  const addBudgetForm = document.getElementById("add-budget-form");
+  const cancelBtnBudget = document.getElementById("cancel-btn-budget");
+  
+  //для бюджету-цілі
+  const addGoalBudgetForm = document.getElementById("add-goalbudget-form");
+  const addGoalBudgetBtn = document.getElementById("add-goalbudget-btn");
+  const cancelBtnGoalBudget = document.getElementById("cancel-btn-goalbudget");
 
-    // Показуємо форму для додавання бюджету
-    addBudgetBtn.addEventListener("click", function(event) {
-        event.preventDefault();
-        addBudgetForm.style.display = "block"; // Показуємо форму
-        addBudgetBtn.style.display = "none"; // Приховуємо кнопку додавання
-    });
+  //для категорій
+  const addCategoryForm = document.getElementById("add-category-form");
+  const addCategoryBtn = document.getElementById("add-category-btn");
+  const cancelBtnCategory = document.getElementById("cancel-btn-category");  
 
-    // Скасувати додавання бюджету
-    cancelBtn.addEventListener("click", function() {
-        addBudgetForm.style.display = "none"; // Приховуємо форму
-        addBudgetBtn.style.display = "inline"; // Показуємо кнопку додавання
-    });
+  // Показуємо форму для додавання бюджету
+  addBudgetBtn.addEventListener("click", function (event) {
+    event.preventDefault();
+    addBudgetForm.style.display = "block"; // Показуємо форму
+    addBudgetBtn.style.display = "none"; // Приховуємо кнопку додавання
+  });
+
+  // Скасувати додавання бюджету
+  cancelBtnBudget.addEventListener("click", function () {
+    addBudgetForm.style.display = "none"; // Приховуємо форму
+    addBudgetBtn.style.display = "inline"; // Показуємо кнопку додавання
+  });
+
+
+  // Показуємо форму для додавання бюджету-цілі
+  addGoalBudgetBtn.addEventListener("click", function (event) {
+    event.preventDefault();
+    addGoalBudgetForm.style.display = "block"; // Показуємо форму
+    addGoalBudgetBtn.style.display = "none"; // Приховуємо кнопку додавання
+  });
+
+  // Скасувати додавання бюджету-цілі
+  cancelBtnGoalBudget.addEventListener("click", function () {
+    addGoalBudgetForm.style.display = "none"; // Приховуємо форму
+    addGoalBudgetBtn.style.display = "inline"; // Показуємо кнопку додавання
+  });
+
+  // Показуємо форму для додавання категорії
+  addCategoryBtn.addEventListener("click", function (event) {
+    event.preventDefault();
+    addCategoryForm.style.display = "block"; // Показуємо форму
+    addCategoryBtn.style.display = "none"; // Приховуємо кнопку додавання
+  });
+
+  // Скасувати додавання категорії
+  cancelBtnCategory.addEventListener("click", function () {
+    addCategoryForm.style.display = "none"; // Приховуємо форму
+    addCategoryBtn.style.display = "inline"; // Показуємо кнопку додавання
+  });
+
 </script>
 
 {% endblock content %}
