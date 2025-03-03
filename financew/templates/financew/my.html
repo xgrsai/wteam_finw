@@ -3,11 +3,28 @@
 
 {% block content %}
 <link rel="stylesheet" href="{% static 'financew/style.css' %}">
-
 <a href="{% url 'plots:report' %}"
     >Візуалізація (чи звіти) </a>
 
-<!--показати бюджети користувача-->
+
+<!-- Вибір валюти відображення -->
+<form method="get" action="{% url 'financew:my' %}">
+    <label for="currency">Валюта відображення:</label>
+    <select name="currency" id="currency" onchange="this.form.submit()">
+        {% for currency in currencies %}
+            <option value="{{ currency }}" {% if currency == display_currency %}selected{% endif %}>{{ currency }}</option>
+        {% endfor %}
+    </select>
+</form>
+
+<p>Загальний баланс у {{ display_currency }}: {% if total_balance != 0 %}{{ total_balance|floatformat:2 }} {{ display_currency }}{% else %}Немає даних{% endif %}</p>
+<ul>
+
+{% for item in budgets_with_converted %}
+    <li>
+      <a href="{% url 'financew:budget' item.budget.id %}">{{ item.budget.name }}: {{ item.budget.amount|floatformat:2 }} {{ item.budget.currency }} ({{ item.converted_balance|floatformat:2 }} {{ display_currency }})</a>
+</ul>
+ 
 <div>Мої бюджети
 {% for budget in budgets%}<!-- воно бере по назві ключа -->
     <li>
@@ -198,6 +215,21 @@ document.getElementById("category-form").addEventListener("submit", function(eve
 </script> {% endcomment %}
 
   
+
+<!-- Останні операції -->
+<h3>Останні 5 операцій</h3>
+<ul>
+{% for operation in recent_operations %}
+    <li>
+      {{ operation.date_added|date:"Y-m-d H:i" }} - {{ operation.get_type_display }}: {{ operation.amount|floatformat:2 }} {{ operation.budget.currency }} (Бюджет: {{ operation.budget.name }} {% if operation.category %}, Категорія: {{ operation.category.name }}{% endif %})
+    </li>
+{% empty %}
+    <li>Операції не знайдено</li>
+{% endfor %}
+</ul>
+
+<!-- Посилання на сторінку всіх транзакцій -->
+<p><a href="{% url 'financew:transactions' %}">Переглянути всі транзакції</a></p>
 
   <script>
   //для бюджету

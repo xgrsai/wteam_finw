@@ -14,8 +14,17 @@ class BudgetForm(forms.ModelForm):
 class FinOperationForm(forms.ModelForm):
     class Meta:
         model = FinOperation
-        fields = ['amount', 'type', 'time_interval', 'category']
-        labels = {'amount': 'Сума', 'type': 'Тип операції','time_interval': 'Часовий інтервал', 'category': 'Категорія операціії'}
+        fields = ['amount', 'type', 'time_interval', 'category', 'start_date']
+        labels = {
+            'amount': 'Сума',
+            'type': 'Тип операції',
+            'time_interval': 'Часовий інтервал',
+            'category': 'Категорія операціії',
+            'start_date': 'Дата початку операції'
+        }
+        widgets = {
+            'start_date': forms.DateTimeInput(attrs={'time_type': 'datetime-local'}),
+        }
 
 class CategoryForm(forms.ModelForm):
     class Meta:

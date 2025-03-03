@@ -1,10 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_UP
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from itertools import chain
 from django.db import transaction
+from django.utils import timezone
 
+from .utils import get_exchange_rates, convert_to_currency
 from .models import Budget, FinOperation, GoalBudget, Category, TransferBudget, TransferGoalBudget
 from .forms import BudgetForm, FinOperationForm, GoalBudgetForm, CategoryForm,  TransferFromBudgetForm
 
@@ -17,14 +19,48 @@ def index(request):
 
 @login_required
 def my(request):
-    """головна сторінка фінансиW з бюджетом та додавання нового бюджету (те саме стосується і бюджетів-цілей)"""
+    """
+    Головна сторінка ФінансиW з бюджетом та загальним балансом у вибраній валюті.
+    Відображає особистий кабінет користувача та дозволяє додавати нові бюджети.
+    """
     budgets = Budget.objects.filter(owner=request.user).all() # взяти всі бюджети що належать цьому користувачу
+    rates = get_exchange_rates(request)
+
+    # Отримуємо останні 5 фінансових операцій для поточного користувача
+    recent_operations = FinOperation.objects.filter(budget__owner=request.user).order_by('-date_added')[:5]
+
+    # Отримуємо валюту відображення з GET-параметра або сесії
+    display_currency = request.GET.get('currency', request.session.get('display_currency', 'UAH'))
+    if display_currency not in ['UAH', 'USD', 'EUR']:
+        display_currency = 'UAH'
+
+    # Зберігаємо вибір валюти у сесії
+    request.session['display_currency'] = display_currency
+
+    # Обчислення загального балансу і конвертованих сум у вибраній валюті
+    total_in_uah = Decimal('0')
+    budgets_with_converted = []
+    for budget in budgets:
+        balance_in_uah = budget.total_balance_in_uah(request)
+        print(
+            f"Budget: {budget.name}, Currency: {budget.currency}, Amount: {budget.amount}, Balance in UAH: {balance_in_uah}")
+        total_in_uah += balance_in_uah
+
+        # Конвертуємо баланс бюджету у вибрану валюту
+        converted_balance = convert_to_currency(balance_in_uah, display_currency, rates)
+        budgets_with_converted.append({
+            'budget': budget,
+            'converted_balance': converted_balance
+        })
+
+    total_balance = convert_to_currency(total_in_uah, display_currency, rates)
+
+    """головна сторінка фінансиW з бюджетом та додавання нового бюджету (те саме стосується і бюджетів-цілей)"""
+    
     goalbudgets = GoalBudget.objects.filter(owner=request.user).all()
 
     #наявнi категорій користувача
     categories = Category.objects.filter(owner=request.user).all()
-
-    # форма для додавання нового бюджету та бюджету цілі
     if request.method != 'POST':
         # No data submitted; create a blank form.
         budgetform = BudgetForm(prefix='budget')
@@ -40,7 +76,6 @@ def my(request):
             new_budget.save() # зберегти в бд
                 
         #для форми бюджету-цілі
-
         goalbudgetform = GoalBudgetForm(data=request.POST,prefix='goalbudget') # аргумент передає значення полів форми
         if goalbudgetform.is_valid():
             new_goalbudget = goalbudgetform.save(commit=False) # не зберігати одразу до бд
@@ -61,12 +96,42 @@ def my(request):
         return redirect('financew:my')
     
     # Display a blank or invalid form.
-    context = {'budgets': budgets, 'goalbudgets': goalbudgets, 'categories': categories, 'goalbudgetform':goalbudgetform, 'budgetform': budgetform, 'categoryform':categoryform,}
-                
-               
+    context = {'budgets': budgets, 'goalbudgets': goalbudgets, 'categories': categories, 'goalbudgetform':goalbudgetform, 'budgetform': budgetform, 'categoryform':categoryform, 'budgets_with_converted': budgets_with_converted, 'total_balance': total_balance, 'display_currency': display_currency, 'currencies': ['UAH', 'USD', 'EUR'], 'recent_operations':recent_operations}
     return render(request, 'financew/my.html', context) # потім дані з context можна використовувати у шаблоні 
 
- 
+@login_required
+def transactions(request):
+    """
+    Відображає всі фінансові операції користувача.
+    """
+    operations = FinOperation.objects.filter(budget__owner=request.user).order_by('-date_added')
+    rates = get_exchange_rates(request)
+
+    # Отримуємо валюту відображення з GET-параметра або сесії
+    display_currency = request.GET.get('currency', request.session.get('display_currency', 'UAH'))
+    if display_currency not in ['UAH', 'USD', 'EUR']:
+        display_currency = 'UAH'
+
+    # Зберігаємо вибір валюти у сесії
+    request.session['display_currency'] = display_currency
+
+    # Конвертуємо суми операцій у вибрану валюту
+    operations_with_converted = []
+    for operation in operations:
+        balance_in_uah = operation.amount if operation.budget.currency == 'UAH' else (
+                    operation.amount * rates[operation.budget.currency])
+        converted_amount = convert_to_currency(balance_in_uah, display_currency, rates)
+        operations_with_converted.append({
+            'operation': operation,
+            'converted_amount': converted_amount
+        })
+
+    context = {
+        'operations_with_converted': operations_with_converted,
+        'display_currency': display_currency,
+        'currencies': ['UAH', 'USD', 'EUR'],
+    }
+    return render(request, 'financew/transactions.html', context)
 
 @login_required
 def budget(request, budget_id):
@@ -119,7 +184,6 @@ def budget(request, budget_id):
     transfers = sorted(all_transfers, key=lambda x: x.date_added, reverse=True)# Відсортувати за датою (воно автоматом в ліст перетворює) елементи в transfers досі є об'єктами класу
     context = {'budget': budget, 'finoperations': finoperations, 'transfers': transfers,'form': budgetform,'transferbudgetform': transferbudgetform, }
     return render(request, 'financew/budget.html', context)
-
 
 
 @login_required
