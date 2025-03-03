@@ -10,13 +10,15 @@
 <!--показати бюджети користувача-->
 <div>Мої бюджети
 {% for budget in budgets%}<!-- воно бере по назві ключа -->
-<li>
-  <a href="{% url 'financew:budget' budget.id %}"
-    >{{ budget.name }} {{ budget.amount }} {{ budget.currency }}</a
-  >
-</li>
+    <li>
+        <a href="{% url 'financew:budget' budget.id %}">{{ budget.name }} {{ budget.amount }} {{ budget.currency }}</a>
+        <form action="{% url 'financew:delete_budget' budget.id %}" method="post" style="display:inline;">
+            {% csrf_token %}
+            <button id="delete-budget-btn">Видалити</button>
+        </form>
+    </li>
 {% empty %}
-<li>Бюджети не знайдено</li>
+    <li>Бюджети не знайдено</li>
 {% endfor %}
 
 <!-- Кнопка для додавання нового бюджету -->
@@ -61,6 +63,10 @@
 {% for goalbudget in goalbudgets%}<!-- воно бере по назві ключа -->
 <li>
     {{ goalbudget.name }} {{ goalbudget.amount }}/{{ goalbudget.target_amount }} {{ goalbudget.currency }}
+    <form action="{% url 'financew:delete_goalbudget' goalbudget.id %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        <button id="delete-goalbudget-btn">Видалити</button>
+    </form>
 </li>
 {% empty %}
 <li>Бюджети-цілі не знайдено</li>
@@ -89,9 +95,13 @@
 {% for category in categories%}<!-- воно бере по назві ключа -->
 <li>
     {{ category.name }}
+    <form action="{% url 'financew:delete_category' category.id %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        <button id="delete-category-btn">Видалити</button>
+    </form>
 </li>
 {% empty %}
-<li>категорії не знайдено</li>
+<li>Категорії не знайдено</li>
 {% endfor %}
 </div>
 
