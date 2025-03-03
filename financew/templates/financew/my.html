@@ -35,6 +35,18 @@
     <button id="cancel-btn">Скасувати</button>
   </form> </div>
 
+<!-- Останні операції -->
+<h3>Останні 5 операцій</h3>
+<ul>
+{% for operation in recent_operations %}
+    <li>
+      {{ operation.date_added|date:"Y-m-d H:i" }} - {{ operation.get_type_display }}: {{ operation.amount|floatformat:2 }} {{ operation.budget.currency }} (Бюджет: {{ operation.budget.name }} {% if operation.category %}, Категорія: {{ operation.category.name }}{% endif %})
+    </li>
+{% empty %}
+    <li>Операції не знайдено</li>
+{% endfor %}
+</ul>
+
   <script>
     // Отримуємо елементи
     const addBudgetBtn = document.getElementById("add-budget-btn");

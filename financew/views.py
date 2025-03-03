@@ -25,6 +25,9 @@ def my(request):
     budgets = Budget.objects.filter(owner=request.user).all() # взяти всі бюджети що належать цьому користувачу
     rates = get_exchange_rates(request)
 
+    # Отримуємо останні 5 фінансових операцій для поточного користувача
+    recent_operations = FinOperation.objects.filter(budget__owner=request.user).order_by('-date_added')[:5]
+
     # Отримуємо валюту відображення з GET-параметра або сесії
     display_currency = request.GET.get('currency', request.session.get('display_currency', 'UAH'))
     if display_currency not in ['UAH', 'USD', 'EUR']:
@@ -65,7 +68,7 @@ def my(request):
         
         # Display a blank or invalid form.
         
-    context = {'budgets_with_converted': budgets_with_converted, 'budgets': budgets, 'total_balance': total_balance, 'display_currency': display_currency, 'form':form, 'currencies': ['UAH', 'USD', 'EUR'],}
+    context = {'budgets_with_converted': budgets_with_converted, 'budgets': budgets, 'total_balance': total_balance, 'display_currency': display_currency, 'form':form, 'currencies': ['UAH', 'USD', 'EUR'], 'recent_operations':recent_operations}
     return render(request, 'financew/my.html', context) # потім дані з context можна використовувати у шаблоні 
 
  
