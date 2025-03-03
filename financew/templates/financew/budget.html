@@ -110,22 +110,9 @@
 <form action="{% url 'financew:budget' budget.id %}" method="post">
     {%csrf_token%}
     {{transferbudgetform.as_div}}
-    {{test}}
     <button type="submit">Здійснити трансфер</button>
 </form>
 </div>
-
-
-
-
-
-
-
-
-
-
-
-
 
 <script>
     // Отримуємо елементи сторінки для бюджету
@@ -151,7 +138,7 @@
 
     editFinoperationBtns.forEach(function(button) {
         button.addEventListener("click", function(event) {
-            event.preventDefault();
+            event.preventDefault(); // Це блокує стандартну поведінку форми (без перенапрвлень) (поястення ЧАТГПТ -  блокує стандартну поведінку події, тобто він не дозволяє браузеру автоматично відправити форму, не перезавантажує сторінку і не виконує перенаправлення, яке зазвичай відбувається при натисканні на кнопку відправлення.)
 
             // Отримуємо ID фінансової операції
             const finoperationId = button.getAttribute("data-finoperation-id");

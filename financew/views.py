@@ -2,9 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from decimal import Decimal
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
-from django.contrib import messages
-from django.db.utils import IntegrityError
 from itertools import chain
+from django.db import transaction
 
 from .models import Budget, FinOperation, GoalBudget, Category, TransferBudget, TransferGoalBudget
 from .forms import BudgetForm, FinOperationForm, GoalBudgetForm, CategoryForm,  TransferFromBudgetForm
@@ -93,21 +92,22 @@ def budget(request, budget_id):
         #форма для трансферу з поточного бюджету
         transferbudgetform = TransferFromBudgetForm(data=request.POST,prefix='transfer-budget')
         if transferbudgetform.is_valid():
-            new_transferbudget = transferbudgetform.save(commit=False) # не зберігати одразу до бд
-            new_transferbudget.from_budget = budget #додати бюджет з якого надсилається
+            with transaction.atomic(): # всі зміни в базі даних будуть виконані або всі разом (якщо всі операції успішні), або жодна (якщо виникне помилка).  
+                new_transferbudget = transferbudgetform.save(commit=False) # не зберігати одразу до бд
+                new_transferbudget.from_budget = budget #додати бюджет з якого надсилається
 
-            #логіка зняття коштів та їх додавання по бюджетах
-            to_budget = new_transferbudget.to_budget # в який бюджет заливаєм кошти
-            to_budget.amount += new_transferbudget.amount 
-            budget.amount = budget.amount - new_transferbudget.amount 
-            #print(budget.amount)
-            #if budget == from_budget: #from_budget = new_transferbudget.from_budget # з якого бюджету заливаєм кошти
-                #print("ТЕСТ ПРОЙДЕНО") - воно все проходить
+                #логіка зняття коштів та їх додавання по бюджетах
+                to_budget = new_transferbudget.to_budget # в який бюджет заливаєм кошти
+                to_budget.amount += new_transferbudget.amount 
+                budget.amount = budget.amount - new_transferbudget.amount 
+                #print(budget.amount)
+                #if budget == from_budget: #from_budget = new_transferbudget.from_budget # з якого бюджету заливаєм кошти
+                    #print("ТЕСТ ПРОЙДЕНО") - воно все проходить
 
-            # зберегти в БД
-            budget.save()
-            to_budget.save()  
-            new_transferbudget.save()  
+                # зберегти в БД
+                budget.save()
+                to_budget.save()  
+                new_transferbudget.save()  
             return redirect('financew:budget', budget_id=budget.id)
     
     #для показу переведень бюджетів
@@ -185,6 +185,7 @@ def edit_finoperation(request, finoperation_id):
         finop_type_old = finoperation.type
         finoperation.amount = Decimal(request.POST.get('amount'))
         finoperation.type = request.POST.get('type')
+        finoperation.category = request.POST.get('category')
 
         # Оновлення бюджету після зміни операції
         if finoperation.type == "expense" and finop_type_old == "expense":
