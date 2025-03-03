@@ -8,6 +8,7 @@ app_name = "financew"
 urlpatterns = [
     path("", views.index, name='index'),
     path("my/", views.my, name='my'), #особистий кабінет
+    path('transactions/', views.transactions, name='transactions'),
     path("budget/<int:budget_id>/", views.budget, name='budget'), # сторінка з бюджетами
     path("new_finoperation/<int:budget_id>/", views.new_finoperation, name='new_finoperation'),
     path("delete_finoperation/<int:finoperation_id>/", views.delete_finoperation, name='delete_finoperation'),

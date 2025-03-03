@@ -71,7 +71,39 @@ def my(request):
     context = {'budgets_with_converted': budgets_with_converted, 'budgets': budgets, 'total_balance': total_balance, 'display_currency': display_currency, 'form':form, 'currencies': ['UAH', 'USD', 'EUR'], 'recent_operations':recent_operations}
     return render(request, 'financew/my.html', context) # потім дані з context можна використовувати у шаблоні 
 
- 
+@login_required
+def transactions(request):
+    """
+    Відображає всі фінансові операції користувача.
+    """
+    operations = FinOperation.objects.filter(budget__owner=request.user).order_by('-date_added')
+    rates = get_exchange_rates(request)
+
+    # Отримуємо валюту відображення з GET-параметра або сесії
+    display_currency = request.GET.get('currency', request.session.get('display_currency', 'UAH'))
+    if display_currency not in ['UAH', 'USD', 'EUR']:
+        display_currency = 'UAH'
+
+    # Зберігаємо вибір валюти у сесії
+    request.session['display_currency'] = display_currency
+
+    # Конвертуємо суми операцій у вибрану валюту
+    operations_with_converted = []
+    for operation in operations:
+        balance_in_uah = operation.amount if operation.budget.currency == 'UAH' else (
+                    operation.amount * rates[operation.budget.currency])
+        converted_amount = convert_to_currency(balance_in_uah, display_currency, rates)
+        operations_with_converted.append({
+            'operation': operation,
+            'converted_amount': converted_amount
+        })
+
+    context = {
+        'operations_with_converted': operations_with_converted,
+        'display_currency': display_currency,
+        'currencies': ['UAH', 'USD', 'EUR'],
+    }
+    return render(request, 'financew/transactions.html', context)
 
 @login_required
 def budget(request, budget_id):
