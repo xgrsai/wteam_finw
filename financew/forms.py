@@ -3,7 +3,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 
-from .models import Budget, FinOperation, Category, GoalBudget
+from .models import Budget, FinOperation, Category, GoalBudget, TransferBudget
 
 class BudgetForm(forms.ModelForm):
     class Meta:
@@ -34,6 +34,21 @@ class GoalBudgetForm(forms.ModelForm):
         model = GoalBudget
         fields = ['name', 'currency', 'target_amount', 'amount']
         labels = {'name':'Ім\'я для бюджету-цілі', 'currency': 'Валюта', 'target_amount': 'Ціль' , 'amount': 'Поточна сума'}
+
+class TransferFromBudgetForm(forms.ModelForm):
+    class Meta:
+        model = TransferBudget
+        fields = [ 'to_budget', 'amount']
+        labels = { 'to_budget':'В який бюджет', 'amount':'Сума',
+        }
+
+class TransferBudgetForm(forms.ModelForm):
+    """Форма для трансферу з включеним """
+    class Meta:
+        model = TransferBudget
+        fields = ['from_budget', 'to_budget', 'amount']
+        labels = {'from_budget':'З якого бюджету', 'to_budget':'В який бюджет', 'amount':'Сума',
+        }
 
 
 # class CustomUserCreationForm(UserCreationForm):

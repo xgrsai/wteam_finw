@@ -4,7 +4,8 @@
 {% block content %}
 <link rel="stylesheet" href="{% static 'styles.css' %}"> 
 
-<p>{{ budget.name }} {{ budget.amount }} {{ budget.currency }} <!-- Кнопка для редагування бюджету --><button id="edit-budget-btn">Змінити дані</button></p>
+<p>{{ budget.name }} {{ budget.amount }} {{ budget.currency }} <!-- Кнопка для редагування бюджету -->
+    <button id="edit-budget-btn">Змінити дані</button></p>
 
 <!-- Форма для редагування бюджету (спочатку прихована) -->
 <div id="edit-budget-form" style="display: none;">
@@ -68,6 +69,9 @@
 
 
 Трансфери з бюджету в бюджет:
+{% comment %} Кнопки для додавання транзакцій {% endcomment %}
+
+
 <table border="1">
     <thead>
         <tr>
@@ -99,18 +103,16 @@
     </tbody>
 </table>
 
+<button id="add-budget-transfer-form">Здійснити транзакцію до бюджету</button>
+<button id="add-goalbudget-transfer-form">Здійснити транзакцію до бюджету-цілі</button>
 
-
-
-
-
-
-
-
-
-
-
-
+<div style = "display:block">
+<form action="{% url 'financew:budget' budget.id %}" method="post">
+    {%csrf_token%}
+    {{transferbudgetform.as_div}}
+    <button type="submit">Здійснити трансфер</button>
+</form>
+</div>
 
 <script>
     // Отримуємо елементи сторінки для бюджету
@@ -136,7 +138,7 @@
 
     editFinoperationBtns.forEach(function(button) {
         button.addEventListener("click", function(event) {
-            event.preventDefault();
+            event.preventDefault(); // Це блокує стандартну поведінку форми (без перенапрвлень) (поястення ЧАТГПТ -  блокує стандартну поведінку події, тобто він не дозволяє браузеру автоматично відправити форму, не перезавантажує сторінку і не виконує перенаправлення, яке зазвичай відбувається при натисканні на кнопку відправлення.)
 
             // Отримуємо ID фінансової операції
             const finoperationId = button.getAttribute("data-finoperation-id");

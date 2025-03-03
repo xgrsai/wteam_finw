@@ -1,4 +1,8 @@
-{% extends 'financew/base.html' %} {% block content %} 
+{% extends 'financew/base.html' %} 
+{% load static %} 
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'financew/style.css' %}">
 
 <a href="{% url 'plots:report' %}"
     >Візуалізація (чи звіти) </a>
