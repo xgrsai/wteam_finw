@@ -3,8 +3,7 @@
 
 {% block content %}
 <link rel="stylesheet" href="{% static 'financew/style.css' %}">
-<a href="{% url 'plots:report' %}"
-    >Візуалізація (чи звіти) </a>
+<a href="{% url 'plots:report' %}">Візуалізація (чи звіти) </a>
 
 
 <!-- Вибір валюти відображення -->
@@ -18,11 +17,13 @@
 </form>
 
 <p>Загальний баланс у {{ display_currency }}: {% if total_balance != 0 %}{{ total_balance|floatformat:2 }} {{ display_currency }}{% else %}Немає даних{% endif %}</p>
-<ul>
 
+
+<ul>
 {% for item in budgets_with_converted %}
     <li>
       <a href="{% url 'financew:budget' item.budget.id %}">{{ item.budget.name }}: {{ item.budget.amount|floatformat:2 }} {{ item.budget.currency }} ({{ item.converted_balance|floatformat:2 }} {{ display_currency }})</a>
+      {% endfor %}
 </ul>
  
 <div>Мої бюджети
