@@ -7,7 +7,6 @@ from .utils import get_exchange_rates, convert_to_currency
 from decimal import Decimal, ROUND_HALF_UP
 from django.core.validators import MinValueValidator
 
-
 CURRENCIES = {
         "UAH": "UAH",
         "USD": "USD",
@@ -17,6 +16,10 @@ CURRENCIES = {
 # Create your models here.
 class Budget(models.Model):
     """Бюджет яким володіє користувач"""
+
+
+
+    
     amount = models.DecimalField(max_digits=19,decimal_places=2,default=0,validators=[MinValueValidator(0)])
     name = models.CharField(max_length=200, null=True) # імя гаманця
     currency = models.CharField(blank=False, choices=CURRENCIES, default="UAH", max_length=17)
@@ -104,7 +107,7 @@ class FinOperation(models.Model):
     time_interval = models.CharField(blank=False, choices=TIME_INTERVALS, default="one_time", max_length=17)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
 
-    start_date = models.DateTimeField(default=timezone.now) # Дата початку операції
+    # start_date = models.DateTimeField(default=timezone.now) # Дата початку операції
     last_execution = models.DateTimeField(null=True, blank=True) # Дата останнього списання
     is_active = models.BooleanField(default=True) # Чи активна операція, по дефолту - активна
 
@@ -121,7 +124,7 @@ class FinOperation(models.Model):
 
         now = timezone.now()
         if self.last_execution is None:
-            return now >= self.start_date
+            return now >= self.date_added
 
         days_diff = (now - self.last_execution).days
 

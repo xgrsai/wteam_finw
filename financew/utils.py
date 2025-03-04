@@ -1,3 +1,5 @@
+"""допоміжні функції (переважно для views.py)"""
+
 import requests
 from decimal import Decimal, ROUND_HALF_UP
 from django.utils import timezone

@@ -103,15 +103,30 @@
     </tbody>
 </table>
 
-<button id="add-budget-transfer-form">Здійснити транзакцію до бюджету</button>
-<button id="add-goalbudget-transfer-form">Здійснити транзакцію до бюджету-цілі</button>
-
-<div style = "display:block">
+<!--Форма для трансферу до бюджету-->
+<div>
+<button id="add-budget-transfer">Здійснити транзакцію до бюджету</button>
+<div id = 'new-budget-transfer-form' style = "display:none;">
 <form action="{% url 'financew:budget' budget.id %}" method="post">
     {%csrf_token%}
     {{transferbudgetform.as_div}}
     <button type="submit">Здійснити трансфер</button>
+    <button type="button" id="cancel-budget-transfer">Скасувати</button> <!--type="button" - щоб не думало що це submit-->
 </form>
+</div>
+</div>
+
+<!--Форма для трансферу до бюджету-цілі-->
+<div>
+<button id="add-goalbudget-transfer">Здійснити транзакцію до бюджету-цілі</button>
+<div id = 'new-goalbudget-transfer-form' style = "display:none;">
+    <form action="{% url 'financew:budget' budget.id %}" method="post">
+        {%csrf_token%}
+        {{transfergoalbudgetform.as_div}}
+        <button type="submit">Здійснити трансфер</button>
+        <button type="button" id="cancel-goalbudget-transfer">Скасувати</button> <!--type="button" - щоб не думало що це submit-->
+    </form>
+    </div>
 </div>
 
 <script>
@@ -119,6 +134,14 @@
     const editBudgetBtn = document.getElementById("edit-budget-btn");
     const editBudgetForm = document.getElementById("edit-budget-form");
     const cancelEditBtn = document.getElementById("cancel-edit-btn");
+    // Отримуємо елементи сторінки для трансферу до бюджету
+    const newBudgetTransferBtn = document.getElementById("add-budget-transfer");
+    const newBudgetTransferForm = document.getElementById("new-budget-transfer-form");
+    const cancelBudgetTransferBtn = document.getElementById("cancel-budget-transfer");
+    // Отримуємо елементи сторінки для трансферу до бюджету-цілі
+    const newGoalBudgetTransferBtn = document.getElementById("add-goalbudget-transfer");
+    const newGoalBudgetTransferForm = document.getElementById("new-goalbudget-transfer-form");
+    const cancelGoalBudgetTransferBtn = document.getElementById("cancel-goalbudget-transfer");
 
     // Показуємо форму редагування бюджету при натисканні на кнопку "Змінити дані"
     editBudgetBtn.addEventListener("click", function(event) {
@@ -126,19 +149,42 @@
         editBudgetForm.style.display = "block"; // Показуємо форму
         editBudgetBtn.style.display = "none"; // Приховуємо кнопку редагування
     });
-
     // Скасувати редагування бюджету
     cancelEditBtn.addEventListener("click", function() {
         editBudgetForm.style.display = "none"; // Приховуємо форму
         editBudgetBtn.style.display = "inline"; // Показуємо кнопку редагування
     });
 
+    // Показуємо форму для трансферу до бюджету
+    newBudgetTransferBtn.addEventListener("click", function(event) {
+    event.preventDefault();
+    newBudgetTransferForm.style.display = "block"; // Показуємо форму
+    newBudgetTransferBtn.style.display = "none"; // Приховуємо кнопку редагування
+    });
+    // Скасувати трансфер до бюджету
+    cancelBudgetTransferBtn.addEventListener("click", function() {
+    newBudgetTransferForm.style.display = "none"; // Приховуємо форму
+    newBudgetTransferBtn.style.display = "inline"; // Показуємо кнопку редагування
+    });
+
+    // Показуємо форму для трансферу до бюджету-цілі
+    newGoalBudgetTransferBtn.addEventListener("click", function(event) {
+    event.preventDefault();
+    newGoalBudgetTransferForm.style.display = "block"; // Показуємо форму
+    newGoalBudgetTransferBtn.style.display = "none"; // Приховуємо кнопку редагування
+    });
+    // Скасувати трансфер до бюджету-цілі
+    cancelGoalBudgetTransferBtn.addEventListener("click", function() {
+    newGoalBudgetTransferForm.style.display = "none"; // Приховуємо форму
+    newGoalBudgetTransferBtn.style.display = "inline"; // Показуємо кнопку редагування
+    });
+    
+
     // Отримуємо всі кнопки для редагування фінансових операцій
     const editFinoperationBtns = document.querySelectorAll(".edit-finoperation-btn");
-
     editFinoperationBtns.forEach(function(button) {
         button.addEventListener("click", function(event) {
-            event.preventDefault(); // Це блокує стандартну поведінку форми (без перенапрвлень) (поястення ЧАТГПТ -  блокує стандартну поведінку події, тобто він не дозволяє браузеру автоматично відправити форму, не перезавантажує сторінку і не виконує перенаправлення, яке зазвичай відбувається при натисканні на кнопку відправлення.)
+            event.preventDefault(); // це блокує стандартну поведінку форми (без перенапрвлень) (поястення ЧАТГПТ -  блокує стандартну поведінку події, тобто він не дозволяє браузеру автоматично відправити форму, не перезавантажує сторінку і не виконує перенаправлення, яке зазвичай відбувається при натисканні на кнопку відправлення.)
 
             // Отримуємо ID фінансової операції
             const finoperationId = button.getAttribute("data-finoperation-id");

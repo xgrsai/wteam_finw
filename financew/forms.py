@@ -3,7 +3,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 
-from .models import Budget, FinOperation, Category, GoalBudget, TransferBudget
+from .models import Budget, FinOperation, Category, GoalBudget, TransferBudget, TransferGoalBudget
 
 class BudgetForm(forms.ModelForm):
     class Meta:
@@ -14,16 +14,17 @@ class BudgetForm(forms.ModelForm):
 class FinOperationForm(forms.ModelForm):
     class Meta:
         model = FinOperation
-        fields = ['amount', 'type', 'time_interval', 'category', 'start_date']
+        fields = ['amount', 'type', 'time_interval', 'category']
         labels = {
             'amount': 'Сума',
             'type': 'Тип операції',
             'time_interval': 'Часовий інтервал',
             'category': 'Категорія операціії',
-            'start_date': 'Дата початку операції'
-        }
-        widgets = {
-            'start_date': forms.DateTimeInput(attrs={'time_type': 'datetime-local'}),
+        #     'start_date': 'Дата початку операції'
+        # }
+        # widgets = {
+        #     'start_date': forms.DateTimeInput(attrs={'time_type': 'datetime-local'}),
+        # 
         }
 
 class CategoryForm(forms.ModelForm):
@@ -49,6 +50,13 @@ class TransferFromBudgetForm(forms.ModelForm):
         model = TransferBudget
         fields = [ 'to_budget', 'amount']
         labels = { 'to_budget':'В який бюджет', 'amount':'Сума',
+        }
+
+class TransferFromGoalBudgetForm(forms.ModelForm):
+    class Meta:
+        model = TransferGoalBudget
+        fields = [ 'to_goalbudget', 'amount']
+        labels = { 'to_goalbudget':'В який бюджет-ціль', 'amount':'Сума',
         }
 
 class TransferBudgetForm(forms.ModelForm):
