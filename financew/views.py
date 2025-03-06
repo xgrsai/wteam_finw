@@ -186,7 +186,7 @@ def budget(request, budget_id):
 
                 #логіка зняття коштів та їх додавання по бюджетах
                 to_budget = new_transfergoalbudget.to_goalbudget # в який бюджет заливаєм кошти
-                to_budget.amount += new_transfergoalbudget.goalamount 
+                to_budget.amount += new_transfergoalbudget.amount 
                 budget.amount = budget.amount - new_transfergoalbudget.amount 
                 #print(budget.amount)
                 #if budget == from_budget: #from_budget = new_transferbudget.from_budget # з якого бюджету заливаєм кошти
