@@ -217,7 +217,7 @@ document.getElementById("category-form").addEventListener("submit", function(eve
 
   
 
-<!-- Останні операції -->
+<!-- Останні операції
 <h3>Останні 5 операцій</h3>
 <ul>
 {% for operation in recent_operations %}
@@ -227,7 +227,7 @@ document.getElementById("category-form").addEventListener("submit", function(eve
 {% empty %}
     <li>Операції не знайдено</li>
 {% endfor %}
-</ul>
+</ul> -->
 
 <!-- Посилання на сторінку всіх транзакцій -->
 <p><a href="{% url 'financew:transactions' %}">Переглянути всі транзакції</a></p>
