@@ -102,24 +102,40 @@ def my(request):
 @login_required
 def transactions(request):
     """
-    Відображає всі фінансові операції користувача.
+    Відображає всі фінансові операції користувача з можливістю фільтрації.
     """
     operations = FinOperation.objects.filter(budget__owner=request.user).order_by('-date_added')
-    rates = get_exchange_rates(request)
+    budgets = Budget.objects.filter(owner=request.user)
+    categories = Category.objects.all()  # Категорії можуть бути загальними
 
     # Отримуємо валюту відображення з GET-параметра або сесії
+    rates = get_exchange_rates(request)
     display_currency = request.GET.get('currency', request.session.get('display_currency', 'UAH'))
     if display_currency not in ['UAH', 'USD', 'EUR']:
         display_currency = 'UAH'
-
-    # Зберігаємо вибір валюти у сесії
     request.session['display_currency'] = display_currency
+
+    # Отримуємо параметри фільтрів
+    date = request.GET.get('date')
+    budget_id = request.GET.get('budget')
+    category_id = request.GET.get('category')
+    operation_type = request.GET.get('type')
+
+    # Застосовуємо фільтри
+    if date:
+        operations = operations.filter(date_added__date=date)
+    if budget_id and budget_id.isdigit():
+        operations = operations.filter(budget_id=int(budget_id))
+    if category_id and category_id.isdigit():
+        operations = operations.filter(category_id=int(category_id))
+    if operation_type in ['income', 'expense']:
+        operations = operations.filter(type=operation_type)
 
     # Конвертуємо суми операцій у вибрану валюту
     operations_with_converted = []
     for operation in operations:
         balance_in_uah = operation.amount if operation.budget.currency == 'UAH' else (
-                    operation.amount * rates[operation.budget.currency])
+            operation.amount * rates[operation.budget.currency])
         converted_amount = convert_to_currency(balance_in_uah, display_currency, rates)
         operations_with_converted.append({
             'operation': operation,
@@ -130,6 +146,8 @@ def transactions(request):
         'operations_with_converted': operations_with_converted,
         'display_currency': display_currency,
         'currencies': ['UAH', 'USD', 'EUR'],
+        'budgets': budgets,
+        'categories': categories,
     }
     return render(request, 'financew/transactions.html', context)
 
