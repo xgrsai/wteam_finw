@@ -1,22 +1,67 @@
+{% extends "financew/base.html" %}
+{% load static %}
 <!DOCTYPE html>
+{% block content %}
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Registration</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
-  
-  {% extends "financew/base.html" %}
+ 
+  <div class="container-left">
+    <div class="left-mini-logo">
+      <img src="{% static 'img/Logo.svg'%}" alt="">
+      <h3>FinW</h3>
+    </div>
+    <img id="image" src="{% static 'img/Image.svg'%}" alt="">
+  </div>
+  <div class="form-container">
+    <h1>Registration</h1>
+    
 
-  {% block content %}
+  
    <form action="{% url 'accounts:register' %}" method='post'>
    {% csrf_token %}
-   {{ form.as_div }}
-   <button name="submit">Реєстрація</button>
+<!--{{ form.as_div }}-->
+      <div>
+        <label for="username">Username:</label><br>
+        <input type="text" name="username" id="username" placeholder="username">
+      </div>
+      <br>
+      <div>
+        <label for="email">Last name:</label><br>
+        <input type="text" name="lastname" id="lastname" placeholder="Last name">
+      </div>
+      <br>
+      <div>
+        <label for="email">Your Email:</label><br>
+        <input type="text" name="email" id="email" placeholder="finance@forecast.com">
+      </div>
+      <br>
+      <div>
+        <label for="password">Password</label><br>
+        <input type="password" name="pass" id="password" placeholder="***********">
+      </div>
+      <br>
+      <div>
+        <label for="password">Repat Password</label><br>
+        <input type="password" name="r_pass" id="R_Password" placeholder="***********">
+      </div>
+
+      <br><button name="submit">Registration</button>
    </form>
-  {% endblock content %}
+  
   
 
+
+
+{% endblock content %} 
+  </div>
 </body>
 </html>
