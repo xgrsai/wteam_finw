@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 
 from .models import Budget, FinOperation, Category, GoalBudget, TransferBudget, TransferGoalBudget
+from .constants import CURRENCIES
 
 class BudgetForm(forms.ModelForm):
     class Meta:
@@ -66,6 +67,15 @@ class TransferBudgetForm(forms.ModelForm):
         fields = ['from_budget', 'to_budget', 'amount']
         labels = {'from_budget':'З якого бюджету', 'to_budget':'В який бюджет', 'amount':'Сума',
         }
+
+class CurrencyForm(forms.Form):
+    currency = forms.ChoiceField(
+        choices=[(key, value) for key, value in CURRENCIES.items()],
+        label="Вибір валюти",
+        #initial= # бере першим зі словника
+        widget=forms.Select(attrs={'onchange': 'this.form.submit()'}),
+
+    )
 
 
 # class CustomUserCreationForm(UserCreationForm):

@@ -1,12 +1,12 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
-from datetime import datetime
 from dateutil.relativedelta import relativedelta
-from .utils import get_exchange_rates, convert_to_currency
 from decimal import Decimal, ROUND_HALF_UP
 from django.core.validators import MinValueValidator
+
 from .constants import CURRENCIES
+from .utils import get_exchange_rates, convert_to_currency
 
 # CURRENCIES = {
 #         "UAH": "UAH",

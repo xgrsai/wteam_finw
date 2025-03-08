@@ -7,19 +7,28 @@
 
 
 <!-- Вибір валюти відображення -->
-<form method="get" action="{% url 'financew:my' %}">
+{% comment %} <form method="get" action="{% url 'financew:my' %}">
     <label for="currency">Валюта відображення:</label>
     <select name="currency" id="currency" onchange="this.form.submit()">
         {% for currency in currencies %}
             <option value="{{ currency }}" {% if currency == display_currency %}selected{% endif %}>{{ currency }}</option>
         {% endfor %}
     </select>
+</form> {% endcomment %}
+<form method="get" action = {% url 'financew:my'%}>
+  <p>{{currencydisplayform.as_div}}</p>
 </form>
+
+
 
 <p>Загальний баланс у {{ display_currency }}: {% if total_balance != 0 %}{{ total_balance|floatformat:2 }} {{ display_currency }}{% else %}Немає даних{% endif %}</p>
 
+{% comment %} ВІДОБРАЖЕННЯ ЗАГАЛЬНОГО БАЛАНСУ З УСІХ БЮДЖЕТІВ В ПЕВНІЙ ВАЛЮТІ {% endcomment %}
+{% comment %} 
 {% for budget in budgets %}
-
+{% empty %}
+    <li>Бюджети не знайдено</li>
+{% endfor %} {% endcomment %}
 
 
 <ul>

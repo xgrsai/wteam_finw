@@ -9,7 +9,7 @@ from django.db import transaction
 from .constants import CURRENCIES
 from .utils import get_exchange_rates, convert_to_currency
 from .models import Budget, FinOperation, GoalBudget, Category, TransferBudget, TransferGoalBudget
-from .forms import BudgetForm, FinOperationForm, GoalBudgetForm, CategoryForm,  TransferFromBudgetForm, TransferFromGoalBudgetForm
+from .forms import BudgetForm, FinOperationForm, GoalBudgetForm, CategoryForm,  TransferFromBudgetForm, TransferFromGoalBudgetForm, CurrencyForm
 
 def index(request):
     """головна сторінка фінансиW з бюджетами"""
@@ -27,15 +27,20 @@ def my(request):
     budgets = Budget.objects.filter(owner=request.user).all() # взяти всі бюджети що належать цьому користувачу
    
     rates = get_exchange_rates(request)
+    
     # Отримуємо останні 5 фінансових операцій для поточного користувача
     recent_operations = FinOperation.objects.filter(budget__owner=request.user).order_by('-date_added')[:5]
-    # Отримуємо валюту відображення з GET-параметра або сесії
-    display_currency = request.GET.get('currency', request.session.get('display_currency', 'UAH'))
-    if display_currency not in ['UAH', 'USD', 'EUR']:
-        display_currency = 'UAH'
-    # Зберігаємо вибір валюти у сесії
-    request.session['display_currency'] = display_currency
-
+    
+    """форма для вибору яку валюту відобразити"""
+    # Отримуємо валюту з сесії (якщо є), або використовуємо дефолтну 'UAH'
+    display_currency = request.session.get('display_currency', 'UAH')
+    # Створюємо форму з ініціалізацією значення за замовчуванням
+    currencydisplayform = CurrencyForm(initial={'currency': display_currency})
+    selected_currency = request.GET.get('currency', None) # None якщо нічого не вибрано
+    if selected_currency:
+        request.session['display_currency'] = selected_currency # Якщо валюта вибрана, зберігаємо її в сесії
+        return redirect('financew:my')
+    
     # Обчислення загального балансу і конвертованих сум у вибраній валюті
     total_in_uah = Decimal('0')
     budgets_with_converted = []
@@ -52,7 +57,7 @@ def my(request):
             'converted_balance': converted_balance
         })
     total_balance = convert_to_currency(total_in_uah, display_currency, rates)
-
+    
 
     """головна сторінка фінансиW з бюджетом та додавання нового бюджету (те саме стосується і бюджетів-цілей)"""
     goalbudgets = GoalBudget.objects.filter(owner=request.user).all()
@@ -94,7 +99,7 @@ def my(request):
         return redirect('financew:my')
     
     # Display a blank or invalid form.
-    context = {'budgets': budgets, 'goalbudgets': goalbudgets, 'categories': categories, 'goalbudgetform':goalbudgetform, 'budgetform': budgetform, 'categoryform':categoryform, 'budgets_with_converted': budgets_with_converted, 'total_balance': total_balance, 'display_currency': display_currency, 'currencies': ['UAH', 'USD', 'EUR'], 'recent_operations':recent_operations}
+    context = {'budgets': budgets, 'goalbudgets': goalbudgets, 'categories': categories, 'goalbudgetform':goalbudgetform, 'budgetform': budgetform, 'categoryform':categoryform, 'budgets_with_converted': budgets_with_converted, 'total_balance': total_balance, 'display_currency': display_currency, 'currencies': ['UAH', 'USD', 'EUR'], 'recent_operations':recent_operations, 'currencydisplayform':currencydisplayform}
     return render(request, 'financew/my.html', context) # потім дані з context можна використовувати у шаблоні 
 
 @login_required
