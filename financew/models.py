@@ -6,20 +6,17 @@ from dateutil.relativedelta import relativedelta
 from .utils import get_exchange_rates, convert_to_currency
 from decimal import Decimal, ROUND_HALF_UP
 from django.core.validators import MinValueValidator
+from .constants import CURRENCIES
 
-CURRENCIES = {
-        "UAH": "UAH",
-        "USD": "USD",
-        "EUR": "EUR",
-    }
+# CURRENCIES = {
+#         "UAH": "UAH",
+#         "USD": "USD",
+#         "EUR": "EUR",
+#     }
 
 # Create your models here.
 class Budget(models.Model):
     """Бюджет яким володіє користувач"""
-
-
-
-    
     amount = models.DecimalField(max_digits=19,decimal_places=2,default=0,validators=[MinValueValidator(0)])
     name = models.CharField(max_length=200, null=True) # імя гаманця
     currency = models.CharField(blank=False, choices=CURRENCIES, default="UAH", max_length=17)
@@ -185,4 +182,29 @@ class TransferGoalBudget(models.Model):
         return f"{self.amount} "
 
 
-        
+class Currency(models.Model):
+    amount = models.DecimalField(max_digits=19, decimal_places=2, validators=[MinValueValidator(0)])
+    currency = models.CharField(choices=CURRENCIES, max_length=17, default="UAH")
+    date_added = models.DateField(auto_now_add=True)
+
+    class Meta:
+        verbose_name_plural = 'currencies'
+
+    def __str__(self):
+        """Відображення валют"""
+        return f"{self.currency}: {self.amount}, {self.date_added}"
+
+class PeriodicStreakTracker(models.Model):
+    """Скільки разів виконувалася періодична фіноперація"""
+    count = models.IntegerField(default=0)
+    fin_operation = models.ForeignKey(FinOperation, on_delete=models.CASCADE)
+    date_execution = models.DateTimeField(auto_now_add=True)
+
+    def increment(self):
+        """Збільшити кількість виконань і оновити час останнього виконання"""
+        self.count += 1
+        self.save()
+
+    def __str__(self):
+        """Відображення"""
+        return f"{self.count}: {self.fin_operation}, {self.date_execution}"    

@@ -1,11 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from decimal import Decimal, ROUND_HALF_UP
+from decimal import Decimal
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from itertools import chain
 from django.db import transaction
-from django.utils import timezone
+# from django.utils import timezone
 
+from .constants import CURRENCIES
 from .utils import get_exchange_rates, convert_to_currency
 from .models import Budget, FinOperation, GoalBudget, Category, TransferBudget, TransferGoalBudget
 from .forms import BudgetForm, FinOperationForm, GoalBudgetForm, CategoryForm,  TransferFromBudgetForm, TransferFromGoalBudgetForm
@@ -24,16 +25,14 @@ def my(request):
     Відображає особистий кабінет користувача та дозволяє додавати нові бюджети.
     """
     budgets = Budget.objects.filter(owner=request.user).all() # взяти всі бюджети що належать цьому користувачу
+   
     rates = get_exchange_rates(request)
-
     # Отримуємо останні 5 фінансових операцій для поточного користувача
     recent_operations = FinOperation.objects.filter(budget__owner=request.user).order_by('-date_added')[:5]
-
     # Отримуємо валюту відображення з GET-параметра або сесії
     display_currency = request.GET.get('currency', request.session.get('display_currency', 'UAH'))
     if display_currency not in ['UAH', 'USD', 'EUR']:
         display_currency = 'UAH'
-
     # Зберігаємо вибір валюти у сесії
     request.session['display_currency'] = display_currency
 
@@ -52,11 +51,10 @@ def my(request):
             'budget': budget,
             'converted_balance': converted_balance
         })
-
     total_balance = convert_to_currency(total_in_uah, display_currency, rates)
 
+
     """головна сторінка фінансиW з бюджетом та додавання нового бюджету (те саме стосується і бюджетів-цілей)"""
-    
     goalbudgets = GoalBudget.objects.filter(owner=request.user).all()
 
     #наявнi категорій користувача

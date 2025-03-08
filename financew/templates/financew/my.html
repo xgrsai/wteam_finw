@@ -18,6 +18,9 @@
 
 <p>Загальний баланс у {{ display_currency }}: {% if total_balance != 0 %}{{ total_balance|floatformat:2 }} {{ display_currency }}{% else %}Немає даних{% endif %}</p>
 
+{% for budget in budgets %}
+
+
 
 <ul>
 {% for item in budgets_with_converted %}
