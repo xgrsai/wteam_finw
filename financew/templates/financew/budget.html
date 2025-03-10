@@ -46,7 +46,7 @@
 </div>
 <br>
 
-{% for finoperation in finoperations %}
+{% for finoperation,edit_finoperation_form in finoperations_and_edit_forms %}
 <div style="display: flex; align-items: center; gap: 10px;">
     <!-- Виведення фінансової операції -->
     <span>{{ finoperation.get_type_display }} - {{ finoperation.amount }} - {{ finoperation.date_added }} - {{ finoperation.category }}</span>
@@ -56,13 +56,14 @@
 
     <!-- Форма для редагування фінансової операції (спочатку прихована) -->
     <div id="edit-finoperation-form-{{ finoperation.id }}" class="edit-finoperation-form" style="display: none;">
-        <form method="POST" action="{% url 'financew:edit_finoperation' finoperation.id %}">
+        <form method="POST" action="{% url 'financew:budget' budget.id %}">
             {% csrf_token %}
-            <input type="number" name="amount" value="{{ finoperation.amount }}" placeholder="Сума операції" required>
+            {% comment %} <input type="number" name="amount" value="{{ finoperation.amount }}" placeholder="Сума операції" required>
             <select name="type">
                 <option value="expense" {% if finoperation.type == 'expense' %}selected{% endif %}>Витрата</option>
                 <option value="income" {% if finoperation.type == 'income' %}selected{% endif %}>Прибуток</option>
-            </select>
+            </select> {% endcomment %}
+            {{edit_finoperation_form.as_div}}
             <button type="submit" >Змінити</button>
         </form>
     </div>

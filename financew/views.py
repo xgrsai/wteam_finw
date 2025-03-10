@@ -158,10 +158,19 @@ def budget(request, budget_id):
         transferbudgetform = TransferFromBudgetForm(prefix='transfer-budget')
         transfergoalbudgetform = TransferFromGoalBudgetForm(prefix='transfer-goalbudget')
         new_finoperation_form = FinOperationForm(prefix='new-finoperation')
+        edit_finoperation_forms = [FinOperationForm(instance=finoperation, prefix=f"new-finoperation-{finoperation.id}") for finoperation in finoperations]
     else:
         budgetform = BudgetForm(instance=budget, data=request.POST,prefix='budget') # бере існуючий запис і дані який надіслав користуввач (типу змінив текст)
         if budgetform.is_valid():
             budgetform.save() # типу запис до бд
+            return redirect('financew:budget', budget_id=budget.id)
+        
+        edit_finoperation_forms = [FinOperationForm(data=request.POST,instance=finoperation, prefix=f"new-finoperation-{finoperation.id}") for finoperation in finoperations]
+        
+        validation = [edit_finoperation_form for edit_finoperation_form in edit_finoperation_forms if edit_finoperation_form.is_valid()]
+        if validation:
+            for edit_finoperation_form in validation:
+                edit_finoperation_form.save() 
             return redirect('financew:budget', budget_id=budget.id)
         
         #форма для трансферу з поточного бюджету до просто бюджету
@@ -224,7 +233,7 @@ def budget(request, budget_id):
     goal_transfers = TransferGoalBudget.objects.filter(from_budget=budget) # Отримати всі перекази, де цей бюджет надсилає гроші у цільовий бюджет (вирази насправді одинакові просто різні представлення (мається на увазі transfers_in = budget.budget_in_set.all()), тобто можна би було вказати TransferBudget.objects.filter(from_budget=budget))
     all_transfers = chain(transfers_out, transfers_in, goal_transfers)# Об'єднуємо всі перекази 
     transfers = sorted(all_transfers, key=lambda x: x.date_added, reverse=True)# Відсортувати за датою (воно автоматом в ліст перетворює) елементи в transfers досі є об'єктами класу
-    context = {'budget': budget, 'finoperations': finoperations, 'transfers': transfers,'form': budgetform,'transferbudgetform': transferbudgetform, 'transfergoalbudgetform':transfergoalbudgetform, 'new_finoperation_form': new_finoperation_form,}
+    context = {'budget': budget, 'finoperations': finoperations, 'transfers': transfers,'form': budgetform,'transferbudgetform': transferbudgetform, 'transfergoalbudgetform':transfergoalbudgetform, 'new_finoperation_form': new_finoperation_form,'edit_finoperation_forms':edit_finoperation_forms, 'finoperations_and_edit_forms': zip(finoperations,edit_finoperation_forms)}
     return render(request, 'financew/budget.html', context)
 
 
@@ -325,6 +334,7 @@ def edit_finoperation(request, finoperation_id):
         finoperation.amount = Decimal(request.POST.get('amount'))
         finoperation.type = request.POST.get('type')
         finoperation.category = request.POST.get('category')
+        # form = FinOperationForm(data=request.POST)
 
         # Оновлення бюджету після зміни операції
         if finoperation.type == "expense" and finop_type_old == "expense":
