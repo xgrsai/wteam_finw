@@ -34,10 +34,20 @@
 </div>
 
 
-<a href="{% url "financew:new_finoperation" budget.id %}">Додати нову фінансову операцію</a>
+{% comment %} <a href="{% url "financew:new_finoperation" budget.id %}">Додати нову фінансову операцію</a> {% endcomment %}
+<button id="add-new-finoperation">Створити нову фіноперацію</button>
+<div id = 'new-finoperation-form' style = "display:none;">
+<form action="{% url 'financew:budget' budget.id %}" method="post"> <!-- action - куди відправляється форма-->
+  {% csrf_token %} 
+  {{ new_finoperation_form.as_div }}
+  <button type="submit">Додати фін операцію</button>
+  <button type='button' id="cancel-new-finoperation">Скасувати</button>
+</form>
+</div>
+<br>
+
 {% for finoperation in finoperations %}
 <div style="display: flex; align-items: center; gap: 10px;">
-
     <!-- Виведення фінансової операції -->
     <span>{{ finoperation.get_type_display }} - {{ finoperation.amount }} - {{ finoperation.date_added }} - {{ finoperation.category }}</span>
 
@@ -69,9 +79,6 @@
 
 
 Трансфери з бюджету в бюджет:
-{% comment %} Кнопки для додавання транзакцій {% endcomment %}
-
-
 <table border="1">
     <thead>
         <tr>
@@ -142,6 +149,10 @@
     const newGoalBudgetTransferBtn = document.getElementById("add-goalbudget-transfer");
     const newGoalBudgetTransferForm = document.getElementById("new-goalbudget-transfer-form");
     const cancelGoalBudgetTransferBtn = document.getElementById("cancel-goalbudget-transfer");
+    // Отримуємо елементи сторінки для new_finoperation
+    const newFinOperationBtn = document.getElementById("add-new-finoperation");
+    const newFinOperationForm = document.getElementById("new-finoperation-form");
+    const cancelFinOperationBtn = document.getElementById("cancel-new-finoperation");
 
     // Показуємо форму редагування бюджету при натисканні на кнопку "Змінити дані"
     editBudgetBtn.addEventListener("click", function(event) {
@@ -179,6 +190,17 @@
     newGoalBudgetTransferBtn.style.display = "inline"; // Показуємо кнопку редагування
     });
     
+    // Показуємо форму для трансферу до бюджету-цілі
+    newFinOperationBtn.addEventListener("click", function(event) {
+        event.preventDefault();
+        newFinOperationForm.style.display = "block"; // Показуємо форму
+        newFinOperationBtn.style.display = "none"; // Приховуємо кнопку редагування
+        });
+    // Скасувати трансфер до бюджету-цілі
+    cancelFinOperationBtn.addEventListener("click", function() {
+        newFinOperationForm.style.display = "none"; // Приховуємо форму
+        newFinOperationBtn.style.display = "inline"; // Показуємо кнопку редагування
+        });
 
     // Отримуємо всі кнопки для редагування фінансових операцій
     const editFinoperationBtns = document.querySelectorAll(".edit-finoperation-btn");

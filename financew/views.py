@@ -150,13 +150,14 @@ def budget(request, budget_id):
     
     #для виведення фін-операцій
     finoperations = budget.finoperation_set.order_by('-date_added') # мінус означає від найновіших до старіших
-
-    # форма для зміни поточного бюджету та форма для трансферу коштів
+        
+    # форми для зміни поточного бюджету та форма для трансферу коштів і тд
     if request.method != 'POST':
         # No data submitted; create a blank form.
         budgetform = BudgetForm(instance=budget,prefix='budget')
         transferbudgetform = TransferFromBudgetForm(prefix='transfer-budget')
         transfergoalbudgetform = TransferFromGoalBudgetForm(prefix='transfer-goalbudget')
+        new_finoperation_form = FinOperationForm(prefix='new-finoperation')
     else:
         budgetform = BudgetForm(instance=budget, data=request.POST,prefix='budget') # бере існуючий запис і дані який надіслав користуввач (типу змінив текст)
         if budgetform.is_valid():
@@ -169,12 +170,6 @@ def budget(request, budget_id):
             with transaction.atomic(): # всі зміни в базі даних будуть виконані або всі разом (якщо всі операції успішні), або жодна (якщо виникне помилка).  
                 new_transferbudget = transferbudgetform.save(commit=False) # не зберігати одразу до бд
                 new_transferbudget.from_budget = budget #додати бюджет з якого надсилається
-
-                
-                # to_budget = new_transferbudget.to_budget # в який бюджет заливаєм кошти
-                # to_budget.amount += new_transferbudget.amount 
-                # budget.amount = budget.amount - new_transferbudget.amount 
-                
                 #логіка зняття коштів та їх додавання по бюджетах
                 to_budget = new_transferbudget.to_budget # в який бюджет заливаєм кошти
                 if budget.currency == to_budget.currency:
@@ -183,8 +178,6 @@ def budget(request, budget_id):
                 else:
                     to_budget.amount += convert_currency_for_transfer(budget.currency,to_budget.currency,new_transferbudget.amount) 
                     budget.amount = budget.amount - new_transferbudget.amount
-
-
                 # зберегти в БД
                 budget.save()
                 to_budget.save()  
@@ -197,7 +190,6 @@ def budget(request, budget_id):
             with transaction.atomic(): # всі зміни в базі даних будуть виконані або всі разом (якщо всі операції успішні), або жодна (якщо виникне помилка).  
                 new_transfergoalbudget = transfergoalbudgetform.save(commit=False) # не зберігати одразу до бд
                 new_transfergoalbudget.from_budget = budget #додати бюджет з якого надсилається
-
                 #логіка зняття коштів та їх додавання по бюджетах
                 to_budget = new_transfergoalbudget.to_goalbudget # в який бюджет заливаєм кошти
                 if budget.currency == to_budget.currency:
@@ -206,13 +198,25 @@ def budget(request, budget_id):
                 else:
                     to_budget.amount += convert_currency_for_transfer(budget.currency,to_budget.currency,new_transfergoalbudget.amount) 
                     budget.amount = budget.amount - new_transfergoalbudget.amount
-
                 # зберегти в БД
                 budget.save() # збереження бюджету з якого відправлвяли
                 to_budget.save()  # це збереження бюджету-цілі
                 new_transfergoalbudget.save() #це збереження запису
             return redirect('financew:budget', budget_id=budget.id)
-
+        
+        # форма для нової фіноперації 
+        new_finoperation_form = FinOperationForm(data=request.POST, prefix='new-finoperation')
+        if new_finoperation_form.is_valid():
+            with transaction.atomic():
+                new_finoperation = new_finoperation_form.save(commit=False) # commit=false не записує об'єкт в базу даних
+                new_finoperation.budget = budget # зберегти запис за бюджетом який ми витягли з БД (на початку функції)
+                if new_finoperation.type == "expense":
+                    budget.amount = budget.amount - new_finoperation.amount
+                elif new_finoperation.type == "income":
+                    budget.amount = budget.amount + new_finoperation.amount
+                budget.save()
+                new_finoperation.save() # тут воно вже зберігає з правильним бюджетом
+            return redirect('financew:budget', budget_id=budget_id)
 
     #для показу переведень бюджетів
     transfers_out = budget.budget_out_set.all() # Отримати всі перекази між бюджетами, де цей бюджет є відправником
@@ -220,7 +224,7 @@ def budget(request, budget_id):
     goal_transfers = TransferGoalBudget.objects.filter(from_budget=budget) # Отримати всі перекази, де цей бюджет надсилає гроші у цільовий бюджет (вирази насправді одинакові просто різні представлення (мається на увазі transfers_in = budget.budget_in_set.all()), тобто можна би було вказати TransferBudget.objects.filter(from_budget=budget))
     all_transfers = chain(transfers_out, transfers_in, goal_transfers)# Об'єднуємо всі перекази 
     transfers = sorted(all_transfers, key=lambda x: x.date_added, reverse=True)# Відсортувати за датою (воно автоматом в ліст перетворює) елементи в transfers досі є об'єктами класу
-    context = {'budget': budget, 'finoperations': finoperations, 'transfers': transfers,'form': budgetform,'transferbudgetform': transferbudgetform, 'transfergoalbudgetform':transfergoalbudgetform}
+    context = {'budget': budget, 'finoperations': finoperations, 'transfers': transfers,'form': budgetform,'transferbudgetform': transferbudgetform, 'transfergoalbudgetform':transfergoalbudgetform, 'new_finoperation_form': new_finoperation_form,}
     return render(request, 'financew/budget.html', context)
 
 
