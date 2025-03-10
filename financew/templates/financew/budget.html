@@ -93,7 +93,7 @@
                     {{ transfer.to_goalbudget.name }}
                 {% endif %}
             </td>
-            <td>{{ transfer.amount }}</td>
+            <td>{{ transfer.amount }} {{ transfer.from_budget.currency }}</td>
         </tr>
         {% empty %}
         <tr>

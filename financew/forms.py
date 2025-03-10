@@ -34,19 +34,15 @@ class CategoryForm(forms.ModelForm):
         fields = ['name']
         labels = {'name': 'Назва категорії'}
     
-    # def clean_name(self):
-    #     name = self.cleaned_data['name']
-    #     if Category.objects.filter(name=name).exists():
-    #         raise forms.ValidationError("Категорія з таким ім'ям вже існує.")
-    #     return name
-    
 class GoalBudgetForm(forms.ModelForm):
+    """форма для створення бюджету-цілі"""
     class Meta:
         model = GoalBudget
         fields = ['name', 'currency', 'target_amount', 'amount']
         labels = {'name':'Ім\'я для бюджету-цілі', 'currency': 'Валюта', 'target_amount': 'Ціль' , 'amount': 'Поточна сума'}
 
 class TransferFromBudgetForm(forms.ModelForm):
+    """трансфер зі сторінки бюджету в бюджет"""
     class Meta:
         model = TransferBudget
         fields = [ 'to_budget', 'amount']
@@ -54,6 +50,7 @@ class TransferFromBudgetForm(forms.ModelForm):
         }
 
 class TransferFromGoalBudgetForm(forms.ModelForm):
+    """трансфер зі сторінки бюджету в бюджет-ціль"""
     class Meta:
         model = TransferGoalBudget
         fields = [ 'to_goalbudget', 'amount']
@@ -61,7 +58,7 @@ class TransferFromGoalBudgetForm(forms.ModelForm):
         }
 
 class TransferBudgetForm(forms.ModelForm):
-    """Форма для трансферу з включеним """
+    """Форма для трансферу з бюджету в бюджет"""
     class Meta:
         model = TransferBudget
         fields = ['from_budget', 'to_budget', 'amount']

@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_UP
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from itertools import chain
@@ -7,7 +7,7 @@ from django.db import transaction
 # from django.utils import timezone
 
 from .constants import CURRENCIES
-from .utils import get_exchange_rates, convert_to_currency
+from .utils import get_exchange_rates, convert_to_currency, amount_in_currency, convert_currency_for_transfer
 from .models import Budget, FinOperation, GoalBudget, Category, TransferBudget, TransferGoalBudget
 from .forms import BudgetForm, FinOperationForm, GoalBudgetForm, CategoryForm,  TransferFromBudgetForm, TransferFromGoalBudgetForm, CurrencyForm
 
@@ -25,45 +25,31 @@ def my(request):
     Відображає особистий кабінет користувача та дозволяє додавати нові бюджети.
     """
     budgets = Budget.objects.filter(owner=request.user).all() # взяти всі бюджети що належать цьому користувачу
-   
-    rates = get_exchange_rates(request)
-    
-    # Отримуємо останні 5 фінансових операцій для поточного користувача
-    recent_operations = FinOperation.objects.filter(budget__owner=request.user).order_by('-date_added')[:5]
+    goalbudgets = GoalBudget.objects.filter(owner=request.user).all() # всі бюджети-цілі користувача
+    categories = Category.objects.filter(owner=request.user).all()#наявнi категорій користувача
+    recent_operations = FinOperation.objects.filter(budget__owner=request.user).order_by('-date_added')[:5]# Отримуємо останні 5 фінансових операцій для поточного користувача
     
     """форма для вибору яку валюту відобразити"""
-    # Отримуємо валюту з сесії (якщо є), або використовуємо дефолтну 'UAH'
-    display_currency = request.session.get('display_currency', 'UAH')
-    # Створюємо форму з ініціалізацією значення за замовчуванням
-    currencydisplayform = CurrencyForm(initial={'currency': display_currency})
+    display_currency = request.session.get('display_currency', 'UAH')# Отримуємо валюту з сесії (якщо є), або використовуємо дефолтну 'UAH'
+    currencydisplayform = CurrencyForm(initial={'currency': display_currency}) # Створюємо форму з ініціалізацією значення за замовчуванням
     selected_currency = request.GET.get('currency', None) # None якщо нічого не вибрано
     if selected_currency:
         request.session['display_currency'] = selected_currency # Якщо валюта вибрана, зберігаємо її в сесії
         return redirect('financew:my')
     
-    # Обчислення загального балансу і конвертованих сум у вибраній валюті
-    total_in_uah = Decimal('0')
-    budgets_with_converted = []
+    """Обчислення загального балансу (і бюджетів) у вибраній валюті"""
+    converted_budgets = []
+    total_balance = 0
     for budget in budgets:
-        balance_in_uah = budget.total_balance_in_uah(request)
-        print(
-            f"Budget: {budget.name}, Currency: {budget.currency}, Amount: {budget.amount}, Balance in UAH: {balance_in_uah}")
-        total_in_uah += balance_in_uah
-
-        # Конвертуємо баланс бюджету у вибрану валюту
-        converted_balance = convert_to_currency(balance_in_uah, display_currency, rates)
-        budgets_with_converted.append({
+        converted_amount = amount_in_currency(display_currency, budget).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)# Конвертуємо баланс бюджету у вибрану валюту (+2 знаки після коми)
+        
+        converted_budgets.append({
             'budget': budget,
-            'converted_balance': converted_balance
+            'converted_amount': converted_amount,
         })
-    total_balance = convert_to_currency(total_in_uah, display_currency, rates)
+
+        total_balance += converted_amount
     
-
-    """головна сторінка фінансиW з бюджетом та додавання нового бюджету (те саме стосується і бюджетів-цілей)"""
-    goalbudgets = GoalBudget.objects.filter(owner=request.user).all()
-
-    #наявнi категорій користувача
-    categories = Category.objects.filter(owner=request.user).all()
     if request.method != 'POST':
         # No data submitted; create a blank form.
         budgetform = BudgetForm(prefix='budget')
@@ -99,7 +85,7 @@ def my(request):
         return redirect('financew:my')
     
     # Display a blank or invalid form.
-    context = {'budgets': budgets, 'goalbudgets': goalbudgets, 'categories': categories, 'goalbudgetform':goalbudgetform, 'budgetform': budgetform, 'categoryform':categoryform, 'budgets_with_converted': budgets_with_converted, 'total_balance': total_balance, 'display_currency': display_currency, 'currencies': ['UAH', 'USD', 'EUR'], 'recent_operations':recent_operations, 'currencydisplayform':currencydisplayform}
+    context = {'budgets': converted_budgets, 'goalbudgets': goalbudgets, 'categories': categories, 'goalbudgetform':goalbudgetform, 'budgetform': budgetform, 'categoryform':categoryform, 'total_balance': total_balance, 'display_currency': display_currency, 'recent_operations':recent_operations, 'currencydisplayform':currencydisplayform}
     return render(request, 'financew/my.html', context) # потім дані з context можна використовувати у шаблоні 
 
 @login_required
@@ -184,13 +170,20 @@ def budget(request, budget_id):
                 new_transferbudget = transferbudgetform.save(commit=False) # не зберігати одразу до бд
                 new_transferbudget.from_budget = budget #додати бюджет з якого надсилається
 
+                
+                # to_budget = new_transferbudget.to_budget # в який бюджет заливаєм кошти
+                # to_budget.amount += new_transferbudget.amount 
+                # budget.amount = budget.amount - new_transferbudget.amount 
+                
                 #логіка зняття коштів та їх додавання по бюджетах
                 to_budget = new_transferbudget.to_budget # в який бюджет заливаєм кошти
-                to_budget.amount += new_transferbudget.amount 
-                budget.amount = budget.amount - new_transferbudget.amount 
-                #print(budget.amount)
-                #if budget == from_budget: #from_budget = new_transferbudget.from_budget # з якого бюджету заливаєм кошти
-                    #print("ТЕСТ ПРОЙДЕНО") - воно все проходить
+                if budget.currency == to_budget.currency:
+                    to_budget.amount += new_transferbudget.amount 
+                    budget.amount = budget.amount - new_transferbudget.amount 
+                else:
+                    to_budget.amount += convert_currency_for_transfer(budget.currency,to_budget.currency,new_transferbudget.amount) 
+                    budget.amount = budget.amount - new_transferbudget.amount
+
 
                 # зберегти в БД
                 budget.save()
@@ -207,16 +200,17 @@ def budget(request, budget_id):
 
                 #логіка зняття коштів та їх додавання по бюджетах
                 to_budget = new_transfergoalbudget.to_goalbudget # в який бюджет заливаєм кошти
-                to_budget.amount += new_transfergoalbudget.amount 
-                budget.amount = budget.amount - new_transfergoalbudget.amount 
-                #print(budget.amount)
-                #if budget == from_budget: #from_budget = new_transferbudget.from_budget # з якого бюджету заливаєм кошти
-                    #print("ТЕСТ ПРОЙДЕНО") - воно все проходить
+                if budget.currency == to_budget.currency:
+                    to_budget.amount += new_transfergoalbudget.amount 
+                    budget.amount = budget.amount - new_transfergoalbudget.amount 
+                else:
+                    to_budget.amount += convert_currency_for_transfer(budget.currency,to_budget.currency,new_transfergoalbudget.amount) 
+                    budget.amount = budget.amount - new_transfergoalbudget.amount
 
                 # зберегти в БД
-                budget.save()
-                to_budget.save()  
-                new_transfergoalbudget.save()  
+                budget.save() # збереження бюджету з якого відправлвяли
+                to_budget.save()  # це збереження бюджету-цілі
+                new_transfergoalbudget.save() #це збереження запису
             return redirect('financew:budget', budget_id=budget.id)
 
 

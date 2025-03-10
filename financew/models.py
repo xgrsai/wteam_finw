@@ -2,11 +2,10 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 from dateutil.relativedelta import relativedelta
-from decimal import Decimal, ROUND_HALF_UP
 from django.core.validators import MinValueValidator
 
 from .constants import CURRENCIES
-from .utils import get_exchange_rates, convert_to_currency
+# from .utils import get_exchange_rates, convert_to_currency
 
 # CURRENCIES = {
 #         "UAH": "UAH",
@@ -29,27 +28,27 @@ class Budget(models.Model):
         """Повернути нормальним текстом"""
         return f"{self.name} {self.amount} {self.currency}"
 
-    def total_balance_in_uah(self, request):
-        """
-        Обчислює загальний баланс у гривнях, конвертуючи USD і EUR за актуальним курсом.
-        """
-        if self.currency == "UAH":
-            return self.amount.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+    # def total_balance_in_uah(self, request):
+    #     """
+    #     Обчислює загальний баланс у гривнях, конвертуючи USD і EUR за актуальним курсом.
+    #     """
+    #     if self.currency == "UAH":
+    #         return self.amount.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
 
-        rates = get_exchange_rates(request)
-        if self.currency in rates:
-            converted_amount = (self.amount * rates[self.currency]).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
-            return converted_amount
-        else:
-            raise ValueError(f"Курс для валюти {self.currency} не знайдено")
+    #     rates = get_exchange_rates()
+    #     if self.currency in rates:
+    #         converted_amount = (self.amount * rates[self.currency]).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+    #         return converted_amount
+    #     else:
+    #         raise ValueError(f"Курс для валюти {self.currency} не знайдено")
 
-    def total_balance_in_currency(self, target_currency, request):
-        """
-        Обчислює баланс у заданій валюті (UAH, USD, EUR).
-        """
-        amount_in_uah = self.total_balance_in_uah(request)
-        rates = get_exchange_rates(request)
-        return convert_to_currency(amount_in_uah, target_currency, rates)
+    # def total_balance_in_currency(self, target_currency, request):
+    #     """
+    #     Обчислює баланс у заданій валюті (UAH, USD, EUR).
+    #     """
+    #     amount_in_uah = self.total_balance_in_uah(request)
+    #     rates = get_exchange_rates(request)
+    #     return convert_to_currency(amount_in_uah, target_currency, rates)
 
 
 class GoalBudget(models.Model):

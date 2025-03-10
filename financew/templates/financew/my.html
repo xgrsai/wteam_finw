@@ -41,8 +41,8 @@
 <div>Мої бюджети
 {% for budget in budgets%}<!-- воно бере по назві ключа -->
     <li>
-        <a href="{% url 'financew:budget' budget.id %}">{{ budget.name }} {{ budget.amount }} {{ budget.currency }}</a>
-        <form action="{% url 'financew:delete_budget' budget.id %}" method="post" style="display:inline;">
+        <a href="{% url 'financew:budget' budget.budget.id %}">{{ budget.budget.name }} {{ budget.budget.amount }} {{ budget.budget.currency }} ({{budget.converted_amount}})</a>
+        <form action="{% url 'financew:delete_budget' budget.budget.id %}" method="post" style="display:inline;">
             {% csrf_token %}
             <button id="delete-budget-btn">Видалити</button>
         </form>
