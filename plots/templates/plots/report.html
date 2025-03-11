@@ -1,6 +1,28 @@
 {% extends 'financew/base.html' %}
 {% block content %}
+<h1>Кругова діаграма</h1>
+{% for budget in budgets%}<!-- воно бере по назві ключа -->
+<li>
+    {{ budget.name }} {{ budget.amount }} {{ budget.currency }}
+</li>
+{% empty %}
+<li>Бюджети не знайдено</li>
+{% endfor %}    
 
+<form method="get">
+    <label for="type">Оберіть тип операції:</label>
+    <select name="type" id="type">
+        <option value="expense" {% if selected_type == 'expense' %}selected{% endif %}>Витрати</option>
+        <option value="income" {% if selected_type == 'income' %}selected{% endif %}>Прибуток</option>
+    </select>
+    <button type="submit">Фільтрувати</button>
+</form>
+
+<!-- Вставляємо Plotly графік -->
+    <div>
+        {{ graph|safe }}
+    </div>
+{% comment %} 
 <style>
         .form-container {
             margin-bottom: 20px;
@@ -45,5 +67,46 @@
     <!-- Графік -->
     <div class="plot-container">
         {{ plot_html|safe }}
-    </div> 
+    </div>  {% endcomment %}
+    {% comment %} <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Графік витрат</title>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    </head>
+    <body>
+    
+        <canvas id="expenseChart" width="400" height="200"></canvas>
+        <script>
+            fetch('/financial-operations-data/')
+                .then(response => response.json())
+                .then(data => {
+                    const categories = Object.keys(data);
+                    const expenses = Object.values(data);
+    
+                    const ctx = document.getElementById('expenseChart').getContext('2d');
+                    new Chart(ctx, {
+                        type: 'bar', // Тип графіка (бар, лінійний тощо)
+                        data: {
+                            labels: categories, // Категорії
+                            datasets: [{
+                                label: 'Витрати по категоріях',
+                                data: expenses, // Суми витрат
+                                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                borderColor: 'rgba(255, 99, 132, 1)',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                });
+        </script>
+    
+    </body> {% endcomment %}
 {% endblock content %}

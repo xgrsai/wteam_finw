@@ -4,7 +4,7 @@ from django.utils import timezone
 from dateutil.relativedelta import relativedelta
 from django.core.validators import MinValueValidator
 
-from .constants import CURRENCIES
+from .constants import CURRENCIES, TIME_INTERVALS, FINOPERATION_TYPE
 # from .utils import get_exchange_rates, convert_to_currency
 
 # CURRENCIES = {
@@ -84,16 +84,16 @@ class Category(models.Model):
     
 class FinOperation(models.Model):
     """Фінансова операція яку здійснює користувач"""
-    TIME_INTERVALS = {
-        "one_time": "Одноразовий",
-        "weekly": "Щотижня",
-        "monthly": "Щомісяця",
-        "annually": "Щорічно",
-    }
-    FINOPERATION_TYPE = {
-        "income": "Прибуток",
-        "expense": "Витрати",
-    }
+    # TIME_INTERVALS = {
+    #     "one_time": "Одноразовий",
+    #     "weekly": "Щотижня",
+    #     "monthly": "Щомісяця",
+    #     "annually": "Щорічно",
+    # }
+    # FINOPERATION_TYPE = {
+    #     "income": "Прибуток",
+    #     "expense": "Витрати",
+    # }
     #FinOperationType = models.TextChoices("FinOperationType", "INCOME EXPENSE") 
     
     budget = models.ForeignKey(Budget, on_delete=models.CASCADE) # бюджет може мати багато фін. операцій
