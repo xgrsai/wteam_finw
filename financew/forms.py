@@ -1,7 +1,10 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
-from .models import Budget, FinOperation, Category
+from django.core.exceptions import ValidationError
+
+from .models import Budget, FinOperation, Category, GoalBudget, TransferBudget, TransferGoalBudget
+from .constants import CURRENCIES
 
 class BudgetForm(forms.ModelForm):
     class Meta:
@@ -12,14 +15,66 @@ class BudgetForm(forms.ModelForm):
 class FinOperationForm(forms.ModelForm):
     class Meta:
         model = FinOperation
-        fields = ['amount', 'type', 'time_interval', 'category']
-        labels = {'amount': 'Сума', 'type': 'Тип операції','time_interval': 'Часовий інтервал', 'category': 'Категорія операціії'}
+        fields = ['amount', 'type', 'time_interval', 'category','is_active']
+        labels = {
+            'amount': 'Сума',
+            'type': 'Тип операції',
+            'time_interval': 'Часовий інтервал',
+            'category': 'Категорія операціії',
+            'is_active': 'Чи активна',
+        #     'start_date': 'Дата початку операції'
+        # }
+        # widgets = {
+        #     'start_date': forms.DateTimeInput(attrs={'time_type': 'datetime-local'}),
+        # 
+        }
 
 class CategoryForm(forms.ModelForm):
     class Meta:
         model = Category
         fields = ['name']
         labels = {'name': 'Назва категорії'}
+    
+class GoalBudgetForm(forms.ModelForm):
+    """форма для створення бюджету-цілі"""
+    class Meta:
+        model = GoalBudget
+        fields = ['name', 'currency', 'target_amount', 'amount']
+        labels = {'name':'Ім\'я для бюджету-цілі', 'currency': 'Валюта', 'target_amount': 'Ціль' , 'amount': 'Поточна сума'}
+
+class TransferFromBudgetForm(forms.ModelForm):
+    """трансфер зі сторінки бюджету в бюджет"""
+    class Meta:
+        model = TransferBudget
+        fields = [ 'to_budget', 'amount']
+        labels = { 'to_budget':'В який бюджет', 'amount':'Сума',
+        }
+
+class TransferFromGoalBudgetForm(forms.ModelForm):
+    """трансфер зі сторінки бюджету в бюджет-ціль"""
+    class Meta:
+        model = TransferGoalBudget
+        fields = [ 'to_goalbudget', 'amount']
+        labels = { 'to_goalbudget':'В який бюджет-ціль', 'amount':'Сума',
+        }
+
+class TransferBudgetForm(forms.ModelForm):
+    """Форма для трансферу з бюджету в бюджет"""
+    class Meta:
+        model = TransferBudget
+        fields = ['from_budget', 'to_budget', 'amount']
+        labels = {'from_budget':'З якого бюджету', 'to_budget':'В який бюджет', 'amount':'Сума',
+        }
+
+class CurrencyForm(forms.Form):
+    currency = forms.ChoiceField(
+        choices=[(key, value) for key, value in CURRENCIES.items()],
+        label="Вибір валюти",
+        #initial= # бере першим зі словника
+        widget=forms.Select(attrs={'onchange': 'this.form.submit()'}),
+
+    )
+
 
 # class CustomUserCreationForm(UserCreationForm):
 #     email = forms.EmailField(required=True)

@@ -17,13 +17,16 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    # підключення графіків
-    path("", include('plots.urls')),
+    
     # Підключення financew
     path('', include('financew.urls', namespace='financew')),
+    # підключення графіків
+    path('plots/', include('plots.urls', namespace='plots')),
     # Підключення модулю: accounts
     path('accounts/', include('accounts.urls', namespace='accounts')),
-]
+] #+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

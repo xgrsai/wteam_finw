@@ -1,0 +1,9 @@
+/* test.css */
+body {
+    background-color: #ff0000 !important; /* Червоний фон, щоб одразу було видно зміни */
+}
+
+h1::after {
+    content: " (CSS підключено!)";
+    color: #00ff00; /* Зелений текст після h1 */
+}
