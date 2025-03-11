@@ -3,8 +3,10 @@
 
 {% block content %}
 <link rel="stylesheet" href="{% static 'financew/style.css' %}">
+<!--Посилання ня на сторінку графіків-->
 <a href="{% url 'plots:report' %}">Візуалізація (чи звіти) </a>
-
+<!-- Посилання на сторінку всіх транзакцій -->
+<p><a href="{% url 'financew:transactions' %}">Переглянути всі транзакції</a></p>
 
 <!-- Вибір валюти відображення -->
 {% comment %} <form method="get" action="{% url 'financew:my' %}">
@@ -241,8 +243,7 @@ document.getElementById("category-form").addEventListener("submit", function(eve
 {% endfor %}
 </ul> -->
 
-<!-- Посилання на сторінку всіх транзакцій -->
-<p><a href="{% url 'financew:transactions' %}">Переглянути всі транзакції</a></p>
+
 
   <script>
   //для бюджету
