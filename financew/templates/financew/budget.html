@@ -52,8 +52,7 @@
     <span>{{ finoperation.get_type_display }} - {{ finoperation.amount }} - {{ finoperation.date_added }} - {{ finoperation.category }}</span>
 
     <!-- Кнопка для редагування фінансової операції -->
-    <a href="#" class="edit-finoperation-btn" data-finoperation-id="{{ finoperation.id }}" style="color: blue; text-decoration: none;">Змінити операцію</a>
-
+    <button type='button' class="edit-finoperation-btn" data-finoperation-id="{{ finoperation.id }}">Змінити операцію</button>
     <!-- Форма для редагування фінансової операції (спочатку прихована) -->
     <div id="edit-finoperation-form-{{ finoperation.id }}" class="edit-finoperation-form" style="display: none;">
         <form method="POST" action="{% url 'financew:budget' budget.id %}">
@@ -65,6 +64,7 @@
             </select> {% endcomment %}
             {{edit_finoperation_form.as_div}}
             <button type="submit" >Змінити</button>
+            <button class="cancel-finoperation-btn">Скасувати</button>
         </form>
     </div>
 
@@ -203,7 +203,50 @@
         newFinOperationBtn.style.display = "inline"; // Показуємо кнопку редагування
         });
 
-    // Отримуємо всі кнопки для редагування фінансових операцій
+    
+// Отримуємо елементи сторінки для редагування фінансової операції
+const editFinOperationBtns = document.querySelectorAll('.edit-finoperation-btn');
+const cancelFinOperationBtns = document.querySelectorAll('.cancel-finoperation-btn');
+const editFinOperationForms = document.querySelectorAll('.edit-finoperation-form');
+
+document.addEventListener("DOMContentLoaded", function() { // "DOMContentLoaded" це подія в JavaScript, яка спрацьовує, коли весь HTML-документ завантажено і розпарсено браузером, але ще не завантажено всі зовнішні ресурси, такі як зображення, стилі CSS, або скрипти. Якщо потрібно тільки взаємодіяти з DOM, тоді достатньо використовувати DOMContentLoaded. Якщо ж потрібно дочекатись завантаження всіх ресурсів, тоді використовуємо load.
+    // Отримуємо всі кнопки "Змінити операцію"
+    const editFinOperationBtns = document.querySelectorAll('.edit-finoperation-btn');
+    
+    // Обробляємо клік по кнопці "Змінити операцію"
+    editFinOperationBtns.forEach((btn) => {
+        btn.addEventListener("click", function(event) {
+            event.preventDefault();
+            const finoperationId = btn.getAttribute('data-finoperation-id'); // Отримуємо ID операції
+            const form = document.getElementById(`edit-finoperation-form-${finoperationId}`);
+
+            // Показуємо форму редагування
+            form.style.display = "block";
+            btn.style.display = "none"; // Приховуємо кнопку редагування
+        });
+    });
+
+    // Отримуємо всі кнопки "Скасувати"
+    const cancelFinOperationBtns = document.querySelectorAll('.cancel-finoperation-btn');
+
+    // Обробляємо клік по кнопці "Скасувати"
+    cancelFinOperationBtns.forEach((btn) => {
+        btn.addEventListener("click", function(event) {
+            event.preventDefault(); // Запобігаємо відправці форми або оновленню сторінки
+            const form = btn.closest('.edit-finoperation-form'); // Отримуємо батьківську форму
+            const editBtn = document.querySelector(`.edit-finoperation-btn[data-finoperation-id="${form.id.replace('edit-finoperation-form-', '')}"]`);
+
+            // Сховуємо форму редагування
+            form.style.display = "none";
+            editBtn.style.display = "inline"; // Показуємо кнопку редагування
+        });
+    });
+});
+
+</script>
+
+{% endblock content %}
+{% comment %} // Отримуємо всі кнопки для редагування фінансових операцій
     const editFinoperationBtns = document.querySelectorAll(".edit-finoperation-btn");
     editFinoperationBtns.forEach(function(button) {
         button.addEventListener("click", function(event) {
@@ -222,7 +265,4 @@
                 form.style.display = "none";
             }
         });
-    });
-</script>
-
-{% endblock content %}
+    }); {% endcomment %}

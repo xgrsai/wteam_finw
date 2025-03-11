@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from itertools import chain
 from django.db import transaction
+from copy import deepcopy
 # from django.utils import timezone
 
 from .constants import CURRENCIES
@@ -165,12 +166,30 @@ def budget(request, budget_id):
             budgetform.save() # типу запис до бд
             return redirect('financew:budget', budget_id=budget.id)
         
-        edit_finoperation_forms = [FinOperationForm(data=request.POST,instance=finoperation, prefix=f"new-finoperation-{finoperation.id}") for finoperation in finoperations]
-        
-        validation = [edit_finoperation_form for edit_finoperation_form in edit_finoperation_forms if edit_finoperation_form.is_valid()]
+        #форми для редагування фіноперацій 
+        edit_finoperation_forms = [(deepcopy(finoperation),FinOperationForm(data=request.POST,instance=finoperation, prefix=f"new-finoperation-{finoperation.id}")) for finoperation in finoperations]# deepcopy для старих значень бо instance їх автоматом оновлює
+        validation = [(finoperation,edit_finoperation_form) for finoperation,edit_finoperation_form in edit_finoperation_forms if edit_finoperation_form.is_valid()] 
         if validation:
-            for edit_finoperation_form in validation:
-                edit_finoperation_form.save() 
+            for finoperation,edit_finoperation_form in validation:
+                with transaction.atomic():
+                    finop_amount_old = finoperation.amount
+                    finop_type_old = finoperation.type
+                    
+                    edit_finoperation = edit_finoperation_form.save(commit=False)
+                    print(finop_amount_old)
+                    # Оновлення бюджету після зміни операції
+                    if edit_finoperation.type == "expense" and finop_type_old == "expense":
+                        budget.amount += finop_amount_old - edit_finoperation.amount
+                    elif edit_finoperation.type == "income" and finop_type_old == "income":
+                        budget.amount += edit_finoperation.amount - finop_amount_old
+                    elif edit_finoperation.type == "income" and finop_type_old == "expense":
+                        budget.amount += edit_finoperation.amount + finop_amount_old
+                    else: #якщо нова операція це витрати а стара операція це прибуток
+                        budget.amount -= edit_finoperation.amount + finop_amount_old
+        
+                    edit_finoperation.save() 
+                    budget.save()
+                    # edit_finoperation_form.save() # ніби тут краще
             return redirect('financew:budget', budget_id=budget.id)
         
         #форма для трансферу з поточного бюджету до просто бюджету
@@ -237,35 +256,35 @@ def budget(request, budget_id):
     return render(request, 'financew/budget.html', context)
 
 
-@login_required
-def new_finoperation(request, budget_id):
-    """додати нову фіноперацію для бюджету"""
-    budget = Budget.objects.get(id=budget_id)
+# @login_required
+# def new_finoperation(request, budget_id):
+#     """додати нову фіноперацію для бюджету"""
+#     budget = Budget.objects.get(id=budget_id)
 
-    if budget.owner != request.user:
-        raise Http404
+#     if budget.owner != request.user:
+#         raise Http404
 
-    if request.method != 'POST':
-        # No data submitted; create a blank form.
-        form = FinOperationForm()
-    else:
-        # POST data submitted; process data.
-        form = FinOperationForm(data=request.POST)
-        if form.is_valid():
-            with transaction.atomic():
-                new_finoperation = form.save(commit=False) # commit=false не записує об'єкт в базу даних
-                new_finoperation.budget = budget # зберегти запис за бюджетом який ми витягли з БД (на початку функції)
-                if new_finoperation.type == "expense":
-                    budget.amount = budget.amount - new_finoperation.amount
-                elif new_finoperation.type == "income":
-                    budget.amount = budget.amount + new_finoperation.amount
-                budget.save()
-                new_finoperation.save() # тут воно вже зберігає з правильним бюджетом
-            return redirect('financew:budget', budget_id=budget_id)
+#     if request.method != 'POST':
+#         # No data submitted; create a blank form.
+#         form = FinOperationForm()
+#     else:
+#         # POST data submitted; process data.
+#         form = FinOperationForm(data=request.POST)
+#         if form.is_valid():
+#             with transaction.atomic():
+#                 new_finoperation = form.save(commit=False) # commit=false не записує об'єкт в базу даних
+#                 new_finoperation.budget = budget # зберегти запис за бюджетом який ми витягли з БД (на початку функції)
+#                 if new_finoperation.type == "expense":
+#                     budget.amount = budget.amount - new_finoperation.amount
+#                 elif new_finoperation.type == "income":
+#                     budget.amount = budget.amount + new_finoperation.amount
+#                 budget.save()
+#                 new_finoperation.save() # тут воно вже зберігає з правильним бюджетом
+#             return redirect('financew:budget', budget_id=budget_id)
         
-    # Display a blank or invalid form.
-    context = {'budget': budget, 'form': form}
-    return render(request, 'financew/new_finoperation.html', context) # потім дані з context можна використовувати у шаблоні 
+#     # Display a blank or invalid form.
+#     context = {'budget': budget, 'form': form}
+#     return render(request, 'financew/new_finoperation.html', context) # потім дані з context можна використовувати у шаблоні 
 
 @login_required
 def delete_finoperation(request, finoperation_id):
