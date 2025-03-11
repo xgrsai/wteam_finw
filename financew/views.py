@@ -28,15 +28,15 @@ def my(request):
     budgets = Budget.objects.filter(owner=request.user).all() # взяти всі бюджети що належать цьому користувачу
     goalbudgets = GoalBudget.objects.filter(owner=request.user).all() # всі бюджети-цілі користувача
     categories = Category.objects.filter(owner=request.user).all()#наявнi категорій користувача
-    recent_operations = FinOperation.objects.filter(budget__owner=request.user).order_by('-date_added')[:5]# Отримуємо останні 5 фінансових операцій для поточного користувача
+    recent_operations = FinOperation.objects.filter(budget__owner=request.user).order_by('-date_added')[:5]# останні 5 фінансових операцій для поточного користувача
     
     """форма для вибору яку валюту відобразити"""
-    display_currency = request.session.get('display_currency', 'UAH')# Отримуємо валюту з сесії (якщо є), або використовуємо дефолтну 'UAH'
+    display_currency = request.GET.get('currency', request.session.get('display_currency', 'UAH'))# Отримуємо валюту з сесії (якщо є), або використовуємо дефолтну 'UAH'... Якщо параметр currency передано через GET-запит (наприклад, через URL: ?currency=USD), то він буде використаний. (щоб редірект не робити)
     currencydisplayform = CurrencyForm(initial={'currency': display_currency}) # Створюємо форму з ініціалізацією значення за замовчуванням
     selected_currency = request.GET.get('currency', None) # None якщо нічого не вибрано
     if selected_currency:
         request.session['display_currency'] = selected_currency # Якщо валюта вибрана, зберігаємо її в сесії
-        return redirect('financew:my')
+        # return redirect('financew:my') # чомусь погано працює тому через редірект
     
     """Обчислення загального балансу (і бюджетів) у вибраній валюті"""
     converted_budgets = []
@@ -99,11 +99,20 @@ def transactions(request):
     categories = Category.objects.all()  # Категорії можуть бути загальними
 
     # Отримуємо валюту відображення з GET-параметра або сесії
-    rates = get_exchange_rates(request)
-    display_currency = request.GET.get('currency', request.session.get('display_currency', 'UAH'))
-    if display_currency not in ['UAH', 'USD', 'EUR']:
-        display_currency = 'UAH'
-    request.session['display_currency'] = display_currency
+    rates = get_exchange_rates()
+    # display_currency = request.GET.get('currency', request.session.get('display_currency', 'UAH'))
+    # if display_currency not in ['UAH', 'USD', 'EUR']:
+    #     display_currency = 'UAH'
+    # request.session['display_currency'] = display_currency
+    """форма для вибору яку валюту відобразити"""
+    display_currency = request.GET.get('currency', request.session.get('display_currency', 'UAH'))# Отримуємо валюту з сесії (якщо є), або використовуємо дефолтну 'UAH'
+    currencydisplayform = CurrencyForm(initial={'currency': display_currency}) # Створюємо форму з ініціалізацією значення за замовчуванням
+    selected_currency = request.GET.get('currency', None) # None якщо нічого не вибрано
+    if selected_currency:
+        request.session['display_currency'] = selected_currency # Якщо валюта вибрана, зберігаємо її в сесії
+        # return redirect('financew:transactions')
+
+
 
     # Отримуємо параметри фільтрів
     date = request.GET.get('date')
@@ -138,6 +147,7 @@ def transactions(request):
         'currencies': ['UAH', 'USD', 'EUR'],
         'budgets': budgets,
         'categories': categories,
+        'currencydisplayform':currencydisplayform,
     }
     return render(request, 'financew/transactions.html', context)
 

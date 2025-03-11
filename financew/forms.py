@@ -15,12 +15,13 @@ class BudgetForm(forms.ModelForm):
 class FinOperationForm(forms.ModelForm):
     class Meta:
         model = FinOperation
-        fields = ['amount', 'type', 'time_interval', 'category']
+        fields = ['amount', 'type', 'time_interval', 'category','is_active']
         labels = {
             'amount': 'Сума',
             'type': 'Тип операції',
             'time_interval': 'Часовий інтервал',
             'category': 'Категорія операціії',
+            'is_active': 'Чи активна',
         #     'start_date': 'Дата початку операції'
         # }
         # widgets = {

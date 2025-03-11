@@ -3,6 +3,12 @@
 {% block content %}
 <h2>Усі транзакції</h2>
 
+<form method="get" action = {% url 'financew:transactions'%}>
+    <p>{{currencydisplayform.as_div}}</p>
+</form>
+
+
+
 <!-- Форма для фільтрів -->
 <form method="get">
     <label for="date">Дата:</label>
