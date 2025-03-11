@@ -38,7 +38,8 @@ INSTALLED_APPS = [
 
     #сторонні додатки
     "django_extensions",
-    
+    "django_bootstrap5",
+
     # дефолтні додатки
     "django.contrib.admin",
     "django.contrib.auth",

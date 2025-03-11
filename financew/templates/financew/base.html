@@ -1,3 +1,12 @@
+<!DOCTYPE html>
+<html lang="uk"> <!-- вказує що сторінка українською мову -->
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FinW</title>
+    {% load django_bootstrap5 %} {% bootstrap_css %} {% bootstrap_javascript %}
+  </head>
+
 <p><a href="{% url 'financew:index' %}">FinanceW</a> -
 {% if user.is_authenticated %}
   <a href="{% url 'financew:my' %}">Мій кабінет</a> - Привіт {{ user.username }}
