@@ -74,20 +74,23 @@ def get_pie_chart_data(request):
     categories = Category.objects.filter(owner=request.user)
     finoperations = FinOperation.objects.filter(budget__owner=request.user)
 
+    """для вибору бюджету"""
+    budget_type = request.session.get('budget_type')
+    if budget_type == 'all':
+        df = pd.DataFrame(list(finoperations.values('amount', 'type', 'category__name')))# Перетворюємо в DataFrame
+    else:
+        df = pd.DataFrame(list(finoperations.filter(budget=budget_type).values('amount', 'type', 'category__name')))# Перетворюємо в DataFrame
     
-    
-    df = pd.DataFrame(list(finoperations.values('amount', 'type', 'category__name')))# Перетворюємо в DataFrame
     # print(finoperations)
     if df.empty:
         return JsonResponse({"labels": [], "values": []})  # Якщо немає даних
 
-    #Отримання типу фін операції
-    selected_type = request.session.get('finoperation_type', None) # беремо це діло через сесію
-    print(selected_type)
+    """фільтр типу фіноперації"""
+    selected_type = request.session.get('finoperation_type') # беремо це діло через сесію
     if selected_type:
         df = df[df['type'] == selected_type]
 
-    df_grouped = df.groupby(['category__name'])['amount'].sum().reset_index()
+    df_grouped = df.groupby(['category__name'])['amount'].sum().reset_index() # 1) df.groupby(['category__name']): Це групує DataFrame df за значеннями в стовпці category__name. Тобто, всі записи з однаковим значенням в колонці category__name будуть об'єднані в одну групу. 2) ['amount']: Після того як дані будуть згруповані за категоріями, вибирається стовпець amount, в якому буде обчислюватися сума для кожної групи. 3) .sum(): Цей метод застосовується до кожної групи, обчислюючи суму значень у стовпці amount для кожної категорії. 4) .reset_index(): Після групування і обчислення суми, цей метод відновлює індекси DataFrame (по суті, створює новий DataFrame з індексами, починаючи з 0, замість того, щоб залишати їх у вигляді багаторівневих індексів після групування).
 
     data = {
         "labels": df_grouped['category__name'].tolist(),

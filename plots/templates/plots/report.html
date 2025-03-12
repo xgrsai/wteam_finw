@@ -3,6 +3,7 @@
     <h1>Кругова діаграма</h1>
     <!-- Підключення Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/randomcolor@0.5.4/randomColor.min.js"></script>
     <div>
         Фільтри
         <form method = 'GET'>
@@ -20,6 +21,7 @@
     </div>
    
     <script>
+        
         document.addEventListener("DOMContentLoaded", function () {
             fetch("{% url 'plots:piechart-data' %}")  // Запит до Django API
                 .then(response => response.json())
@@ -32,7 +34,7 @@
                             datasets: [{
                                 label: 'Фінанси',
                                 data: data.values,
-                                backgroundColor: ['red', 'blue', 'green', 'yellow', 'purple'],
+                                backgroundColor: data.labels.map(() => randomColor()),
                                 borderWidth: 1
                             }]
                         }
