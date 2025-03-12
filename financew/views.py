@@ -166,10 +166,10 @@ def budget(request, budget_id):
     if request.method != 'POST':
         # No data submitted; create a blank form.
         budgetform = BudgetForm(instance=budget,prefix='budget')
-        transferbudgetform = TransferFromBudgetForm(prefix='transfer-budget')
-        transfergoalbudgetform = TransferFromGoalBudgetForm(prefix='transfer-goalbudget')
-        new_finoperation_form = FinOperationForm(prefix='new-finoperation')
-        edit_finoperation_forms = [FinOperationForm(instance=finoperation, prefix=f"new-finoperation-{finoperation.id}") for finoperation in finoperations]
+        transferbudgetform = TransferFromBudgetForm(prefix='transfer-budget',user = request.user)
+        transfergoalbudgetform = TransferFromGoalBudgetForm(prefix='transfer-goalbudget',user = request.user)
+        new_finoperation_form = FinOperationForm(user = request.user,prefix='new-finoperation')
+        edit_finoperation_forms = [FinOperationForm(instance=finoperation, user = request.user,prefix=f"new-finoperation-{finoperation.id}") for finoperation in finoperations]
     else:
         budgetform = BudgetForm(instance=budget, data=request.POST,prefix='budget') # бере існуючий запис і дані який надіслав користуввач (типу змінив текст)
         if budgetform.is_valid():
@@ -177,7 +177,7 @@ def budget(request, budget_id):
             return redirect('financew:budget', budget_id=budget.id)
         
         #форми для редагування фіноперацій 
-        edit_finoperation_forms = [(deepcopy(finoperation),FinOperationForm(data=request.POST,instance=finoperation, prefix=f"new-finoperation-{finoperation.id}")) for finoperation in finoperations]# deepcopy для старих значень бо instance їх автоматом оновлює
+        edit_finoperation_forms = [(deepcopy(finoperation),FinOperationForm(data=request.POST,user = request.user,instance=finoperation, prefix=f"new-finoperation-{finoperation.id}")) for finoperation in finoperations]# deepcopy для старих значень бо instance їх автоматом оновлює
         validation = [(finoperation,edit_finoperation_form) for finoperation,edit_finoperation_form in edit_finoperation_forms if edit_finoperation_form.is_valid()] 
         if validation:
             for finoperation,edit_finoperation_form in validation:
@@ -203,7 +203,7 @@ def budget(request, budget_id):
             return redirect('financew:budget', budget_id=budget.id)
         
         #форма для трансферу з поточного бюджету до просто бюджету
-        transferbudgetform = TransferFromBudgetForm(data=request.POST,prefix='transfer-budget')
+        transferbudgetform = TransferFromBudgetForm(data=request.POST,user = request.user,prefix='transfer-budget')
         if transferbudgetform.is_valid():
             with transaction.atomic(): # всі зміни в базі даних будуть виконані або всі разом (якщо всі операції успішні), або жодна (якщо виникне помилка).  
                 new_transferbudget = transferbudgetform.save(commit=False) # не зберігати одразу до бд
@@ -223,7 +223,7 @@ def budget(request, budget_id):
             return redirect('financew:budget', budget_id=budget.id)
 
         #форма для трансферу з поточного бюджету до бюджету-цілі
-        transfergoalbudgetform = TransferFromGoalBudgetForm(data=request.POST,prefix='transfer-goalbudget')
+        transfergoalbudgetform = TransferFromGoalBudgetForm(data=request.POST,user = request.user,prefix='transfer-goalbudget')
         if transfergoalbudgetform.is_valid():
             with transaction.atomic(): # всі зміни в базі даних будуть виконані або всі разом (якщо всі операції успішні), або жодна (якщо виникне помилка).  
                 new_transfergoalbudget = transfergoalbudgetform.save(commit=False) # не зберігати одразу до бд
@@ -243,7 +243,7 @@ def budget(request, budget_id):
             return redirect('financew:budget', budget_id=budget.id)
         
         # форма для нової фіноперації 
-        new_finoperation_form = FinOperationForm(data=request.POST, prefix='new-finoperation')
+        new_finoperation_form = FinOperationForm(data=request.POST, user = request.user, prefix='new-finoperation')
         if new_finoperation_form.is_valid():
             with transaction.atomic():
                 new_finoperation = new_finoperation_form.save(commit=False) # commit=false не записує об'єкт в базу даних

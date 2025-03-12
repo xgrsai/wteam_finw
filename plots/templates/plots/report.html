@@ -1,15 +1,59 @@
 {% extends 'financew/base.html' %}
 {% block content %}
-<h1>Кругова діаграма</h1>
-{% for budget in budgets%}<!-- воно бере по назві ключа -->
+    <h1>Кругова діаграма</h1>
+    <!-- Підключення Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <div>
+        Фільтри
+        <form method = 'GET'>
+        {{finoperationtypeform.as_div}}
+        {{budgetform.as_div}}
+        <button type = "submit">Фільтрувати</button>
+        </form>
+    </div>    
+    
+
+
+    <div style="width: 500px; height: 500px; margin: auto;">
+    <!-- Полотно для графіка -->
+    <canvas id="myPieChart"></canvas>
+    </div>
+   
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch("{% url 'plots:piechart-data' %}")  // Запит до Django API
+                .then(response => response.json())
+                .then(data => {
+                    const ctx = document.getElementById('myPieChart').getContext('2d');
+                    new Chart(ctx, {
+                        type: 'pie',  // Кругова діаграма
+                        data: {
+                            labels: data.labels,
+                            datasets: [{
+                                label: 'Фінанси',
+                                data: data.values,
+                                backgroundColor: ['red', 'blue', 'green', 'yellow', 'purple'],
+                                borderWidth: 1
+                            }]
+                        }
+                    });
+                })
+                .catch(error => console.error("Помилка завантаження графіка:", error));
+        });
+        
+    </script>
+
+
+
+{% comment %} {% for budget in budgets%}<!-- воно бере по назві ключа -->
 <li>
     {{ budget.name }} {{ budget.amount }} {{ budget.currency }}
 </li>
 {% empty %}
 <li>Бюджети не знайдено</li>
-{% endfor %}    
+{% endfor %}     {% endcomment %}
 
-<form method="get">
+{% comment %} <form method="get">
     <label for="type">Оберіть тип операції:</label>
     <select name="type" id="type">
         <option value="expense" {% if selected_type == 'expense' %}selected{% endif %}>Витрати</option>
@@ -21,7 +65,13 @@
 <!-- Вставляємо Plotly графік -->
     <div>
         {{ graph|safe }}
-    </div>
+    </div> {% endcomment %}
+
+
+
+
+
+
 {% comment %} 
 <style>
         .form-container {

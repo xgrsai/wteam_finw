@@ -5,4 +5,5 @@ app_name = "plots"
 urlpatterns = [
     #Головна сторінка
     path("", views.visualisation, name="report"),
+    path("get_pie_chart_data/", views.get_pie_chart_data, name="piechart-data"),
 ]
