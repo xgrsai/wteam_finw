@@ -23,7 +23,7 @@ def visualisation(request):
     if selected_graphic_type:
         request.session['graphic_type'] = selected_graphic_type
 
-    ###ГРАФІК PIECHART###
+    ###ФІЛЬТРИ ГРАФІК PIECHART###
     """форма для фін операцій"""
     finoperation_type = request.GET.get('finoperation_type', request.session.get('finoperation_type', random.choice(list(FINOPERATION_TYPE.keys())))) # вибираємо на рандом
     finoperationtypeform = FinOperationTypeForm(initial={'finoperation_type': finoperation_type})
@@ -34,7 +34,6 @@ def visualisation(request):
     budget_type = request.GET.get('budget_type', request.session.get('budget_type', 'all')) # вибираємо на рандом
     budgetform = WhichBudgetForm(initial={'budget_type': budget_type},user = request.user,)
     selected_budget_type = request.GET.get('budget_type', None) # None якщо нічого не вибрано
-    print(selected_budget_type)
     if selected_finoperation_type:
         request.session['budget_type'] = selected_budget_type
 
@@ -91,7 +90,7 @@ def get_bar_chart_data(request):
     budgets = Budget.objects.filter(owner=request.user)
     categories = Category.objects.filter(owner=request.user)
     finoperations = FinOperation.objects.filter(budget__owner=request.user)
-
+    
     """для вибору бюджету"""
     budget_type = request.session.get('budget_type')
     if budget_type == 'all':
