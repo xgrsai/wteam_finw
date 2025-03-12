@@ -2,6 +2,7 @@ from django import forms
 
 from financew.constants import CURRENCIES, TIME_INTERVALS, FINOPERATION_TYPE
 from financew.models import Budget 
+from .constants import GRAPH_TYPE_CHOICES
 
 class FinOperationTypeForm(forms.Form):
     """форма для вибору фільтрів для piechart"""
@@ -9,8 +10,8 @@ class FinOperationTypeForm(forms.Form):
         choices=[(key, value) for key, value in FINOPERATION_TYPE.items()],
         label="Вибір типу фіноперації",
         #initial= # бере першим зі словника
-        # widget=forms.Select(attrs={'onchange': 'this.form.submit()'}),
-
+        # widget=forms.Select(attrs={'onchange': 'this.form.submit()'}), 
+        # widget=forms.Select(attrs={'class': 'mb-3'}),
     )
  
 class WhichBudgetForm(forms.Form):
@@ -31,5 +32,16 @@ class WhichBudgetForm(forms.Form):
             label="Вибір бюджету",
             # widget=forms.Select(attrs={'onchange': 'this.form.submit()'})
         )
+
+class GraphicTypeForm(forms.Form):
+    
+    graphic_type = forms.ChoiceField(choices=GRAPH_TYPE_CHOICES, label='Тип графіка', 
+                                    widget=forms.Select(attrs={ 
+                                                               'onchange': 'this.form.submit()',
+                                                            #    'class': 'form-control',
+                                     }),
+
+                                     )
+
     
     

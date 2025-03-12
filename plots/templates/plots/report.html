@@ -1,29 +1,55 @@
 {% extends 'financew/base.html' %}
 {% block content %}
-    <h1>Кругова діаграма</h1>
-    <!-- Підключення Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/randomcolor@0.5.4/randomColor.min.js"></script>
+<!-- Підключення Chart.js та RandomColor-->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/randomcolor@0.5.4/randomColor.min.js"></script>
+
+<!--ВИБІР ГРАФІКА-->
+<div class = "col-md-6">
+<form method="GET">
+{{graphic_type_form.as_div}}
+</form>
+</div>
+
+{% if graphic_type == "pie"%}
     <div>
-        Фільтри
+        <h1>Кругова діаграма</h1>
         <form method = 'GET'>
-        {{finoperationtypeform.as_div}}
-        {{budgetform.as_div}}
+            <div class="mb-3">
+                {{ finoperationtypeform.as_div }}
+            </div>
+            <div class="mb-3">
+                {{ budgetform.as_div }}
+            </div>
         <button type = "submit">Фільтрувати</button>
         </form>
     </div>    
     
-
-
     <div style="width: 500px; height: 500px; margin: auto;">
     <!-- Полотно для графіка -->
     <canvas id="myPieChart"></canvas>
     </div>
-   
-    <script>
-        
+ {%elif graphic_type == "bar"%}
+ <div>
+ <h1>Стовпчаста діаграма</h1>
+ <form method = 'GET'>
+     <div class="mb-3">
+         {% comment %} {{ finoperationtypeform.as_div }} {% endcomment %}
+     </div>
+     <div class="mb-3">
+         {% comment %} {{ budgetform.as_div }} {% endcomment %}
+     </div>
+ {% comment %} <button type = "submit">Фільтрувати</button> {% endcomment %}
+ </form>
+</div>    
+    <div style="width: 500px; height: 500px; margin: auto;">
+    <canvas id="myBarChart"></canvas>
+    </div>
+ {%endif%}  
+    
+ <script>
         document.addEventListener("DOMContentLoaded", function () {
-            fetch("{% url 'plots:piechart-data' %}")  // Запит до Django API
+            fetch("{% url 'plots:piechart-data' %}")  // Запит 
                 .then(response => response.json())
                 .then(data => {
                     const ctx = document.getElementById('myPieChart').getContext('2d');
@@ -32,7 +58,7 @@
                         data: {
                             labels: data.labels,
                             datasets: [{
-                                label: 'Фінанси',
+                                label: 'Сума',
                                 data: data.values,
                                 backgroundColor: data.labels.map(() => randomColor()),
                                 borderWidth: 1
@@ -40,10 +66,10 @@
                         }
                     });
                 })
-                .catch(error => console.error("Помилка завантаження графіка:", error));
+                //.catch(error => console.error("Помилка завантаження графіка:", error));
         });
         
-    </script>
+</script>
 
 
 
