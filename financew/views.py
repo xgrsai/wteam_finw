@@ -5,6 +5,8 @@ from django.http import Http404
 from itertools import chain
 from django.db import transaction
 from copy import deepcopy
+from django.http import JsonResponse
+from .forecast import forecast_expenses
 # from django.utils import timezone
 
 from .constants import CURRENCIES
@@ -390,6 +392,21 @@ def goalbudgets(request):
     context = {'goalbudgets': goalbudgets}
     return render(request, 'financew/my.html', context) # потім дані з context можна використовувати у шаблоні  
   
+@login_required
+def expenses_forecast(request, budget_id):
+    try:
+        budget = Budget.objects.get(id=budget_id, owner=request.user)  # Змінив user -> owner
+    except Budget.DoesNotExist:
+        return JsonResponse({"error": "Бюджет не знайдено або немає доступу"}, status=404)
+
+    predicted_expenses = forecast_expenses(budget)
+
+    if predicted_expenses is None:
+        return JsonResponse({"error": "Недостатньо даних для прогнозу"}, status=400)
+
+    return JsonResponse({"predicted_expenses": predicted_expenses})
+
+
 
 
 # @login_required
