@@ -28,6 +28,14 @@ class FinOperationForm(forms.ModelForm):
         #     'start_date': forms.DateTimeInput(attrs={'time_type': 'datetime-local'}),
         # 
         }
+    def __init__(self, *args, **kwargs):
+        """щоб виводило категорії які належеть лише користувачу"""
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+
+        # Якщо користувач переданий, фільтруємо категорії
+        if user:
+            self.fields['category'].queryset = Category.objects.filter(owner=user)    
 
 class CategoryForm(forms.ModelForm):
     class Meta:
@@ -40,7 +48,7 @@ class GoalBudgetForm(forms.ModelForm):
     class Meta:
         model = GoalBudget
         fields = ['name', 'currency', 'target_amount', 'amount']
-        labels = {'name':'Ім\'я для бюджету-цілі', 'currency': 'Валюта', 'target_amount': 'Ціль' , 'amount': 'Поточна сума'}
+        labels = {'name':'Ім\'я для бюджету-цілі', 'currency': 'Валюта', 'target_amount': 'Ціль' , 'amount': 'Поточна сума'}   
 
 class TransferFromBudgetForm(forms.ModelForm):
     """трансфер зі сторінки бюджету в бюджет"""
@@ -49,6 +57,14 @@ class TransferFromBudgetForm(forms.ModelForm):
         fields = [ 'to_budget', 'amount']
         labels = { 'to_budget':'В який бюджет', 'amount':'Сума',
         }
+    def __init__(self, *args, **kwargs):
+        """щоб виводило [name] які належеть лише користувачу"""
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+
+        # Якщо користувач переданий, фільтруємо категорії
+        if user:
+            self.fields['to_budget'].queryset = Budget.objects.filter(owner=user)     
 
 class TransferFromGoalBudgetForm(forms.ModelForm):
     """трансфер зі сторінки бюджету в бюджет-ціль"""
@@ -57,6 +73,14 @@ class TransferFromGoalBudgetForm(forms.ModelForm):
         fields = [ 'to_goalbudget', 'amount']
         labels = { 'to_goalbudget':'В який бюджет-ціль', 'amount':'Сума',
         }
+    def __init__(self, *args, **kwargs):
+        """щоб виводило [name] які належеть лише користувачу"""
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+
+        # Якщо користувач переданий, фільтруємо категорії
+        if user:
+            self.fields['to_goalbudget'].queryset = GoalBudget.objects.filter(owner=user) 
 
 class TransferBudgetForm(forms.ModelForm):
     """Форма для трансферу з бюджету в бюджет"""

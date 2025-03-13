@@ -32,7 +32,32 @@
         <button type="button" id="cancel-edit-btn">Скасувати</button>
     </form>
 </div>
+<button id="forecast-btn">Прогнозувати витрати</button>
+<p id="forecast-result"></p>
 
+<script>
+    document.getElementById("forecast-btn").addEventListener("click", function () {
+        // Отримуємо поточний URL та парсимо ID бюджету
+        const pathParts = window.location.pathname.split('/');
+        const budgetId = pathParts[2]; // Якщо URL виглядає як /budget/1/
+
+        if (!budgetId) {
+            document.getElementById("forecast-result").innerText = "Не вдалося визначити ID бюджету";
+            return;
+        }
+
+        fetch(`/budget/${budgetId}/expenses_forecast/`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("forecast-result").innerText = data.error 
+                    ? "Помилка: " + data.error 
+                    : "Прогнозовані витрати на наступний місяць: " + data.predicted_expenses;
+            })
+            .catch(error => {
+                document.getElementById("forecast-result").innerText = "Щось пішло не так";
+            });
+    });
+</script>
 
 {% comment %} <a href="{% url "financew:new_finoperation" budget.id %}">Додати нову фінансову операцію</a> {% endcomment %}
 <button id="add-new-finoperation">Створити нову фіноперацію</button>
