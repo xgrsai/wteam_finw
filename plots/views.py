@@ -23,7 +23,7 @@ def visualisation(request):
     if selected_graphic_type:
         request.session['graphic_type'] = selected_graphic_type
 
-    ###ФІЛЬТРИ ГРАФІК PIECHART###
+    ###ФІЛЬТРИ###
     """форма для фін операцій"""
     finoperation_type = request.GET.get('finoperation_type', request.session.get('finoperation_type', random.choice(list(FINOPERATION_TYPE.keys())))) # вибираємо на рандом
     finoperationtypeform = FinOperationTypeForm(initial={'finoperation_type': finoperation_type})
@@ -34,12 +34,11 @@ def visualisation(request):
     budget_type = request.GET.get('budget_type', request.session.get('budget_type', 'all')) # вибираємо на рандом
     budgetform = WhichBudgetForm(initial={'budget_type': budget_type},user = request.user,)
     selected_budget_type = request.GET.get('budget_type', None) # None якщо нічого не вибрано
-    if selected_finoperation_type:
+    if selected_budget_type:
         request.session['budget_type'] = selected_budget_type
 
-    ###ГРАФІК BARCHART###
 
-
+    ###context###
     context = { 'budgets':budgets,
                 'categories':categories,
                 'finoperations':finoperations,
@@ -49,6 +48,7 @@ def visualisation(request):
                 'budgetform':budgetform,
                 'graphic_type_form':graphic_type_form,
                 'graphic_type':graphic_type,
+                
                 
     }
     return render(request, "plots/report.html", context)
@@ -84,34 +84,187 @@ def get_pie_chart_data(request):
 
     return JsonResponse(data)
 
-
 def get_bar_chart_data(request):
-    """дані для barchart"""
+    """Дані для barchart"""
+    # Отримуємо всі бюджети, навіть ті, у яких немає фінансових операцій
     budgets = Budget.objects.filter(owner=request.user)
-    categories = Category.objects.filter(owner=request.user)
     finoperations = FinOperation.objects.filter(budget__owner=request.user)
     
-    """для вибору бюджету"""
+    # Для вибору бюджету
+    budget_type = request.session.get('budget_type')
+
+    if budget_type == 'all':
+        df = pd.DataFrame(list(finoperations.values('amount', 'type', 'budget__name')))  # Перетворюємо в DataFrame
+    else:
+        df = pd.DataFrame(list(finoperations.filter(budget=budget_type).values('amount', 'type', 'budget__name')))  # Перетворюємо в DataFrame
+    
+    # Переконуємося, що сума — це числа
+    df['amount'] = df['amount'].astype(float)
+    
+    # Фільтруємо дані по прибутку та витратах
+    df_profit = df[df['type'] == 'income']  # Прибуток
+    df_expenses = df[df['type'] == 'expense']  # Витрати
+    
+    # Групуємо за кожним бюджетом для прибутку та витрат
+    df_profit_grouped = df_profit.groupby('budget__name')['amount'].sum().reset_index()
+    df_expenses_grouped = df_expenses.groupby('budget__name')['amount'].sum().reset_index()
+    
+    # Використовуємо merge, щоб з'єднати дві таблиці
+    df_combined = pd.merge(df_profit_grouped, df_expenses_grouped, on='budget__name', how='left', suffixes=('_profit', '_expenses'))
+    
+      # Використовуємо merge, щоб з'єднати дві таблиці
+    df_combined = pd.merge(df_profit_grouped, df_expenses_grouped, on='budget__name', how='left', suffixes=('_profit', '_expenses'))
+    
+    # Заповнюємо пропущені значення 0 для витрат і прибутку
+    df_combined['amount_profit'] = df_combined['amount_profit'].fillna(0)
+    df_combined['amount_expenses'] = df_combined['amount_expenses'].fillna(0)
+
+    # Формуємо фінальний результат
+    data = {
+         "labels": df_combined['budget__name'].tolist(),  # Лейбли - бюджети
+         "profit": df_combined['amount_profit'].tolist(),  # Суми прибутку
+         "expenses": df_combined['amount_expenses'].tolist(),  # Суми витрат
+     }
+    print(df_profit_grouped['budget__name'].tolist())
+    
+    # # Для кожного бюджету перевіряємо наявність операцій і додаємо відповідні значення
+    # for budget in data["labels"]:
+    #     # Перевіряємо, чи є бюджет у групованих даних для прибутку та витрат
+    #     profit = df_profit_grouped.loc[df_profit_grouped['budget__name'] == budget, 'amount']
+    #     expenses = df_expenses_grouped.loc[df_expenses_grouped['budget__name'] == budget, 'amount']
+        
+    #     # Якщо для бюджету немає прибутку чи витрат, ставимо 0
+    #     data["profit"].append(profit.sum() if not profit.empty else 0)
+    #     data["expenses"].append(expenses.sum() if not expenses.empty else 0)
+    
+    return JsonResponse(data)
+
+def get_line_chart_data(request):
+    """Дані для лінійного графіка по датах"""
+    
+    # Фільтруємо фінансові операції для поточного користувача
+    finoperations = FinOperation.objects.filter(budget__owner=request.user)
+
+    # Перевірка на тип бюджету (якщо потрібно)
     budget_type = request.session.get('budget_type')
     if budget_type == 'all':
-        df = pd.DataFrame(list(finoperations.values('amount', 'type', 'category__name')))# Перетворюємо в DataFrame
+        df = pd.DataFrame(list(finoperations.values('amount', 'type', 'date_added')))  # Перетворюємо в DataFrame
     else:
-        df = pd.DataFrame(list(finoperations.filter(budget=budget_type).values('amount', 'type', 'category__name')))# Перетворюємо в DataFrame
+        df = pd.DataFrame(list(finoperations.filter(budget=budget_type).values('amount', 'type', 'date_added')))  # Перетворюємо в DataFrame
     
-    # print(finoperations)
+    # Якщо дані відсутні
     if df.empty:
-        return JsonResponse({"labels": [], "values": []})  # Якщо немає даних
+        return JsonResponse({"labels": [], "profit": [], "expenses": []})
+    
+    # Переконуємось, що сума є числом
+    df['amount'] = df['amount'].astype(float)
 
-    """фільтр типу фіноперації"""
-    selected_type = request.session.get('finoperation_type') # беремо це діло через сесію
-    if selected_type:
-        df = df[df['type'] == selected_type]
+    # Додаємо колонку з датами (можна форматувати дату для групування)
+    df['date_added'] = pd.to_datetime(df['date_added']).dt.date  # Залишаємо тільки дату без часу
 
-    df_grouped = df.groupby(['category__name'])['amount'].sum().reset_index() # 1) df.groupby(['category__name']): Це групує DataFrame df за значеннями в стовпці category__name. Тобто, всі записи з однаковим значенням в колонці category__name будуть об'єднані в одну групу. 2) ['amount']: Після того як дані будуть згруповані за категоріями, вибирається стовпець amount, в якому буде обчислюватися сума для кожної групи. 3) .sum(): Цей метод застосовується до кожної групи, обчислюючи суму значень у стовпці amount для кожної категорії. 4) .reset_index(): Після групування і обчислення суми, цей метод відновлює індекси DataFrame (по суті, створює новий DataFrame з індексами, починаючи з 0, замість того, щоб залишати їх у вигляді багаторівневих індексів після групування).
+    # Групуємо за датами та типами операцій (прибуток або витрати)
+    df_profit = df[df['type'] == 'income'].groupby('date_added')['amount'].sum().reset_index()  # Прибуток
+    df_expenses = df[df['type'] == 'expense'].groupby('date_added')['amount'].sum().reset_index()  # Витрати
+    
+    # Об'єднуємо дані
+    all_dates = pd.date_range(start=df['date_added'].min(), end=df['date_added'].max()).date  # Створюємо список всіх дат від мінімальної до максимальної
+    
+    df_profit = df_profit.set_index('date_added').reindex(all_dates, fill_value=0).reset_index()  # Заповнюємо пропущені дати для прибутку
+    df_expenses = df_expenses.set_index('date_added').reindex(all_dates, fill_value=0).reset_index()  # Заповнюємо пропущені дати для витрат
 
+    # Підготовка даних для відповіді
     data = {
-        "labels": df_grouped['category__name'].tolist(),
-        "values": df_grouped['amount'].tolist(),
+        "labels": df_profit['date_added'].astype(str).tolist(),  # Перетворюємо дати на строки для відображення
+        "profit": df_profit['amount'].tolist(),  # Дані по прибутку
+        "expenses": df_expenses['amount'].tolist(),  # Дані по витратах
     }
-
+    print(data)
     return JsonResponse(data)
+
+# def get_line_chart_data(request):
+#     """Дані для line chart"""
+#     budgets = Budget.objects.filter(owner=request.user)
+#     finoperations = FinOperation.objects.filter(budget__owner=request.user)
+    
+#     # Для вибору бюджету
+#     budget_type = request.session.get('budget_type')
+    
+#     if budget_type == 'all':
+#         df = pd.DataFrame(list(finoperations.values('amount', 'type', 'budget__name')))  # Перетворюємо в DataFrame
+#     else:
+#         df = pd.DataFrame(list(finoperations.filter(budget=budget_type).values('amount', 'type', 'budget__name')))  # Перетворюємо в DataFrame
+    
+#     # Якщо немає операцій, повертаємо порожній результат з 0 для всіх категорій
+#     if df.empty:
+#         data = {
+#             "labels": [budget.name for budget in budgets],
+#             "profit": [0] * len(budgets),  # Якщо немає прибутку, ставимо 0
+#             "expenses": [0] * len(budgets)  # Якщо немає витрат, ставимо 0
+#         }
+#         return JsonResponse(data)
+
+#     # Переконуємося, що сума — це числа
+#     df['amount'] = df['amount'].astype(float)
+    
+#     # Фільтруємо дані по прибутку та витратах
+#     df_profit = df[df['type'] == 'income']  # Прибуток
+#     df_expenses = df[df['type'] == 'expense']  # Витрати
+    
+#     # Групуємо за кожним бюджетом для прибутку та витрат
+#     df_profit_grouped = df_profit.groupby('budget__name')['amount'].sum().reset_index()
+#     df_expenses_grouped = df_expenses.groupby('budget__name')['amount'].sum().reset_index()
+    
+#     # Формуємо фінальний результат
+#     data = {
+#         "labels": [budget.name for budget in budgets],  # Всі бюджети
+#         "profit": [],  # Дані для прибутку
+#         "expenses": []  # Дані для витрат
+#     }
+    
+#     # Для кожного бюджету перевіряємо наявність операцій і додаємо відповідні значення
+#     for budget in data["labels"]:
+#         # Перевіряємо, чи є бюджет у групованих даних для прибутку та витрат
+#         profit = df_profit_grouped.loc[df_profit_grouped['budget__name'] == budget, 'amount']
+#         expenses = df_expenses_grouped.loc[df_expenses_grouped['budget__name'] == budget, 'amount']
+        
+#         # Якщо для бюджету немає прибутку чи витрат, ставимо 0
+#         data["profit"].append(profit.sum() if not profit.empty else 0)
+#         data["expenses"].append(expenses.sum() if not expenses.empty else 0)
+    
+#     return JsonResponse(data)
+
+
+# def get_bar_chart_data(request):
+#     """Дані для barchart"""
+#     budgets = Budget.objects.filter(owner=request.user)
+#     categories = Category.objects.filter(owner=request.user)
+#     finoperations = FinOperation.objects.filter(budget__owner=request.user)
+    
+#     # Для вибору бюджету
+#     budget_type = request.session.get('budget_type')
+#     if budget_type == 'all':
+#         df = pd.DataFrame(list(finoperations.values('amount', 'type', 'budget__name')))  # Перетворюємо в DataFrame
+#     else:
+#         df = pd.DataFrame(list(finoperations.filter(budget=budget_type).values('amount', 'type', 'budget__name')))  # Перетворюємо в DataFrame
+    
+#     print(df)
+#     # Якщо немає даних
+#     if df.empty:
+#         return JsonResponse({"labels": [], "profit": [], "expenses": []})
+    
+#     # Групуємо дані за бюджетами та типами операцій (Прибуток або Витрати)
+#     df['amount'] = df['amount'].astype(float)  # Переконатися, що суми це числа
+#     df_profit = df[df['type'] == 'income']  # Прибуток
+#     df_expenses = df[df['type'] == 'expense']  # Витрати
+    
+#     # Підсумовуємо суми по кожному бюджету для прибутку та витрат
+#     df_profit_grouped = df_profit.groupby('budget__name')['amount'].sum().reset_index()
+#     df_expenses_grouped = df_expenses.groupby('budget__name')['amount'].sum().reset_index()
+#     # Дані для відповіді
+#     data = {
+#         "labels": df_profit_grouped['budget__name'].tolist(),  # Лейбли - бюджети
+#         "profit": df_profit_grouped['amount'].tolist(),  # Суми прибутку
+#         "expenses": df_expenses_grouped['amount'].tolist(),  # Суми витрат
+#     }
+
+#     return JsonResponse(data)
