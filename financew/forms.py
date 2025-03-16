@@ -32,7 +32,16 @@ class FinOperationForm(forms.ModelForm):
 
         # 
         }
-        widget=forms.Select(attrs={"class": "new-finoperation-form"}),
+
+        widgets = {
+            'amount': forms.NumberInput(attrs={'class': 'form-control'}),
+            'type': forms.Select(attrs={'class': 'form-control'}),
+            'time_interval': forms.Select(attrs={'class': 'form-control'}),
+            'category': forms.Select(attrs={'class': 'form-control'}),
+            'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
+    
+
 
     def __init__(self, *args, **kwargs):
         """щоб виводило категорії які належеть лише користувачу"""
