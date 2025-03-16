@@ -1,7 +1,12 @@
 /* test.css */
+body {
+    background-color: red;
+}
+
 .finoperationtypeform div {
     margin-bottom: 15px; /* Відстань між полями в finoperationtypeform */
 }
+
 
 .budgetform div {
     margin-bottom: 10px; /* Відстань між полями в budgetform */

@@ -28,6 +28,15 @@ class FinOperationForm(forms.ModelForm):
         #     'start_date': forms.DateTimeInput(attrs={'time_type': 'datetime-local'}),
         # 
         }
+        widgets = {
+            'amount': forms.NumberInput(attrs={'class': 'form-control'}),
+            'type': forms.Select(attrs={'class': 'form-control'}),
+            'time_interval': forms.Select(attrs={'class': 'form-control'}),
+            'category': forms.Select(attrs={'class': 'form-control'}),
+            'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
+    
+
     def __init__(self, *args, **kwargs):
         """щоб виводило категорії які належеть лише користувачу"""
         user = kwargs.pop('user', None)
