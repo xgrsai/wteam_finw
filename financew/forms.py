@@ -13,6 +13,7 @@ class BudgetForm(forms.ModelForm):
         labels = {'name':'Ім\'я','amount': 'Сума', 'currency': 'Валюта' }
 
 class FinOperationForm(forms.ModelForm):
+    
     class Meta:
         model = FinOperation
         fields = ['amount', 'type', 'time_interval', 'category','is_active']
@@ -23,11 +24,25 @@ class FinOperationForm(forms.ModelForm):
             'category': 'Категорія операціії',
             'is_active': 'Чи активна',
         #     'start_date': 'Дата початку операції'
-        # }
+        # } 
+        
         # widgets = {
+        
         #     'start_date': forms.DateTimeInput(attrs={'time_type': 'datetime-local'}),
+
         # 
         }
+
+        widgets = {
+            'amount': forms.NumberInput(attrs={'class': 'form-control'}),
+            'type': forms.Select(attrs={'class': 'form-control'}),
+            'time_interval': forms.Select(attrs={'class': 'form-control'}),
+            'category': forms.Select(attrs={'class': 'form-control'}),
+            'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
+    
+
+
     def __init__(self, *args, **kwargs):
         """щоб виводило категорії які належеть лише користувачу"""
         user = kwargs.pop('user', None)
@@ -95,7 +110,7 @@ class CurrencyForm(forms.Form):
         choices=[(key, value) for key, value in CURRENCIES.items()],
         label="Вибір валюти",
         #initial= # бере першим зі словника
-        widget=forms.Select(attrs={'onchange': 'this.form.submit()'}),
+        widget=forms.Select(attrs={'onchange': 'this.form.submit()',"class": "form-control"}),
 
     )
 

@@ -1,13 +1,23 @@
 {% extends 'financew/base.html' %}
-
+{% load static %}
 {% block content %}
+
+
+<div class="transactions-container">
+    <div class="side-bar">
+        <a  href="{% url 'financew:my' %}"><img src="{% static 'img/acc.svg' %}" alt="">Персональний кабінет</a>
+        <!--Посилання ня на сторінку графіків-->
+        <a href="{% url 'plots:report' %}"><img src="{% static 'img/grafik.svg' %}" alt="">  Візуалізація (чи звіти) </a>
+        <!-- Посилання на сторінку всіх транзакцій -->
+        <a style="background-color: #EAF1DF;"href="{% url 'financew:transactions' %}"> <img src="{% static 'img/euro.svg' %}" alt=""> Переглянути всі транзакції</a>
+        <form method="get" action = {% url 'financew:transactions'%}>
+            <p>{{currencydisplayform.as_div}}</p>
+        </form>
+        
+    </div>
+    
+<div class="all-transactions">    
 <h2>Усі транзакції</h2>
-
-<form method="get" action = {% url 'financew:transactions'%}>
-    <p>{{currencydisplayform.as_div}}</p>
-</form>
-
-
 
 <!-- Форма для фільтрів -->
 <form method="get">
@@ -58,9 +68,9 @@
     <li>Транзакції не знайдено</li>
 {% endfor %}
 </ul>
+</div>
 
-<p><a href="{% url 'financew:my' %}">Повернутися до особистого кабінету</a></p>
-
+</div>
 <style>
     .reset-button {
         display: inline-block;

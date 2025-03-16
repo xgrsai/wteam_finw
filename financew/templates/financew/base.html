@@ -1,25 +1,37 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="uk"> <!-- вказує що сторінка українською мову -->
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>FinW</title>
+    <link rel="stylesheet" href="{% static 'css/main.css' %}"> <!-- Підключення стилів -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  
     {% load django_bootstrap5 %} {% bootstrap_css %} {% bootstrap_javascript %}
   </head>
-
-<p><a href="{% url 'financew:index' %}">FinanceW</a> -
+  
+<div class="container-header">
+  <a href="{% url 'financew:index' %}"><img src="{% static 'img/SVG.svg' %}" alt="logo">FinanceW</a> 
 {% if user.is_authenticated %}
-  <a href="{% url 'financew:my' %}">Мій кабінет</a> - Привіт {{ user.username }}
+  <div class="user-info">
+      <a href="{% url 'financew:my' %}"><img src="{% static 'img/acc.svg' %}" alt="">Привіт {{ user.username }}</a>  
 {% else %}
-    <a href="{% url 'accounts:register' %}">Реєстрація</a> - 
-    <a href="{% url 'accounts:login' %}">Вхід</a>
+      <div class="login-register">
+        <a href="{% url 'accounts:register' %}">Реєстрація</a>  
+        <a href="{% url 'accounts:login' %}">Вхід</a>
+      </div>
 {% endif %}
-</p>
-{% block content %}{% endblock content %}
-<br>
 {% if user.is_authenticated %}
-    <form action="{% url 'accounts:logout' %}" method="post">
-        {% csrf_token %}
-        <button name="submit">Вихід</button>
-    </form>
+        <form action="{% url 'accounts:logout' %}" method="post">
+            {% csrf_token %}
+            <button name="submit"><img src="{% static 'img/log_out.svg' %}" alt="log_out"></button>
+        </form>
 {% endif %}
+  </div>
+</div>
+
+{% block content %}{% endblock content %}
+

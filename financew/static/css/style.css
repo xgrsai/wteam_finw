@@ -1,9 +1,130 @@
-/* test.css */
-body {
-    background-color: #ff0000 !important; /* Червоний фон, щоб одразу було видно зміни */
-}
+input::placeholder{
+    padding: 5px;
+  }
+  
+  *{
+    font-family: "Montserrat", serif;
+    margin: 0px;
+    padding: 0px; 
+  }
 
-h1::after {
-    content: " (CSS підключено!)";
-    color: #00ff00; /* Зелений текст після h1 */
-}
+  body {
+    font-family: "Montserrat", serif;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* прибирає прокрутку */
+  }
+  html, body {
+    height: 100%;
+    overflow: hidden; /* прибирає прокрутку повністю */
+  }
+  
+  #image{
+    width: 80%;
+    height: 80%;
+  }
+  
+  .left-mini-logo{
+    width: 6%;
+    display: flex;
+    justify-content: space-between;
+    position: absolute;
+    top: 15px;
+    left: 15px;
+  }
+  .container-left {
+    height: 100vh;
+    width: 40%;
+    background-color: #D7E6C5;
+    border-radius: 0px 15px 15px 0px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .form-container
+  {
+    display: flex; 
+    flex-direction: column;
+    justify-content: center; 
+    align-items: center; 
+    min-height: 100vh;
+    width: 60%; 
+    gap: 8%;
+  }
+  .form-container input {
+    width: 400px;
+    height: 40px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    margin: 5px;
+    box-sizing: border-box; /* додає ширину до правильного обчислення */
+  }
+  
+  .form-container button{
+    font-weight: bold;
+    width: 400px;
+    height: 40px;
+    border-radius:8px ;
+    border: none;
+    margin: 5px;
+    background-color: #D7E6C5;
+  
+  }
+  .form-container form{
+    display: flex;
+    flex-direction: column;
+  }
+
+  .wrapper {
+    display: flex;
+    flex-direction: row; /* важливо — щоб блоки йшли зліва направо */
+    height: 100vh; /* або 100%, якщо треба на всю висоту */
+    width: 100%;
+  }
+  .top-left-logo {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px; /* відстань між картинкою і текстом */
+    z-index: 10; /* щоб було поверх усього */
+  }
+  
+  .top-left-logo img {
+    width: 30px; /* або як тобі треба */
+    height: auto;
+  }
+  
+  .top-left-logo a {
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 18px;
+    color: #000; /* або будь-який колір */
+  }
+  .top-right-register {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    z-index: 10;
+  }
+  
+  .top-right-register a {
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 18px;
+    color: #000; /* або як хочеш */
+  }
+  .input-container {
+    display: flex;
+    flex-direction: column; /* Розташовує label та input вертикально */
+    margin-bottom: 15px; /* Відстань між полями */
+  }
+  
+  .input-container label {
+    margin-bottom: 5px; /* Відстань між лейблом і полем вводу */
+    font-weight: bold; /* Можна змінити шрифт для лейбла */
+  }
+  
