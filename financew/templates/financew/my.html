@@ -2,29 +2,33 @@
 {% load static %} 
 
 {% block content %}
-<link rel="stylesheet" href="{% static 'financew/style.css' %}">
-<!--Посилання ня на сторінку графіків-->
-<a href="{% url 'plots:report' %}">Візуалізація (чи звіти) </a>
-<!-- Посилання на сторінку всіх транзакцій -->
-<p><a href="{% url 'financew:transactions' %}">Переглянути всі транзакції</a></p>
 
-<!-- Вибір валюти відображення -->
+
+<div class="container-my-budget">
+
+    <div class="side-bar">
+      
+    <!--Посилання ня на сторінку графіків-->
+    <a href="{% url 'plots:report' %}"><img src="{% static 'img/grafik.svg' %}" alt="">  Візуалізація (чи звіти) </a>
+    <!-- Посилання на сторінку всіх транзакцій -->
+    <a href="{% url 'financew:transactions' %}"> <img src="{% static 'img/euro.svg' %}" alt=""> Переглянути всі транзакції</a>
+
+
+
+    <div id="total-balance"><p >Загальний баланс: <div id="total-balance-value"> {% if total_balance != 0 %}{{ total_balance|floatformat:2 }} {{ display_currency }}{% else %}Немає даних{% endif %}</div></p></div>
+        <!-- Вибір валюти відображення -->
 {% comment %} <form method="get" action="{% url 'financew:my' %}">
-    <label for="currency">Валюта відображення:</label>
-    <select name="currency" id="currency" onchange="this.form.submit()">
-        {% for currency in currencies %}
-            <option value="{{ currency }}" {% if currency == display_currency %}selected{% endif %}>{{ currency }}</option>
-        {% endfor %}
-    </select>
+  <label for="currency">Валюта відображення:</label>
+  <select name="currency" id="currency" onchange="this.form.submit()">
+      {% for currency in currencies %}
+          <option value="{{ currency }}" {% if currency == display_currency %}selected{% endif %}>{{ currency }}</option>
+      {% endfor %}
+  </select>
 </form> {% endcomment %}
 <form method="get" action = {% url 'financew:my'%}>
-  <p>{{currencydisplayform.as_div}}</p>
+<p>{{currencydisplayform.as_div}}</p>
 </form>
-
-
-
-<p>Загальний баланс у {{ display_currency }}: {% if total_balance != 0 %}{{ total_balance|floatformat:2 }} {{ display_currency }}{% else %}Немає даних{% endif %}</p>
-
+</div>
 {% comment %} ВІДОБРАЖЕННЯ ЗАГАЛЬНОГО БАЛАНСУ З УСІХ БЮДЖЕТІВ В ПЕВНІЙ ВАЛЮТІ {% endcomment %}
 {% comment %} 
 {% for budget in budgets %}
@@ -33,48 +37,55 @@
 {% endfor %} {% endcomment %}
 
 
+
+
 <ul>
 {% for item in budgets_with_converted %}
     <li>
       <a href="{% url 'financew:budget' item.budget.id %}">{{ item.budget.name }}: {{ item.budget.amount|floatformat:2 }} {{ item.budget.currency }} ({{ item.converted_balance|floatformat:2 }} {{ display_currency }})</a>
       {% endfor %}
 </ul>
- 
-<div>Мої бюджети
+
+<div class="budget-list">
+  <h1 id="greeting">Добрий день, {{ user.username }}</h1>
+  
+  <div class="my-budget">Мої бюджети
 {% for budget in budgets%}<!-- воно бере по назві ключа -->
     <li>
         <a href="{% url 'financew:budget' budget.budget.id %}">{{ budget.budget.name }} {{ budget.budget.amount }} {{ budget.budget.currency }} ({{budget.converted_amount}})</a>
         <form action="{% url 'financew:delete_budget' budget.budget.id %}" method="post" style="display:inline;">
             {% csrf_token %}
-            <button id="delete-budget-btn">Видалити</button>
+            <button id="delete-budget-btn"><img src="{% static 'img/trash.svg' %}" alt=""></button>
         </form>
     </li>
 {% empty %}
     <li>Бюджети не знайдено</li>
 {% endfor %}
+  
 
-<!-- Кнопка для додавання нового бюджету -->
-<button id="add-budget-btn">Додати новий бюджет</button>
-<!-- Форма для додавання нового бюджету (спочатку прихована) -->
+    <!-- Кнопка для додавання нового бюджету -->
+    <button id="add-budget-btn">Додати новий бюджет</button>
+    <!-- Форма для додавання нового бюджету (спочатку прихована) -->
+  
 <div id="add-budget-form" style="display: none">
   <form action="{% url 'financew:my' %}" method="post">
     <!-- action - куди відправляється форма-->
     {% csrf_token %}
     <!--токен CSRF, який додається до кожної форми, що дозволяє серверу перевіряти, чи запит дійсно надійшов з авторизованого джерела (тобто з вашого веб-сайту, а не з якогось іншого, створеного зловмисником).-->
     
-    {% comment %} <div class="form-group" style="border: 2px solid red; padding: 10px">
+    {% comment %} <div class="form-group" >
       <label for="{{ budget_form.name.id_for_label }}">{{ budget_form.name.label }}</label>
       {{ budget_form.name }}
     </div>
 
-    <div class="form-group" style="border: 2px solid red; padding: 10px">
+    <div class="form-group" >
       <label for="{{ budget_form.amount.id_for_label }}"
         >{{ budget_form.amount.label }}</label
       >
       {{ budget_form.amount }}
     </div>
 
-    <div class="form-group" style="border: 2px solid red; padding: 10px">
+    <div class="form-group" >
       <label for="{{ budget_form.currency.id_for_label }}"
         >{{ budget_form.currency.label }}</label
       >
@@ -91,13 +102,13 @@
 </div>
 
 <!--бюджетицілі-->
-<div>Мої бюджети-цілі
+<div class="goal-budget-list">Мої бюджети-цілі
 {% for goalbudget in goalbudgets%}<!-- воно бере по назві ключа -->
 <li>
     {{ goalbudget.name }} {{ goalbudget.amount }}/{{ goalbudget.target_amount }} {{ goalbudget.currency }}
     <form action="{% url 'financew:delete_goalbudget' goalbudget.id %}" method="post" style="display:inline;">
         {% csrf_token %}
-        <button id="delete-goalbudget-btn">Видалити</button>
+        <button id="delete-goalbudget-btn"><img src="{% static 'img/trash.svg' %}" alt=""></button>
     </form>
 </li>
 {% empty %}
@@ -120,22 +131,21 @@
 </div>
   
 
-
 {% comment %} А ТУТ ДОДАТИ ПЕРЕГЛЯД КАТЕГОРІЙ І ТАКОЖ ЇХ ДОДАВАВННЯ {% endcomment %}
 <!--категорії-->
-<div>Мої категорії
+<div class="category-list">Мої категорії
 {% for category in categories%}<!-- воно бере по назві ключа -->
 <li>
     {{ category.name }}
     <form action="{% url 'financew:delete_category' category.id %}" method="post" style="display:inline;">
         {% csrf_token %}
-        <button id="delete-category-btn">Видалити</button>
+        <button id="delete-category-btn"><img src="{% static 'img/trash.svg' %}" alt=""></button>
     </form>
 </li>
 {% empty %}
 <li>Категорії не знайдено</li>
 {% endfor %}
-</div>
+
 
 
  <!-- Кнопка для додавання категорії -->
@@ -157,7 +167,7 @@
          {{ categoryform.as_div }}
          <!-- Виведення помилки під полем "name" -->
          {% if categoryform.name.errors %}
-         <div style="color: red;">
+         <div>
             {% for error in categoryform.name.errors %}
                 <p>{{ error }}</p>
             {% endfor %}
@@ -180,7 +190,14 @@
     <button type="submit">Додати категорію</button>
     <button id="cancel-btn-category">Скасувати</button>
   </form> 
-</div> {% endcomment %}
+</div></div> {% endcomment %}
+
+</div>
+<div class="more-info">
+  <p>Додаткова інформація:</p>
+</div>
+
+</div>
 
 
 
@@ -200,7 +217,7 @@ document.getElementById("cancel-category-btn").addEventListener("click", functio
     document.getElementById("add-category-form").style.display = "none";  // Сховати форму
     document.getElementById("show-category-form-btn").style.display = "block";  // Повернути кнопку
 });
-]
+
 // Обробник подачі форми
 document.getElementById("category-form").addEventListener("submit", function(event) {
     event.preventDefault();  // Відмінити перезавантаження сторінки
