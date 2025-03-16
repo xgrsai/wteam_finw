@@ -2,7 +2,8 @@
 {% load static %}
 
 {% block content %}
-<link rel="stylesheet" href="{% static 'styles.css' %}"> 
+
+<link rel="stylesheet" href="{% static 'css/main.css' %}"> 
 
 <p>{{ budget.name }} {{ budget.amount }} {{ budget.currency }} <!-- Кнопка для редагування бюджету -->
     <button id="edit-budget-btn">Змінити дані</button></p>
@@ -35,34 +36,12 @@
 <button id="forecast-btn">Прогнозувати витрати</button>
 <p id="forecast-result"></p>
 
-<script>
-    document.getElementById("forecast-btn").addEventListener("click", function () {
-        // Отримуємо поточний URL та парсимо ID бюджету
-        const pathParts = window.location.pathname.split('/');
-        const budgetId = pathParts[2]; // Якщо URL виглядає як /budget/1/
 
-        if (!budgetId) {
-            document.getElementById("forecast-result").innerText = "Не вдалося визначити ID бюджету";
-            return;
-        }
-
-        fetch(`/budget/${budgetId}/expenses_forecast/`)
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById("forecast-result").innerText = data.error 
-                    ? "Помилка: " + data.error 
-                    : "Прогнозовані витрати на наступний місяць: " + data.predicted_expenses;
-            })
-            .catch(error => {
-                document.getElementById("forecast-result").innerText = "Щось пішло не так";
-            });
-    });
-</script>
 
 {% comment %} <a href="{% url "financew:new_finoperation" budget.id %}">Додати нову фінансову операцію</a> {% endcomment %}
 <button id="add-new-finoperation">Створити нову фіноперацію</button>
 <div id = 'new-finoperation-form' style = "display:none;">
-<form action="{% url 'financew:budget' budget.id %}" method="post"> <!-- action - куди відправляється форма-->
+<form action="{% url 'financew:budget' budget.id %}" method="post" class="new-finoperation-form"> <!-- action - куди відправляється форма-->
   {% csrf_token %} 
   {{ new_finoperation_form.as_div }}
   <button type="submit">Додати фін операцію</button>
@@ -268,6 +247,28 @@ document.addEventListener("DOMContentLoaded", function() { // "DOMContentLoaded"
     });
 });
 
+ //прогнозування витрат
+    document.getElementById("forecast-btn").addEventListener("click", function () {
+        // Отримуємо поточний URL та парсимо ID бюджету
+        const pathParts = window.location.pathname.split('/');
+        const budgetId = pathParts[2]; // Якщо URL виглядає як /budget/1/
+
+        if (!budgetId) {
+            document.getElementById("forecast-result").innerText = "Не вдалося визначити ID бюджету";
+            return;
+        }
+
+        fetch(`/budget/${budgetId}/expenses_forecast/`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("forecast-result").innerText = data.error 
+                    ? "Помилка: " + data.error 
+                    : "Прогнозовані витрати на наступний місяць: " + data.predicted_expenses;
+            })
+            .catch(error => {
+                document.getElementById("forecast-result").innerText = "Щось пішло не так";
+            });
+    });
 </script>
 
 {% endblock content %}
