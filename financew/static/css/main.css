@@ -85,14 +85,15 @@ li{
 .side-bar a{
   text-decoration: none;
   color: #5F605E;
-  font-weight: semibold;
   font-size: 16px;
-  margin: 10px;
-  
+  margin: 5px;
   height: 40px;
   display: flex;
   align-items: center;
   gap: 10px;
+  width: 100%;
+  padding: 15px;
+  border-radius: 15px;
 }
 #total-balance{
   border-bottom: 1px solid #ccc;
@@ -432,4 +433,18 @@ li{
   color: #000;
   text-align: center;
   overflow-y: auto;
+}
+
+
+/* transactions-container */
+
+.transactions-container{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: start;
+}
+
+.all-transactions{
+  width: 100%;
 }
