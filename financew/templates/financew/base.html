@@ -9,8 +9,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  
     {% load django_bootstrap5 %} {% bootstrap_css %} {% bootstrap_javascript %}
   </head>
+  
 <div class="container-header">
   <a href="{% url 'financew:index' %}"><img src="{% static 'img/SVG.svg' %}" alt="logo">FinanceW</a> 
 {% if user.is_authenticated %}
@@ -32,4 +34,4 @@
 </div>
 
 {% block content %}{% endblock content %}
-<br>
+
