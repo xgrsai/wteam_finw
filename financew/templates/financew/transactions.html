@@ -67,7 +67,7 @@
 <h3>Список транзакцій</h3>
 <ul>
 {% for item in operations_with_converted %}
-    <li style="color: {% if item.operation.type == 'income' %}green{% else %}red{% endif %};">
+    <li class="transaction-item" style="color: {% if item.operation.type == 'income' %}green{% else %}red{% endif %};">
       {{ item.operation.date_added|date:"Y-m-d H:i" }} - 
       {{ item.operation.get_type_display }}:
       {{ item.converted_amount|floatformat:2 }} {{ display_currency }}

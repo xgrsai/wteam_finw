@@ -10,21 +10,19 @@
         <a  href="{% url 'plots:report' %}"><img src="{% static 'img/grafik.svg' %}" alt="">  Візуалізація (чи звіти) </a>
         <!-- Посилання на сторінку всіх транзакцій -->
         <a href="{% url 'financew:transactions' %}"> <img src="{% static 'img/euro.svg' %}" alt=""> Переглянути всі транзакції</a>
+        
+        
         <form method="get" action = {% url 'financew:transactions'%}>
-            <div id="total-balance"><p >Баланс бюджету<span style="font-weight: bold; font-size: 19px;"> {{ budget.name }}:</span> </p><div id="total-balance-value">{{ budget.amount }} {{ budget.currency }} </div><button id="edit-budget-btn">Змінити дані</button>
+            <div id="total-balance"><p >Баланс бюджету<span style="font-weight: bold; font-size: 19px;"> {{ budget.name }}:</span> </p>
+               
+                
+                
+                <div id="total-balance-value">{{ budget.amount }} {{ budget.currency }} </div><button id="edit-budget-btn">Змінити дані</button>
             <div id="edit-budget-form" style="display: none;">
 
                 <form method="post" action="{% url 'financew:budget' budget.id %}">
                     {% csrf_token %}
                     <div class="cnt-input-edit-form">{{form.as_div}}
-                    
-                    
-                    {% comment %} <label for="name">Назва бюджету:</label>
-                    <input type="text" name="name" value="{{ budget.name }}" required>
-                    <label for="amount">Сума:</label>
-                    <input type="number" name="amount" value="{{ budget.amount }}" required>
-                    <label for="currency">Валюта:</label>
-                    <input type="text" name="currency" value="{{ budget.currency }}" required> {% endcomment %}
                     </div>
                     
                     {% comment %} {% for fm in form %}
@@ -40,11 +38,15 @@
                     </div>
                    
                 </form>
+
+                
             </div>
+            
         </div>
 
         </form>
-        
+        <button id="forecast-btn">Прогнозувати витрати</button>
+<p id="forecast-result"></p> 
     </div>
 
 
@@ -186,7 +188,7 @@ document.addEventListener("DOMContentLoaded", function () {
 </div>
 <!--Форма для трансферу до бюджету-->
 <div>
-<button id="add-budget-transfer">Здійснити транзакцію до бюджету</button>
+<button id="add-budget-transfer">Здійснити трансфер до бюджету</button>
 <div id = 'new-budget-transfer-form' style = "display:none;">
 <form action="{% url 'financew:budget' budget.id %}" method="post">
     {%csrf_token%}
@@ -200,7 +202,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 <!--Форма для трансферу до бюджету-цілі-->
 <div>
-<button id="add-goalbudget-transfer">Здійснити транзакцію до бюджету-цілі</button>
+<button id="add-goalbudget-transfer">Здійснити трансфер до бюджету-цілі</button>
 <div id = 'new-goalbudget-transfer-form' style = "display:none;">
     <form action="{% url 'financew:budget' budget.id %}" method="post">
         {%csrf_token%}

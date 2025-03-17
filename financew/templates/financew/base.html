@@ -12,7 +12,7 @@
   
     {% load django_bootstrap5 %} {% bootstrap_css %} {% bootstrap_javascript %}
   </head>
-  
+  <body>
 <div class="container-header">
   <a href="{% url 'financew:index' %}"><img src="{% static 'img/SVG.svg' %}" alt="logo">FinanceW</a> 
 {% if user.is_authenticated %}
@@ -34,4 +34,5 @@
 </div>
 
 {% block content %}{% endblock content %}
-
+</body>
+</html>

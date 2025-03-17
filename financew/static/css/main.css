@@ -132,7 +132,7 @@ body, html {
     /* justify-content: space-between; */
 }
 .my-budget{
-  width: 60vh;
+  width: 620px;
   height: 350px;
   display: flex;
   flex-direction: column;
@@ -334,7 +334,7 @@ body, html {
 
 /* categori list */
 .category-list{
-  width: 800px;
+  width: 400px;
   height: 350px;
   display: flex;
   flex-direction: column;
@@ -827,7 +827,7 @@ body, html {
   padding: 20px;
   border-radius: 10px;
   margin-bottom: 20px;
-
+  gap: 15px;
 }
 
 .ctn-fin-op button{
@@ -837,7 +837,7 @@ body, html {
   background-color: #636C59;
   color: #fff;
   cursor: pointer;
-
+  
 }
 .ctn-fin-op button:hover{
   background-color: #444a3d;
@@ -1043,3 +1043,191 @@ body, html {
   margin-top: 30px;
 }
 
+.recent-operations {
+  width: 800px;
+  height: 350px;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  margin: 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 15px;
+  background-color: #FBFCF7;
+  color: #000;
+  overflow-y: auto;
+}
+
+.recent-operations .section-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-align: center;
+  width: 100%;
+}
+
+.recent-operations ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+
+.recent-operations li {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 10px;
+  width: 100%;
+}
+
+.recent-operations .amount {
+ 
+  font-weight: bold;
+}
+
+.recent-operations .operation-meta {
+  font-size: 14px;
+  color: #555;
+  margin-top: 5px;
+}
+
+.recent-operations .no-operations {
+  text-align: center;
+  color: #888;
+  font-style: italic;
+}
+.currency-summary {
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  margin: 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 15px;
+  background-color: #FBFCF7;
+  color: #000;
+}
+
+.currency-summary .section-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-align: center;
+  width: 100%;
+}
+
+.currency-summary ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+
+.currency-summary li {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 10px;
+  width: 100%;
+}
+
+.currency-summary .currency-name {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.currency-summary .currency-amount {
+ 
+  font-weight: bold;
+}
+
+.currency-summary .no-currencies {
+  text-align: center;
+  color: #888;
+  font-style: italic;
+  width: 100%;
+}
+#new-budget-transfer-form button,
+#new-goalbudget-transfer-form button {
+  margin: 5px 0; /* Додає відступи зверху та знизу */
+}
+
+#new-budget-transfer-form .btn-sum-cencel,
+#new-goalbudget-transfer-form .btn-sum-cencel {
+  display: flex;
+  gap: 10px; /* Відступи між кнопками */
+}
+
+/* Основний стиль кнопки */
+#forecast-btn {
+  background-color: #3B4D32; /* Твій основний колір */
+  color: white;
+  border: 2px solid #3B4D32;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 30px;
+  text-transform: uppercase;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+/* Легке світіння при наведенні */
+#forecast-btn:hover {
+  background-color: #2C3A27; /* Темніший відтінок */
+  color: #A1B28E; /* Світліший текст */
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(59, 77, 50, 0.5), 0 0 20px rgba(59, 77, 50, 0.3);
+}
+
+/* При натисканні */
+#forecast-btn:active {
+  transform: scale(0.95);
+  box-shadow: 0 0 10px rgba(59, 77, 50, 0.5);
+}
+/* Загальний стиль для транзакцій */
+.transaction-item {
+  list-style-type: none;
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 5px;
+  background-color: #f4f4f4;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transform: translateX(100%); /* Початковий стан: елементи зсунуті справа */
+  animation: slide-in 0.7s ease-out forwards; /* Анімація для плавного входу */
+  opacity: 0; /* Початкова прозорість */
+}
+
+/* Коли елемент набуває видимості */
+.transaction-item:nth-child(odd) {
+  animation-delay: 0.3s; /* Затримка для непарних елементів */
+}
+
+.transaction-item:nth-child(even) {
+  animation-delay: 0.5s; /* Затримка для парних елементів */
+}
+
+/* Анімація для зсуву елементів */
+@keyframes slide-in {
+  0% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Кілька додаткових стилів для покращення вигляду */
+.transaction-item:hover {
+  background-color: #e0e0e0; /* Зміна фону при наведенні */
+  cursor: pointer; /* Зміна курсору при наведенні */
+}

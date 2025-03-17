@@ -1,6 +1,6 @@
 {% extends 'financew/base.html' %} 
 {% load static %} 
-
+{% load django_bootstrap5 %}
 {% block content %}
 
 
@@ -118,7 +118,7 @@
 
 {% comment %} А ТУТ ДОДАТИ ПЕРЕГЛЯД КАТЕГОРІЙ І ТАКОЖ ЇХ ДОДАВАВННЯ {% endcomment %}
 <!--категорії-->
-<div class="category-list">Мої категорії
+<div class="category-list">Мої категорії витрат та прибутків
 {% for category in categories%}<!-- воно бере по назві ключа -->
 <li>
     {{ category.name }}
@@ -178,18 +178,39 @@
 </div></div> {% endcomment %}
 
 </div>
-<div class="more-info">
-  <p>Останні 5 операцій:</p>
-<ul>
-{% for operation in recent_operations %}
-    <li>
-      {{ operation.date_added|date:"Y-m-d H:i" }} - {{ operation.get_type_display }}: {{ operation.amount|floatformat:2 }} {{ operation.budget.currency }} (Бюджет: {{ operation.budget.name }} {% if operation.category %}, Категорія: {{ operation.category.name }}{% endif %})
-    </li>
-{% empty %}
-    <li>Операції не знайдено</li>
-{% endfor %}
+
+
+<div class="recent-operations">
+  <p class="section-title">Останні 10 операцій:</p>
+  <ul>
+    {% for operation in recent_operations %}
+      <li>
+        <div>
+          <strong>{{ operation.date_added|date:"Y-m-d H:i" }}</strong> – {{ operation.get_type_display }}:
+          <span class="amount">{{ operation.amount|floatformat:2 }} {{ operation.budget.currency }}</span>
+        </div>
+        <div class="operation-meta">
+          Бюджет: {{ operation.budget.name }}{% if operation.category %}, Категорія: {{ operation.category.name }}{% endif %}
+        </div>
+      </li>
+    {% empty %}
+      <li class="no-operations">Операції не знайдено</li>
+    {% endfor %}
+  </ul>
 </div>
 
+<div class="currency-summary">
+  <p class="section-title">Курс валют за {{currencies.0.date_added}} до UAH</p>
+  <ul>
+    {% for currency in currencies %}
+      <li>
+        <div class="currency-name">{{ currency.currency }}</div>
+        <div class="currency-amount">{{ currency.amount|floatformat:2 }}</div>
+      </li>
+    {% empty %}
+      <li class="no-currencies">Валюти не знайдено</li>
+    {% endfor %}
+  </ul>
 </div>
 
 
