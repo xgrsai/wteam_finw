@@ -17,17 +17,20 @@ Personal finance management platform (FinW) - helps users track expenses, foreca
 `.\venv\Scripts\activate`
 - На macOS або Linux:
 `source venv/bin/activate`
-## 3. Міграція бази даних 
+## 3. Встановлення залежностей
+Для встановлення усіх необхідних бібліотек виконуємо команду:<br>
+`pip install -r requirements.txt`
+## 4. Міграція бази даних 
 Після того, як ви створите віртуальне середовище та активуєте його, вам потрібно виконати міграцію бази даних. Це застосовує зміни, які були визначені в моделях вашого проєкту, до бази даних:<br>
 `python manage.py migrate`
 Якщо є проблеми, то виконуємо команду<br>
 `python manage.py makemigrations`
 І потім<br>
 `python manage.py migrate`
-## 4. Створення superuser
+## 5. Створення superuser
 Для того щоб отримати доступ до адмін-панелі Django, потрібно створити суперкористувача. Це можна зробити за допомогою наступної команди:<br>
 `python manage.py createsuperuser`
-## 5. Запуск сервера Django 
+## 6. Запуск сервера Django 
 Щоб запустити сервер Django і перевірити роботу вашого проєкту, скористайтеся командою:<br>
 `python manage.py runserver`
 
@@ -43,12 +46,15 @@ Activate the virtual environment:
 `.\venv\Scripts\activate`
 - On macOS or Linux:
 `source venv/bin/activate`
-## 3. Migrating the database 
+## 3. Installing dependencies
+To install all the necessary libraries, run the command:<br>
+`pip install -r requirements.txt`.
+## 4. Migrating the database 
 After you create the virtual environment and activate it, you need to perform a database migration. This applies the changes that were defined in your project models to the database:<br>
 `python manage.py migrate`
-## 4. Creating a superuser
+## 5. Creating a superuser
 In order to access the Django admin panel, you need to create a superuser. This can be done with the following command:<br>
 `python manage.py createsuperuser`
-## 5. Starting the Django server 
+## 6. Starting the Django server 
 To start the Django server and check the operation of your project, use the command:<br>
 `python manage.py runserver`
