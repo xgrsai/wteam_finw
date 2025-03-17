@@ -12,7 +12,8 @@
         <a href="{% url 'financew:transactions' %}"> <img src="{% static 'img/euro.svg' %}" alt=""> Переглянути всі транзакції</a>
         
         
-        <form method="get" action = {% url 'financew:transactions'%}>
+        <form method="get" action = {% url 'financew:transactions'%}>  </form>
+
             <div id="total-balance"><p >Баланс бюджету<span style="font-weight: bold; font-size: 19px;"> {{ budget.name }}:</span> </p>
                
                 
@@ -24,21 +25,12 @@
                     {% csrf_token %}
                     <div class="cnt-input-edit-form">{{form.as_div}}
                     </div>
-                    
-                    {% comment %} {% for fm in form %}
-                    <div class="form-group">
-                        <label>{{fm.label}}</label>
-                        <div>{{fm}} </div>
-                    </div>
-                    {% endfor %}  {% endcomment %}
-            
                     <div class="container-btn-edit-form">
                         <button type="submit">Зберегти зміни</button>
                         <button type="button" id="cancel-edit-btn">Скасувати</button>
                     </div>
                    
-                </form>
-
+              
                 
             </div>
             
@@ -100,36 +92,8 @@
         </form>
     </div>
 </div>
-
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    document.querySelectorAll(".edit-finoperation-btn").forEach(button => {
-        button.addEventListener("click", function () {
-            const finoperationId = this.getAttribute("data-finoperation-id");
-            document.getElementById(`edit-finoperation-modal-${finoperationId}`).style.display = "flex";
-        });
-    });
-
-    document.querySelectorAll(".close-modal, .cancel-finoperation-btn").forEach(button => {
-        button.addEventListener("click", function () {
-            this.closest(".modal-overlay").style.display = "none";
-        });
-    });
-
-    // Закриття модального вікна при кліку поза ним
-    document.querySelectorAll(".modal-overlay").forEach(modal => {
-        modal.addEventListener("click", function (event) {
-            if (event.target === modal) {
-                modal.style.display = "none";
-            }
-        });
-    });
-});
-</script>
-
-
     <!-- видалення операції -->
-    <a class="btn-del-op" "{% url 'financew:delete_finoperation' finoperation.id %}" >🗑 Видалити</a>
+    <a class="btn-del-op" href="{% url 'financew:delete_finoperation' finoperation.id %}" >🗑 Видалити</a>
 </div>
 </div>
 
@@ -216,6 +180,31 @@ document.addEventListener("DOMContentLoaded", function () {
 </div>
 </div>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".edit-finoperation-btn").forEach(button => {
+            button.addEventListener("click", function () {
+                const finoperationId = this.getAttribute("data-finoperation-id");
+                document.getElementById(`edit-finoperation-modal-${finoperationId}`).style.display = "flex";
+            });
+        });
+    
+        document.querySelectorAll(".close-modal, .cancel-finoperation-btn").forEach(button => {
+            button.addEventListener("click", function () {
+                this.closest(".modal-overlay").style.display = "none";
+            });
+        });
+    
+        // Закриття модального вікна при кліку поза ним
+        document.querySelectorAll(".modal-overlay").forEach(modal => {
+            modal.addEventListener("click", function (event) {
+                if (event.target === modal) {
+                    modal.style.display = "none";
+                }
+            });
+        });
+    });
+    </script>
 <script>
     // Отримуємо елементи сторінки для бюджету
     const editBudgetBtn = document.getElementById("edit-budget-btn");
