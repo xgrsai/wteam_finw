@@ -22,9 +22,9 @@ Personal finance management platform (FinW) - helps users track expenses, foreca
 `pip install -r requirements.txt`
 ## 4. Міграція бази даних 
 Після того, як ви створите віртуальне середовище та активуєте його, вам потрібно виконати міграцію бази даних. Це застосовує зміни, які були визначені в моделях вашого проєкту, до бази даних:<br>
-`python manage.py migrate`
+`python manage.py migrate`<br>
 Якщо є проблеми, то виконуємо команду<br>
-`python manage.py makemigrations`
+`python manage.py makemigrations`<br>
 І потім<br>
 `python manage.py migrate`
 ## 5. Створення superuser
@@ -51,6 +51,10 @@ To install all the necessary libraries, run the command:<br>
 `pip install -r requirements.txt`.
 ## 4. Migrating the database 
 After you create the virtual environment and activate it, you need to perform a database migration. This applies the changes that were defined in your project models to the database:<br>
+`python manage.py migrate`<br>
+Якщо є проблеми, то виконуємо команду<br>
+`python manage.py makemigrations`<br>
+І потім<br>
 `python manage.py migrate`
 ## 5. Creating a superuser
 In order to access the Django admin panel, you need to create a superuser. This can be done with the following command:<br>
