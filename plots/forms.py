@@ -9,9 +9,9 @@ class FinOperationTypeForm(forms.Form):
     finoperation_type = forms.ChoiceField(
         choices=[(key, value) for key, value in FINOPERATION_TYPE.items()],
         
-        label="",
+        label="Тип фінансової операції",
         #initial= # бере першим зі словника
-        # widget=forms.Select(attrs={'onchange': 'this.form.submit()'}), 
+        widget=forms.Select(attrs={'onchange': 'this.form.submit()'}), 
         # widget=forms.Select(attrs={'class': 'mb-3'}),
     )
  
@@ -31,16 +31,15 @@ class WhichBudgetForm(forms.Form):
         # Перетворюємо словник в список кортежів для ChoiceField
         self.fields['budget_type'] = forms.ChoiceField(
             choices=[(key, value) for key, value in budget_dict.items()],
-            label="",
-            # widget=forms.Select(attrs={'onchange': 'this.form.submit()'})
+            label="Тип бюджету",
+            widget=forms.Select(attrs={'onchange': 'this.form.submit()'})
         )
 
 class GraphicTypeForm(forms.Form):
-    
     graphic_type = forms.ChoiceField(choices=GRAPH_TYPE_CHOICES, label='Тип графіка', 
                                     widget=forms.Select(attrs={ 
                                                                'onchange': 'this.form.submit()',
-                                                            #    'class': 'form-control',
+                                                            #   'class': 'form-control',
                                      }),
 
                                      )

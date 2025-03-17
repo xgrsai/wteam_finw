@@ -71,15 +71,17 @@ def get_pie_chart_data(request):
     
     if budget_type == 'all':
         df = pd.DataFrame(list(finoperations.values('amount', 'type', 'category__name', 'budget__currency')))# Перетворюємо в DataFrame
-        # print(df)
     else:
         df = pd.DataFrame(list(finoperations.filter(budget=budget_type).values('amount', 'type', 'category__name','budget__currency')))# Перетворюємо в DataFrame
-    
     if df.empty:
         return JsonResponse({"labels": [], "values": []})  # Якщо немає даних
 
+    """перетворення None на 'без категорії'"""
+    df['category__name'] = df['category__name'].fillna("Без категорії") # спеціальний метод для заповнення пустих значень
+
     """Переведення за вибраною валютою"""
     selected_currency = request.session.get('display_currency')
+    
     df = convert_df_amount(df, selected_currency)
 
     """фільтр типу фіноперації"""
@@ -106,13 +108,13 @@ def get_bar_chart_data(request):
     budget_type = request.session.get('budget_type')
 
     if budget_type == 'all':
-        df = pd.DataFrame(list(finoperations.values('amount', 'type', 'budget__name','budget__currency')))  # Перетворюємо в DataFrame
+        df = pd.DataFrame(list(finoperations.values('amount', 'type', 'budget__name','budget__currency','category__name')))  # Перетворюємо в DataFrame
     else:
-        df = pd.DataFrame(list(finoperations.filter(budget=budget_type).values('amount', 'type', 'budget__name', 'budget__currency')))  # Перетворюємо в DataFrame
+        df = pd.DataFrame(list(finoperations.filter(budget=budget_type).values('amount', 'type', 'budget__name', 'budget__currency','category__name')))  # Перетворюємо в DataFrame
     
-    # # Переконуємося, що сума — це числа
-    # df['amount'] = df['amount'].astype(float)
-    # print(df.info())
+    """перетворення None на 'без категорії'"""
+    df['category__name'] = df['category__name'].fillna("Без категорії") # спеціальний метод для заповнення пустих значень
+
     """зміна валюти"""
     selected_currency = request.session.get('display_currency')
     df = convert_df_amount(df, selected_currency)
@@ -153,13 +155,15 @@ def get_line_chart_data(request):
     # Перевірка на тип бюджету (якщо потрібно)
     budget_type = request.session.get('budget_type')
     if budget_type == 'all':
-        df = pd.DataFrame(list(finoperations.values('amount', 'type', 'date_added', 'budget__currency')))  # Перетворюємо в DataFrame
+        df = pd.DataFrame(list(finoperations.values('amount', 'type', 'date_added', 'budget__currency','category__name')))  # Перетворюємо в DataFrame
     else:
-        df = pd.DataFrame(list(finoperations.filter(budget=budget_type).values('amount', 'type', 'date_added','budget__currency')))  # Перетворюємо в DataFrame
-    
+        df = pd.DataFrame(list(finoperations.filter(budget=budget_type).values('amount', 'type', 'date_added','budget__currency','category__name')))  # Перетворюємо в DataFrame
     # Якщо дані відсутні
     if df.empty:
         return JsonResponse({"labels": [], "profit": [], "expenses": []})
+
+    """перетворення None на 'без категорії'"""
+    df['category__name'] = df['category__name'].fillna("Без категорії") # спеціальний метод для заповнення пустих значень
 
     """зміна валюти"""
     selected_currency = request.session.get('display_currency')
@@ -186,91 +190,3 @@ def get_line_chart_data(request):
     }
     
     return JsonResponse(data)
-
-# def get_line_chart_data(request):
-#     """Дані для line chart"""
-#     budgets = Budget.objects.filter(owner=request.user)
-#     finoperations = FinOperation.objects.filter(budget__owner=request.user)
-    
-#     # Для вибору бюджету
-#     budget_type = request.session.get('budget_type')
-    
-#     if budget_type == 'all':
-#         df = pd.DataFrame(list(finoperations.values('amount', 'type', 'budget__name')))  # Перетворюємо в DataFrame
-#     else:
-#         df = pd.DataFrame(list(finoperations.filter(budget=budget_type).values('amount', 'type', 'budget__name')))  # Перетворюємо в DataFrame
-    
-#     # Якщо немає операцій, повертаємо порожній результат з 0 для всіх категорій
-#     if df.empty:
-#         data = {
-#             "labels": [budget.name for budget in budgets],
-#             "profit": [0] * len(budgets),  # Якщо немає прибутку, ставимо 0
-#             "expenses": [0] * len(budgets)  # Якщо немає витрат, ставимо 0
-#         }
-#         return JsonResponse(data)
-
-#     # Переконуємося, що сума — це числа
-#     df['amount'] = df['amount'].astype(float)
-    
-#     # Фільтруємо дані по прибутку та витратах
-#     df_profit = df[df['type'] == 'income']  # Прибуток
-#     df_expenses = df[df['type'] == 'expense']  # Витрати
-    
-#     # Групуємо за кожним бюджетом для прибутку та витрат
-#     df_profit_grouped = df_profit.groupby('budget__name')['amount'].sum().reset_index()
-#     df_expenses_grouped = df_expenses.groupby('budget__name')['amount'].sum().reset_index()
-    
-#     # Формуємо фінальний результат
-#     data = {
-#         "labels": [budget.name for budget in budgets],  # Всі бюджети
-#         "profit": [],  # Дані для прибутку
-#         "expenses": []  # Дані для витрат
-#     }
-    
-#     # Для кожного бюджету перевіряємо наявність операцій і додаємо відповідні значення
-#     for budget in data["labels"]:
-#         # Перевіряємо, чи є бюджет у групованих даних для прибутку та витрат
-#         profit = df_profit_grouped.loc[df_profit_grouped['budget__name'] == budget, 'amount']
-#         expenses = df_expenses_grouped.loc[df_expenses_grouped['budget__name'] == budget, 'amount']
-        
-#         # Якщо для бюджету немає прибутку чи витрат, ставимо 0
-#         data["profit"].append(profit.sum() if not profit.empty else 0)
-#         data["expenses"].append(expenses.sum() if not expenses.empty else 0)
-    
-#     return JsonResponse(data)
-
-
-# def get_bar_chart_data(request):
-#     """Дані для barchart"""
-#     budgets = Budget.objects.filter(owner=request.user)
-#     categories = Category.objects.filter(owner=request.user)
-#     finoperations = FinOperation.objects.filter(budget__owner=request.user)
-    
-#     # Для вибору бюджету
-#     budget_type = request.session.get('budget_type')
-#     if budget_type == 'all':
-#         df = pd.DataFrame(list(finoperations.values('amount', 'type', 'budget__name')))  # Перетворюємо в DataFrame
-#     else:
-#         df = pd.DataFrame(list(finoperations.filter(budget=budget_type).values('amount', 'type', 'budget__name')))  # Перетворюємо в DataFrame
-    
-#     print(df)
-#     # Якщо немає даних
-#     if df.empty:
-#         return JsonResponse({"labels": [], "profit": [], "expenses": []})
-    
-#     # Групуємо дані за бюджетами та типами операцій (Прибуток або Витрати)
-#     df['amount'] = df['amount'].astype(float)  # Переконатися, що суми це числа
-#     df_profit = df[df['type'] == 'income']  # Прибуток
-#     df_expenses = df[df['type'] == 'expense']  # Витрати
-    
-#     # Підсумовуємо суми по кожному бюджету для прибутку та витрат
-#     df_profit_grouped = df_profit.groupby('budget__name')['amount'].sum().reset_index()
-#     df_expenses_grouped = df_expenses.groupby('budget__name')['amount'].sum().reset_index()
-#     # Дані для відповіді
-#     data = {
-#         "labels": df_profit_grouped['budget__name'].tolist(),  # Лейбли - бюджети
-#         "profit": df_profit_grouped['amount'].tolist(),  # Суми прибутку
-#         "expenses": df_expenses_grouped['amount'].tolist(),  # Суми витрат
-#     }
-
-#     return JsonResponse(data)

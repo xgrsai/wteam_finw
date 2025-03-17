@@ -1,6 +1,6 @@
 {% extends 'financew/base.html' %}
-{% block content %}
 {% load static %}
+{% block content %}
 <!-- Підключення Chart.js та RandomColor-->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/randomcolor@0.5.4/randomColor.min.js"></script>
@@ -19,97 +19,85 @@
     
 </div>
 
-
 <div class = "all-grafik">
-
-    <div class="filter-form">
-        <form method="GET">
+    <div class="filter-form align-items-center">
+        <form method="GET">           
             
-{{ finoperationtypeform.as_div }}
-
-{{graphic_type_form.as_div}}
-            
-{{ budgetform.as_div }}
-           
-            <button type="submit">Фільтрувати</button>
+            {{graphic_type_form.as_div}} 
+            {% if graphic_type == 'pie' %}
+                {{ finoperationtypeform.as_div }}
+            {% endif %}
+            {{ budgetform.as_div }}
+            {% comment %} <button type="submit">Фільтрувати</button> {% endcomment %}
         </form>
     </div>
-    <div class="display-grafik"></div>
-    <div class="grafik-krug">
-        <h1>Кругова діаграма</h1>
-        <div style="width: 50%; height: 100%; margin: auto;">
-            <!-- Полотно для кругової діаграми -->
+
+    <div class="square-grafik" id="pieChartContainer" style="display: none;">
+        <h1 id="pieChartTitle">Кругова діаграма</h1>
             <canvas id="myPieChart"></canvas>
-        </div>
     </div>
     
-    <div class="grafik-stolb">
-        <h1>Стовпчаста діаграма</h1>
-        <div style="width: 50%; height: 100%; margin: auto;">
-            <!-- Полотно для стовпчастої діаграми -->
+    <div class="rectangular-grafik" id="barChartContainer" style="display: none;">
+        <h1 id="barChartTitle">Стовпчаста діаграма</h1>
             <canvas id="myBarChart"></canvas>
-        </div>
     </div>
     
-    <div class="grafik-lin">
-        <h1>Лінійна діаграма</h1>
-        <div style="width: 50%; height: 100%; margin: auto;">
-            <!-- Полотно для лінійної діаграми -->
+    <div class="rectangular-grafik" id="lineChartContainer" style="display: none;">
+        <h1 id="lineChartTitle">Лінійна діаграма</h1>
             <canvas id="myLineChart"></canvas>
-        </div>
     </div>
     
     <div id="noDataMessage" style="display:none;">
         <p>Немає даних для відображення.</p>
     </div>
-    
 </div>
 </div>
-    <script>
+
+<script>
         document.addEventListener("DOMContentLoaded", function () {
             let url;
             let chartId;
             let chartType;
-    
+        
             // Перевірка типу графіка і налаштування відповідно URL та ID
             if ("{{ graphic_type }}" == "pie") {
                 url = "{% url 'plots:piechart-data' %}";  // Запит для кругової діаграми
                 chartId = 'myPieChart'; // ID для canvas кругової діаграми
                 chartType = 'pie'; // Тип діаграми - pie
+                document.getElementById('pieChartContainer').style.display = 'block';  // Показати контейнер для кругової діаграми
             } else if ("{{ graphic_type }}" == "bar") {
                 url = "{% url 'plots:barchart-data' %}";  // Запит для стовпчастої діаграми
                 chartId = 'myBarChart'; // ID для canvas стовпчастої діаграми
                 chartType = 'bar'; // Тип діаграми - bar
+                document.getElementById('barChartContainer').style.display = 'block';  // Показати контейнер для стовпчастої діаграми
             } else if ("{{ graphic_type }}" == "line") {
                 url = "{% url 'plots:linechart-data' %}";  // Запит для лінійної діаграми
                 chartId = 'myLineChart'; // ID для canvas лінійної діаграми
                 chartType = 'line'; // Тип діаграми - line
-            } 
-            else {
-                // Якщо тип графіка невідомий
+                document.getElementById('lineChartContainer').style.display = 'block';  // Показати контейнер для лінійної діаграми
+            } else {
                 console.error("Невідомий тип графіка.");
                 return;
             }
-    
+        
             // Завантажуємо дані та будуємо графік
-            fetch(url)  // Запит
+            fetch(url)
                 .then(response => response.json())
                 .then(data => {
                     const ctx = document.getElementById(chartId).getContext('2d');
-    
+        
                     // Перевірка на наявність даних
                     if (data.labels.length === 0) {
-                        // Якщо даних немає
-                        document.getElementById('noDataMessage').style.display = 'block';  // Показуємо повідомлення "Немає даних"
-                        document.getElementById(chartId).style.display = 'none';  // Приховуємо графік
+                        document.getElementById('noDataMessage').style.display = 'block';
+                        document.getElementById(chartId).style.display = 'none';
                     } else {
-                        document.getElementById('noDataMessage').style.display = 'none';  // Приховуємо повідомлення
-                        document.getElementById(chartId).style.display = 'block';  // Показуємо графік
-    
-                        // Якщо це кругова діаграма
+                        document.getElementById('noDataMessage').style.display = 'none';
+                        document.getElementById(chartId).style.display = 'block';
+        
                         if (chartType === 'pie') {
                             new Chart(ctx, {
-                                type: 'pie',  // Тип графіка: pie
+                                type: 'pie',
+                                
                                 data: {
                                     labels: data.labels,
                                     datasets: [{
@@ -120,73 +108,47 @@
                                     }]
                                 }
                             });
-                        }
-    
-                        // Якщо це стовпчаста діаграма
-                        else if (chartType === 'bar') {
-                            const colors = data.labels.map(() => randomColor()); // Масив кольорів для кожної категорії
-                        
+                        } else if (chartType === 'bar') {
+                            const colors = data.labels.map(() => randomColor());
                             new Chart(ctx, {
                                 type: 'bar',
                                 data: {
                                     labels: data.labels,
                                     datasets: [
                                         {
-                                            label: "Прибуток", // Серія для прибутку
-                                            data: data.profit, // Дані прибутку
-                                            backgroundColor: 'rgba(0, 255, 0, 0.6)',  // Зелені стовпці для прибутку
-                                            borderWidth: 1
-                                        },
-                                        {
-                                            label: "Витрати", // Серія для витрат
-                                            data: data.expenses, // Дані витрат
-                                            backgroundColor: 'rgba(255, 0, 0, 0.6)',  // Червоні стовпці для витрат
-                                            borderWidth: 1
-                                        }
-                                    ]
-                                },
-                                options: {
-                                    responsive: true,
-                                    scales: {
-                                        y: {
-                                            beginAtZero: true  // Почати з нуля
-                                        },
-                                        x: {
-                                            // Додаємо певну відстань між групами стовпців
-                                            ticks: {
-                                                autoSkip: false
-                                            }
-                                        }
-                                    },
-                                    plugins: {
-                                        legend: {
-                                            position: 'top',  // Легенда вгорі
-                                            display: true
-                                        }
-                                    }
-                                }
-                            });
-                        }
-    
-                        if (chartType === 'line') {
-                            new Chart(ctx, {
-                                type: 'line',  // Тип графіка: line
-                                data: {
-                                    labels: data.labels,  // Лейбли - бюджети
-                                    datasets: [
-                                        {
                                             label: "Прибуток",
-                                            data: data.profit,  // Дані прибутку
-                                            borderColor: "green",  // Колір лінії для прибутку
-                                            fill: false,  // Без заповнення області під лінією
-                                            tension: 0.4  // Плавність лінії
+                                            data: data.profit,
+                                            backgroundColor: 'rgba(0, 255, 0, 0.6)',
+                                            borderWidth: 1
                                         },
                                         {
                                             label: "Витрати",
-                                            data: data.expenses,  // Дані витрат
-                                            borderColor: "red",  // Колір лінії для витрат
-                                            fill: false,  // Без заповнення області під лінією
-                                            tension: 0.4  // Плавність лінії
+                                            data: data.expenses,
+                                            backgroundColor: 'rgba(255, 0, 0, 0.6)',
+                                            borderWidth: 1
+                                        }
+                                    ]
+                                }
+                            });
+                        } else if (chartType === 'line') {
+                            new Chart(ctx, {
+                                type: 'line',
+                                data: {
+                                    labels: data.labels,
+                                    datasets: [
+                                        {
+                                            label: "Прибуток",
+                                            data: data.profit,
+                                            borderColor: "green",
+                                            fill: false,
+                                            tension: 0.4
+                                        },
+                                        {
+                                            label: "Витрати",
+                                            data: data.expenses,
+                                            borderColor: "red",
+                                            fill: false,
+                                            tension: 0.4
                                         }
                                     ]
                                 }
@@ -196,11 +158,12 @@
                 })
                 .catch(error => {
                     console.error("Помилка завантаження графіка:", error);
-                    document.getElementById('noDataMessage').style.display = 'block';  // Виводимо повідомлення про помилку
-                    document.getElementById(chartId).style.display = 'none';  // Приховуємо графік у випадку помилки
+                    document.getElementById('noDataMessage').style.display = 'block';
+                    document.getElementById(chartId).style.display = 'none';
                 });
         });
-    </script>
- 
+        
+</script>
 
+ 
 {% endblock content %}

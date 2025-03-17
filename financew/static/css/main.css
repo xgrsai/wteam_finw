@@ -9,7 +9,10 @@ li{
   list-style: none;
 
 }
-
+body, html {
+  height: 100%;
+  margin: 0;
+}
 /* img{
   width: 40px;
 } */
@@ -69,7 +72,7 @@ li{
 /* side bar */
 .side-bar{
   background-color: #FBFCF7;
-  width: 630px;
+  width: 30%;
   height: 100vh;
   padding: 20px;
   color: #000;
@@ -120,11 +123,12 @@ li{
   display: flex;
     flex-wrap: wrap; /* Дозволяє переносити блоки на новий рядок */
     gap: 20px; /* Відступ між блоками */
-    max-width: 100%;
+    width: 100%;
     overflow-x: auto; /* Доповнюється горизонтально */
+    /* justify-content: space-between; */
 }
 .my-budget{
-  width: 630px;
+  width: 60vh;
   height: 350px;
   display: flex;
   flex-direction: column;
@@ -229,7 +233,7 @@ li{
 
 /* Goal */
 .goal-budget-list{
-  width: 620px;
+  width: 620px; /* Щоб не розтягувалось занадто на великих екранах */
   height: 350px;
   display: flex;
   flex-direction: column;
@@ -554,7 +558,7 @@ li{
 }
 
 .filter-form form{
-  width: 50%;
+  width: 100%;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -594,24 +598,36 @@ li{
   text-align: center;
 }
 
-
-.all-grafik{
+.all-grafik {
   width: 100%;
-  display: flex;  
-  flex-direction: column;  
-  justify-content: space-between;  
+  height: auto;  /* Повна висота екрана */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;  /* Вирівнює вміст контейнера з самого початку */
+  align-items: center;  /* Центрує вміст по горизонталі */
   margin: 10px;
   padding: 10px;
   color: #000;
   overflow-y: auto;
 }
+/* Клас для квадратних графіків */
+.square-grafik {
+  width: 50%;
+  height: 100%;  /* Висота контейнера — 90% висоти екрану */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  color: #000;
+}
 
-.display-grafik{
+/* Клас для прямокутних графіків */
+.rectangular-grafik {
   width: 100%;
-  display: flex;  
-  flex-direction: column;  
-  justify-content: space-between;  
-  margin: 10px;
+  height: 90vh;  /* Висота контейнера — 90% висоти екрану */
+  display: flex;
+  justify-content: center;
+  align-items: center;
   padding: 10px;
   color: #000;
 }
