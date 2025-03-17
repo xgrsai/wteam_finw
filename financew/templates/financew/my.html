@@ -18,28 +18,12 @@
 
     <div id="total-balance"><p >Загальний баланс: <div id="total-balance-value"> {% if total_balance != 0 %}{{ total_balance|floatformat:2 }} {{ display_currency }}{% else %}Немає даних{% endif %}</div></p></div>
         <!-- Вибір валюти відображення -->
-{% comment %} <form method="get" action="{% url 'financew:my' %}">
-  <label for="currency">Валюта відображення:</label>
-  <select name="currency" id="currency" onchange="this.form.submit()">
-      {% for currency in currencies %}
-          <option value="{{ currency }}" {% if currency == display_currency %}selected{% endif %}>{{ currency }}</option>
-      {% endfor %}
-  </select>
-</form> {% endcomment %}
 <form method="get" action = {% url 'financew:my'%}>
 <p>{{currencydisplayform.as_div}}</p>
 </form>
 </div>
+
 {% comment %} ВІДОБРАЖЕННЯ ЗАГАЛЬНОГО БАЛАНСУ З УСІХ БЮДЖЕТІВ В ПЕВНІЙ ВАЛЮТІ {% endcomment %}
-{% comment %} 
-{% for budget in budgets %}
-{% empty %}
-    <li>Бюджети не знайдено</li>
-{% endfor %} {% endcomment %}
-
-
-
-
 <ul>
 {% for item in budgets_with_converted %}
     <li>
@@ -195,7 +179,15 @@
 
 </div>
 <div class="more-info">
-  <p>Додаткова інформація:</p>
+  <p>Останні 5 операцій:</p>
+<ul>
+{% for operation in recent_operations %}
+    <li>
+      {{ operation.date_added|date:"Y-m-d H:i" }} - {{ operation.get_type_display }}: {{ operation.amount|floatformat:2 }} {{ operation.budget.currency }} (Бюджет: {{ operation.budget.name }} {% if operation.category %}, Категорія: {{ operation.category.name }}{% endif %})
+    </li>
+{% empty %}
+    <li>Операції не знайдено</li>
+{% endfor %}
 </div>
 
 </div>
