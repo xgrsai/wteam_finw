@@ -16,7 +16,7 @@ class FinOperationForm(forms.ModelForm):
     
     class Meta:
         model = FinOperation
-        fields = ['amount', 'type', 'time_interval', 'category','is_active']
+        fields = ['type', 'amount',  'time_interval', 'category','is_active']
         labels = {
             'amount': 'Сума',
             'type': 'Тип операції',

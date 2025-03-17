@@ -10,9 +10,7 @@ li{
 
 }
 
-/* img{
-  width: 40px;
-} */
+
 /* Header */
 .container-header{
   background-color: #D7E6C5;
@@ -69,7 +67,7 @@ li{
 /* side bar */
 .side-bar{
   background-color: #FBFCF7;
-  width: 630px;
+  width: 400px;
   height: 100vh;
   padding: 20px;
   color: #000;
@@ -120,7 +118,7 @@ li{
   display: flex;
     flex-wrap: wrap; /* Дозволяє переносити блоки на новий рядок */
     gap: 20px; /* Відступ між блоками */
-    max-width: 100%;
+    width: 100%;
     overflow-x: auto; /* Доповнюється горизонтально */
 }
 .my-budget{
@@ -614,4 +612,415 @@ li{
   margin: 10px;
   padding: 10px;
   color: #000;
+}
+
+
+/* budget style */
+
+.container-budget{
+  display: flex;
+  flex-direction: row;
+  align-items: start;
+}
+/*form */
+.new-finoperation-form{
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  margin: 10px;
+  padding: 10px;
+  border: 1px solid #000;
+  border-radius: 10px;
+  cursor: pointer;
+  gap: 5px; 
+}
+.new-finoperation-form input{
+
+
+  }
+#new-budget-transfer-form form{
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  margin: 10px;
+  padding: 10px;
+  border: 1px solid #000;
+  border-radius: 10px;
+  cursor: pointer;
+  gap: 5px;
+  width: 500px;
+}
+#new-budget-transfer-form form input{
+  margin: 10px;
+  padding: 5px;
+  border: 1px solid #000;
+  border-radius: 10px;
+  cursor: pointer;
+  }
+#new-budget-transfer-form form button{
+  background-color: #636C59; /* Колір кнопки */
+  color: white; 
+  border: none;
+  padding: 10px 20px;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 15px; /* Овальна форма */
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  text-align: center;
+  }
+
+  .btn-sum-cencel{
+    width: 500px;
+    display: flex;
+    flex-direction: row;
+  }
+  #new-goalbudget-transfer-form form{
+    display: flex;
+  flex-direction: column;
+  align-items: start;
+  margin: 10px;
+  padding: 10px;
+  border: 1px solid #000;
+  border-radius: 10px;
+  cursor: pointer;
+  gap: 5px;
+  width: 500px;
+    }
+    #new-goalbudget-transfer-form form input{
+      margin: 10px;
+      padding: 5px;
+      border: 1px solid #000;
+      border-radius: 10px;
+      cursor: pointer;
+      }
+      #new-goalbudget-transfer-form form button{
+        background-color: #636C59; /* Колір кнопки */
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 12px;
+        font-weight: bold;
+        border-radius: 15px; /* Овальна форма */
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        text-align: center;
+        }
+.tbl-trans{
+
+}
+#edit-budget-btn
+{
+  background-color: #636C59; /* Колір кнопки */
+  color: white; 
+  border: none;
+  padding: 10px 20px;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 15px; /* Овальна форма */
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  text-align: center;
+  
+}
+
+#edit-budget-form{
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  justify-content: space-between;
+}
+#edit-budget-form button{
+  background-color: #636C59; /* Колір кнопки */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 15px; /* Овальна форма */
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  text-align: center;
+
+}
+.cnt-input-edit-form{
+  width: 100%;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  /* align-items: center; */
+  justify-content: space-between;
+
+}
+.cnt-input-edit-form div{
+  display: flex;
+  flex-direction: column;
+}
+
+.cnt-input-edit-form input,
+.cnt-input-edit-form select{
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  
+}
+.container-btn-edit-form{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
+
+.info-budget{
+  width: 100%;
+}
+
+
+.dashbord-op{
+  width: 65%;
+  margin-bottom: 10px;
+  padding-bottom:10px ;
+  border-bottom: 1px solid #ccc;
+  display: flex;
+  justify-content: space-between;
+}
+.info-budget-in-form{
+  width: 65%;
+  display: flex;
+  justify-content: space-between;
+} 
+
+
+
+.ctn-fin-op{
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+
+}
+
+.ctn-fin-op button{
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  background-color: #636C59;
+  color: #fff;
+  cursor: pointer;
+
+}
+.ctn-fin-op button:hover{
+  background-color: #444a3d;
+  }
+
+.ctn-fin-op a{
+  text-decoration: none;
+  background-color: #D7E6C5;
+  color: black;
+  padding: 10px;
+  border-radius:10px ;
+
+}
+.ctn-fin-op a:hover{
+  background-color: rgb(171, 194, 172);
+  }
+
+
+.ctn-form-budg{
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+}
+
+
+
+.edit-finoperation-form form{
+  display: flex;
+  flex-direction: row;
+  align-items: start;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  background-color: #F7F7F7;
+
+
+}
+
+
+
+/* pop menu edit fin operation */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6); /* Затемнення фону */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-window {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 400px;
+  height: 500px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+.close-modal {
+  width: 50px;
+  height: 50px;
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 20px;
+  text-align: center;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+.modal-window form{
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: start ;
+  padding: 20px;
+  gap: 10px;
+
+
+}
+
+.modal-window form input,select{
+  width: 300px;
+  height: 40px;
+  
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  }
+.modal-window form input[type="checkbox"]{
+  width: 20px;
+  height: 20px;
+  margin-bottom: 20px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+}
+
+.modal-window form input[type="checkbox"]:checked{
+  background-color: #D7E6C5;
+}
+
+#add-goalbudget-transfer,#add-budget-transfer{
+  width: 500px;
+  height: 40px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background-color: #D7E6C5;
+  color: #000;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  
+}
+
+.styled-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 16px;
+  text-align: left;
+}
+
+/* Лінія під заголовками */
+.styled-table thead th {
+  border-bottom: 2px solid #333;
+  padding: 10px;
+}
+
+/* Лінії між рядками */
+.styled-table tbody td {
+  border-bottom: 1px solid #ccc;
+  padding: 10px;
+}
+
+/* Невелике підсвічування при наведенні */
+.styled-table tbody tr:hover {
+  background-color: #f9f9f9;
+}
+
+/* Стиль для "Немає переказів" */
+.no-transfers {
+  text-align: center;
+  font-style: italic;
+  color: #888;
+}
+
+
+/* index */
+
+.container-index {
+  max-width: 900px;
+  margin: 50px auto;
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.container-index h1 {
+  text-align: center;
+  color: #636C59;
+}
+
+.container-index p {
+  text-align: justify;
+  margin-bottom: 20px;
+}
+
+.highlight {
+  font-weight: bold;
+  color: #636C59;
+}
+
+.features {
+  background: #D7E6C5;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+.features ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.features li {
+  padding: 8px 0;
+}
+
+.cta {
+  text-align: center;
+  margin-top: 30px;
 }
