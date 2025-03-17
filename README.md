@@ -11,7 +11,7 @@ Personal finance management platform (FinW) - helps users track expenses, foreca
 `git clone <URL репозиторію>`
 ## 2. Створення віртуального середовища 
 Для створення віртуального середовища використовуйте команду<br>
-`python -m venv <назва_середовища>`
+`python -m venv <назва_середовища>`<br>
 Активуйте віртуальне середовище:
 - На Windows:
 `.\venv\Scripts\activate`
@@ -33,7 +33,7 @@ First of all, you need to clone the project repository to your local computer. U
 `git clone <repository URL>`
 ## 2. Create a virtual environment 
 To create a virtual environment, use the command <br>
-`python -m venv <environment_name>`
+`python -m venv <environment_name>`<br>
 Activate the virtual environment:
 - On Windows:
 `.\venv\Scripts\activate`
