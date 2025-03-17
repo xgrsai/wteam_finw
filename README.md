@@ -20,6 +20,10 @@ Personal finance management platform (FinW) - helps users track expenses, foreca
 ## 3. Міграція бази даних 
 Після того, як ви створите віртуальне середовище та активуєте його, вам потрібно виконати міграцію бази даних. Це застосовує зміни, які були визначені в моделях вашого проєкту, до бази даних:<br>
 `python manage.py migrate`
+Якщо є проблеми, то виконуємо команду<br>
+`python manage.py makemigrations`
+І потім<br>
+`python manage.py migrate`
 ## 4. Створення superuser
 Для того щоб отримати доступ до адмін-панелі Django, потрібно створити суперкористувача. Це можна зробити за допомогою наступної команди:<br>
 `python manage.py createsuperuser`

@@ -1,6 +1,4 @@
 import pandas as pd
-import plotly.express as px
-import plotly.graph_objects as go
 from django.http import JsonResponse
 from django.shortcuts import render
 import random
@@ -10,7 +8,6 @@ from financew.constants import FINOPERATION_TYPE
 from financew.models import Budget, FinOperation, Category
 from .forms import FinOperationTypeForm, WhichBudgetForm, GraphicTypeForm
 from financew.forms import CurrencyForm
-from financew.utils import get_exchange_rates
 from .utils import convert_df_amount
 
 def visualisation(request):
