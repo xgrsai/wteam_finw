@@ -10,9 +10,14 @@ li{
 
 }
 
+body, html {
+  height: 100%;
+  margin: 0;
+}
 /* img{
   width: 40px;
 } */
+
 /* Header */
 .container-header{
   background-color: #D7E6C5;
@@ -69,8 +74,10 @@ li{
 /* side bar */
 .side-bar{
   background-color: #FBFCF7;
-  width: 630px;
-  height: 100vh;
+
+  width: 400px;
+
+  height: 100%;
   padding: 20px;
   color: #000;
   display: flex;
@@ -120,11 +127,12 @@ li{
   display: flex;
     flex-wrap: wrap; /* Дозволяє переносити блоки на новий рядок */
     gap: 20px; /* Відступ між блоками */
-    max-width: 100%;
+    width: 100%;
     overflow-x: auto; /* Доповнюється горизонтально */
+    /* justify-content: space-between; */
 }
 .my-budget{
-  width: 630px;
+  width: 620px;
   height: 350px;
   display: flex;
   flex-direction: column;
@@ -229,7 +237,7 @@ li{
 
 /* Goal */
 .goal-budget-list{
-  width: 620px;
+  width: 620px; /* Щоб не розтягувалось занадто на великих екранах */
   height: 350px;
   display: flex;
   flex-direction: column;
@@ -326,7 +334,7 @@ li{
 
 /* categori list */
 .category-list{
-  width: 800px;
+  width: 400px;
   height: 350px;
   display: flex;
   flex-direction: column;
@@ -443,8 +451,801 @@ li{
   flex-direction: row;
   justify-content: space-between;
   align-items: start;
+  
 }
 
 .all-transactions{
   width: 100%;
+  margin: 10px;
+}
+/* НАлаштування кнопки   */
+
+.dropdown-btn {
+  background-color: #636C59; /* Колір кнопки */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 15px; /* Овальна форма */
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.arrow {
+  font-size: 12px;
+}
+
+.dropdown-btn:hover {
+  background-color: #575e4f; /* Трохи темніше при наведенні */
+}
+
+/* Приховане поле вибору дати */
+.date-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+
+
+.all-transactions form{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin: 10px;
+  padding: 10px;
+  color: #000;
+  text-align: center;
+  overflow-y: auto;
+}
+
+.all-transactions form select{
+  background-color: #D7E6C5; /* Колір кнопки */
+  color: black;
+  border: none;
+  padding: 10px 20px;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 15px; /* Овальна форма */
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  text-align: center;
+  appearance: none
+  
+}
+
+.all-transactions form button{
+  background-color: #636C59; /* Колір кнопки */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 15px; /* Овальна форма */
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  text-align: center;
+
+}
+.all-transactions form button img{
+  width: 18px;
+}
+.reset-button{
+  background-color: #D7E6C5; /* Колір кнопки */
+  color: black;
+  border: none;
+  padding: 10px 20px;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 15px; /* Овальна форма */
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+}
+
+
+/* Grafiki */
+
+
+.grafik-container{
+  display: flex;
+  flex-direction: row;
+  align-items: start;
+}
+
+.filter-form form{
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin: 10px;
+  padding: 10px;
+  color: #000;
+  text-align: center;
+  overflow-y: auto;
+}
+
+.filter-form form select{
+  background-color: #D7E6C5; /* Колір кнопки */
+  color: black;
+  border: none;
+  padding: 10px 20px;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 15px; /* Овальна форма */
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  text-align: center;
+}
+
+.filter-form form button{
+  background-color: #636C59; /* Колір кнопки */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 15px; /* Овальна форма */
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  text-align: center;
+}
+
+.all-grafik {
+  width: 100%;
+  height: auto;  /* Повна висота екрана */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;  /* Вирівнює вміст контейнера з самого початку */
+  align-items: center;  /* Центрує вміст по горизонталі */
+  margin: 10px;
+  padding: 10px;
+  color: #000;
+  overflow-y: auto;
+}
+/* Клас для квадратних графіків */
+.square-grafik {
+  width: 40%;
+  height: 70vh;  /* Висота контейнера — 90% висоти екрану */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  color: #000;
+}
+
+/* Клас для прямокутних графіків */
+.rectangular-grafik {
+  width: 80%;
+  height: 70vh;  /* Висота контейнера — 90% висоти екрану */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  color: #000;
+}
+
+
+
+/* budget style */
+
+.container-budget{
+  display: flex;
+  flex-direction: row;
+  align-items: start;
+}
+/*form */
+.new-finoperation-form{
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  margin: 10px;
+  padding: 10px;
+  border: 1px solid #000;
+  border-radius: 10px;
+  cursor: pointer;
+  gap: 5px; 
+}
+
+#new-budget-transfer-form form{
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  margin: 10px;
+  padding: 10px;
+  border: 1px solid #000;
+  border-radius: 10px;
+  cursor: pointer;
+  gap: 5px;
+  width: 500px;
+}
+#new-budget-transfer-form form input{
+  margin: 10px;
+  padding: 5px;
+  border: 1px solid #000;
+  border-radius: 10px;
+  cursor: pointer;
+  }
+#new-budget-transfer-form form button{
+  background-color: #636C59; /* Колір кнопки */
+  color: white; 
+  border: none;
+  padding: 10px 20px;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 15px; /* Овальна форма */
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  text-align: center;
+  }
+
+  .btn-sum-cencel{
+    width: 500px;
+    display: flex;
+    flex-direction: row;
+  }
+  #new-goalbudget-transfer-form form{
+    display: flex;
+  flex-direction: column;
+  align-items: start;
+  margin: 10px;
+  padding: 10px;
+  border: 1px solid #000;
+  border-radius: 10px;
+  cursor: pointer;
+  gap: 5px;
+  width: 500px;
+    }
+    #new-goalbudget-transfer-form form input{
+      margin: 10px;
+      padding: 5px;
+      border: 1px solid #000;
+      border-radius: 10px;
+      cursor: pointer;
+      }
+      #new-goalbudget-transfer-form form button{
+        background-color: #636C59; /* Колір кнопки */
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 12px;
+        font-weight: bold;
+        border-radius: 15px; /* Овальна форма */
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        text-align: center;
+        }
+
+#edit-budget-btn
+{
+  background-color: #636C59; /* Колір кнопки */
+  color: white; 
+  border: none;
+  padding: 10px 20px;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 15px; /* Овальна форма */
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  text-align: center;
+  
+}
+
+#edit-budget-form{
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  justify-content: space-between;
+}
+#edit-budget-form button{
+  background-color: #636C59; /* Колір кнопки */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 15px; /* Овальна форма */
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  text-align: center;
+
+}
+.cnt-input-edit-form{
+  width: 100%;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  /* align-items: center; */
+  justify-content: space-between;
+
+}
+.cnt-input-edit-form div{
+  display: flex;
+  flex-direction: column;
+}
+
+.cnt-input-edit-form input,
+.cnt-input-edit-form select{
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  
+}
+.container-btn-edit-form{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
+
+.info-budget{
+  width: 100%;
+}
+
+
+.dashbord-op{
+  width: 65%;
+  margin-bottom: 10px;
+  padding-bottom:10px ;
+  border-bottom: 1px solid #ccc;
+  display: flex;
+  justify-content: space-between;
+}
+.info-budget-in-form{
+  width: 65%;
+  display: flex;
+  justify-content: space-between;
+} 
+
+
+
+.ctn-fin-op{
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  gap: 15px;
+}
+
+.ctn-fin-op button{
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  background-color: #636C59;
+  color: #fff;
+  cursor: pointer;
+  
+}
+.ctn-fin-op button:hover{
+  background-color: #444a3d;
+  }
+
+.ctn-fin-op a{
+  text-decoration: none;
+  background-color: #D7E6C5;
+  color: black;
+  padding: 10px;
+  border-radius:10px ;
+
+}
+.ctn-fin-op a:hover{
+  background-color: rgb(171, 194, 172);
+  }
+
+
+.ctn-form-budg{
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+}
+
+
+
+.edit-finoperation-form form{
+  display: flex;
+  flex-direction: row;
+  align-items: start;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  background-color: #F7F7F7;
+
+
+}
+
+
+
+/* pop menu edit fin operation */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6); /* Затемнення фону */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-window {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 400px;
+  height: 500px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+.close-modal {
+  width: 50px;
+  height: 50px;
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 20px;
+  text-align: center;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+.modal-window form{
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: start ;
+  padding: 20px;
+  gap: 10px;
+
+
+}
+
+.modal-window form input,select{
+  width: 300px;
+  height: 40px;
+  
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  }
+.modal-window form input[type="checkbox"]{
+  width: 20px;
+  height: 20px;
+  margin-bottom: 20px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+}
+
+.modal-window form input[type="checkbox"]:checked{
+  background-color: #D7E6C5;
+}
+
+#add-goalbudget-transfer,#add-budget-transfer{
+  width: 500px;
+  height: 40px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background-color: #D7E6C5;
+  color: #000;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  
+}
+
+.styled-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 16px;
+  text-align: left;
+}
+
+/* Лінія під заголовками */
+.styled-table thead th {
+  border-bottom: 2px solid #333;
+  padding: 10px;
+}
+
+/* Лінії між рядками */
+.styled-table tbody td {
+  border-bottom: 1px solid #ccc;
+  padding: 10px;
+}
+
+/* Невелике підсвічування при наведенні */
+.styled-table tbody tr:hover {
+  background-color: #f9f9f9;
+}
+
+/* Стиль для "Немає переказів" */
+.no-transfers {
+  text-align: center;
+  font-style: italic;
+  color: #888;
+}
+
+
+/* index */
+
+.container-index {
+  max-width: 900px;
+  margin: 50px auto;
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.container-index h1 {
+  text-align: center;
+  color: #636C59;
+}
+
+.container-index p {
+  text-align: justify;
+  margin-bottom: 20px;
+}
+
+.highlight {
+  font-weight: bold;
+  color: #636C59;
+}
+
+.features {
+  background: #D7E6C5;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+.features ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.features li {
+  padding: 8px 0;
+}
+
+.cta {
+  text-align: center;
+  margin-top: 30px;
+}
+
+.recent-operations {
+  width: 800px;
+  height: 350px;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  margin: 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 15px;
+  background-color: #FBFCF7;
+  color: #000;
+  overflow-y: auto;
+}
+
+.recent-operations .section-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-align: center;
+  width: 100%;
+}
+
+.recent-operations ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+
+.recent-operations li {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 10px;
+  width: 100%;
+}
+
+.recent-operations .amount {
+ 
+  font-weight: bold;
+}
+
+.recent-operations .operation-meta {
+  font-size: 14px;
+  color: #555;
+  margin-top: 5px;
+}
+
+.recent-operations .no-operations {
+  text-align: center;
+  color: #888;
+  font-style: italic;
+}
+.currency-summary {
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  margin: 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 15px;
+  background-color: #FBFCF7;
+  color: #000;
+}
+
+.currency-summary .section-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-align: center;
+  width: 100%;
+}
+
+.currency-summary ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+
+.currency-summary li {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 10px;
+  width: 100%;
+}
+
+.currency-summary .currency-name {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.currency-summary .currency-amount {
+ 
+  font-weight: bold;
+}
+
+.currency-summary .no-currencies {
+  text-align: center;
+  color: #888;
+  font-style: italic;
+  width: 100%;
+}
+#new-budget-transfer-form button,
+#new-goalbudget-transfer-form button {
+  margin: 5px 0; /* Додає відступи зверху та знизу */
+}
+
+#new-budget-transfer-form .btn-sum-cencel,
+#new-goalbudget-transfer-form .btn-sum-cencel {
+  display: flex;
+  gap: 10px; /* Відступи між кнопками */
+}
+
+/* Основний стиль кнопки */
+#forecast-btn {
+  background-color: #3B4D32; /* Твій основний колір */
+  color: white;
+  border: 2px solid #3B4D32;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 30px;
+  text-transform: uppercase;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+/* Легке світіння при наведенні */
+#forecast-btn:hover {
+  background-color: #2C3A27; /* Темніший відтінок */
+  color: #A1B28E; /* Світліший текст */
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(59, 77, 50, 0.5), 0 0 20px rgba(59, 77, 50, 0.3);
+}
+
+/* При натисканні */
+#forecast-btn:active {
+  transform: scale(0.95);
+  box-shadow: 0 0 10px rgba(59, 77, 50, 0.5);
+}
+/* Загальний стиль для транзакцій */
+.transaction-item {
+  list-style-type: none;
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 5px;
+  background-color: #f4f4f4;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transform: translateX(100%); /* Початковий стан: елементи зсунуті справа */
+  animation: slide-in 0.7s ease-out forwards; /* Анімація для плавного входу */
+  opacity: 0; /* Початкова прозорість */
+}
+
+/* Коли елемент набуває видимості */
+.transaction-item:nth-child(odd) {
+  animation-delay: 0.3s; /* Затримка для непарних елементів */
+}
+
+.transaction-item:nth-child(even) {
+  animation-delay: 0.5s; /* Затримка для парних елементів */
+}
+
+/* Анімація для зсуву елементів */
+@keyframes slide-in {
+  0% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Кілька додаткових стилів для покращення вигляду */
+.transaction-item:hover {
+  background-color: #e0e0e0; /* Зміна фону при наведенні */
+  cursor: pointer; /* Зміна курсору при наведенні */
+}
+.goal-budget-list p {
+  text-align: center;
+  margin: 0 auto; /* Це допомагає, якщо є інші стилі, що впливають */
+  font-weight: bold; /* Додає жирний шрифт */
+  font-size: 18px;
+}
+.category-list p {
+  text-align: center;
+  margin: 0 auto; /* Це допомагає, якщо є інші стилі, що впливають */
+  font-weight: bold; /* Додає жирний шрифт */
+  font-size: 18px;
+}
+.my-budget p {
+  text-align: center;
+  margin: 0 auto; /* Це допомагає, якщо є інші стилі, що впливають */
+  font-weight: bold; /* Додає жирний шрифт */
+  font-size: 18px;
 }

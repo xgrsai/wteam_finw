@@ -2,7 +2,7 @@
 {% load static %} 
 
 {% block content %}
-
+{% load django_bootstrap5 %}
 
 <div class="container-my-budget">
 
@@ -18,28 +18,12 @@
 
     <div id="total-balance"><p >Загальний баланс: <div id="total-balance-value"> {% if total_balance != 0 %}{{ total_balance|floatformat:2 }} {{ display_currency }}{% else %}Немає даних{% endif %}</div></p></div>
         <!-- Вибір валюти відображення -->
-{% comment %} <form method="get" action="{% url 'financew:my' %}">
-  <label for="currency">Валюта відображення:</label>
-  <select name="currency" id="currency" onchange="this.form.submit()">
-      {% for currency in currencies %}
-          <option value="{{ currency }}" {% if currency == display_currency %}selected{% endif %}>{{ currency }}</option>
-      {% endfor %}
-  </select>
-</form> {% endcomment %}
 <form method="get" action = {% url 'financew:my'%}>
 <p>{{currencydisplayform.as_div}}</p>
 </form>
 </div>
+
 {% comment %} ВІДОБРАЖЕННЯ ЗАГАЛЬНОГО БАЛАНСУ З УСІХ БЮДЖЕТІВ В ПЕВНІЙ ВАЛЮТІ {% endcomment %}
-{% comment %} 
-{% for budget in budgets %}
-{% empty %}
-    <li>Бюджети не знайдено</li>
-{% endfor %} {% endcomment %}
-
-
-
-
 <ul>
 {% for item in budgets_with_converted %}
     <li>
@@ -50,7 +34,7 @@
 <div class="budget-list">
   <h1 id="greeting">Добрий день, {{ user.username }}</h1>
   
-  <div class="my-budget">Мої бюджети
+  <div class="my-budget"><p>Мої бюджети</p>
 {% for budget in budgets%}<!-- воно бере по назві ключа -->
     <li>
         <a href="{% url 'financew:budget' budget.budget.id %}">{{ budget.budget.name }} {{ budget.budget.amount }} {{ budget.budget.currency }} ({{budget.converted_amount}})</a>
@@ -103,7 +87,7 @@
 </div>
 
 <!--бюджетицілі-->
-<div class="goal-budget-list">Мої бюджети-цілі
+<div class="goal-budget-list"><p>Мої бюджети-цілі</p>
 {% for goalbudget in goalbudgets%}<!-- воно бере по назві ключа -->
 <li>
     {{ goalbudget.name }} {{ goalbudget.amount }}/{{ goalbudget.target_amount }} {{ goalbudget.currency }}
@@ -134,7 +118,7 @@
 
 {% comment %} А ТУТ ДОДАТИ ПЕРЕГЛЯД КАТЕГОРІЙ І ТАКОЖ ЇХ ДОДАВАВННЯ {% endcomment %}
 <!--категорії-->
-<div class="category-list">Мої категорії
+<div class="category-list"><p>Мої категорії витрат та прибутків</p>
 {% for category in categories%}<!-- воно бере по назві ключа -->
 <li>
     {{ category.name }}
@@ -194,10 +178,39 @@
 </div></div> {% endcomment %}
 
 </div>
-<div class="more-info">
-  <p>Додаткова інформація:</p>
+
+
+<div class="recent-operations">
+  <p class="section-title">Останні 10 операцій:</p>
+  <ul>
+    {% for operation in recent_operations %}
+      <li>
+        <div>
+          <strong>{{ operation.date_added|date:"Y-m-d H:i" }}</strong> – {{ operation.get_type_display }}:
+          <span class="amount">{{ operation.amount|floatformat:2 }} {{ operation.budget.currency }}</span>
+        </div>
+        <div class="operation-meta">
+          Бюджет: {{ operation.budget.name }}{% if operation.category %}, Категорія: {{ operation.category.name }}{% endif %}
+        </div>
+      </li>
+    {% empty %}
+      <li class="no-operations">Операції не знайдено</li>
+    {% endfor %}
+  </ul>
 </div>
 
+<div class="currency-summary">
+  <p class="section-title">Курс валют за {{currencies.0.date_added}} до UAH</p>
+  <ul>
+    {% for currency in currencies %}
+      <li>
+        <div class="currency-name">{{ currency.currency }}</div>
+        <div class="currency-amount">{{ currency.amount|floatformat:2 }}</div>
+      </li>
+    {% empty %}
+      <li class="no-currencies">Валюти не знайдено</li>
+    {% endfor %}
+  </ul>
 </div>
 
 

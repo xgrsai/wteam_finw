@@ -1,90 +1,160 @@
 {% extends 'financew/base.html' %}
 {% load static %}
-
 {% block content %}
 
-<link rel="stylesheet" href="{% static 'css/main.css' %}"> 
-
-<p>{{ budget.name }} {{ budget.amount }} {{ budget.currency }} <!-- Кнопка для редагування бюджету -->
-    <button id="edit-budget-btn">Змінити дані</button></p>
-
-<!-- Форма для редагування бюджету (спочатку прихована) -->
-<div id="edit-budget-form" style="display: none;">
-    <form method="post" action="{% url 'financew:budget' budget.id %}">
-        {% csrf_token %}
-        {{form.as_div}}
+<!-- <link rel="stylesheet" href="{% static 'css/main.css' %}">  -->
+<div class="container-budget">
+    <div class="side-bar">
+        <a  href="{% url 'financew:my' %}"><img src="{% static 'img/acc.svg' %}" alt="">Персональний кабінет</a>
+        <!--Посилання ня на сторінку графіків-->
+        <a  href="{% url 'plots:report' %}"><img src="{% static 'img/grafik.svg' %}" alt="">  Візуалізація (чи звіти) </a>
+        <!-- Посилання на сторінку всіх транзакцій -->
+        <a href="{% url 'financew:transactions' %}"> <img src="{% static 'img/euro.svg' %}" alt=""> Переглянути всі транзакції</a>
         
-        {% comment %} <label for="name">Назва бюджету:</label>
-        <input type="text" name="name" value="{{ budget.name }}" required>
-        <label for="amount">Сума:</label>
-        <input type="number" name="amount" value="{{ budget.amount }}" required>
-        <label for="currency">Валюта:</label>
-        <input type="text" name="currency" value="{{ budget.currency }}" required> {% endcomment %}
         
-        {% comment %} {% for fm in form %}
-        <div class="form-group" style="border: 2px solid red; padding: 10px;">
-            <label>{{fm.label}}</label>
-            <div>{{fm}} </div>
+        <form method="get" action = {% url 'financew:transactions'%}>
+            <div id="total-balance"><p >Баланс бюджету<span style="font-weight: bold; font-size: 19px;"> {{ budget.name }}:</span> </p>
+               
+                
+                
+                <div id="total-balance-value">{{ budget.amount }} {{ budget.currency }} </div><button id="edit-budget-btn">Змінити дані</button>
+            <div id="edit-budget-form" style="display: none;">
+
+                <form method="post" action="{% url 'financew:budget' budget.id %}">
+                    {% csrf_token %}
+                    <div class="cnt-input-edit-form">{{form.as_div}}
+                    </div>
+                    
+                    {% comment %} {% for fm in form %}
+                    <div class="form-group">
+                        <label>{{fm.label}}</label>
+                        <div>{{fm}} </div>
+                    </div>
+                    {% endfor %}  {% endcomment %}
+            
+                    <div class="container-btn-edit-form">
+                        <button type="submit">Зберегти зміни</button>
+                        <button type="button" id="cancel-edit-btn">Скасувати</button>
+                    </div>
+                   
+                </form>
+
+                
+            </div>
+            
         </div>
-        {% endfor %}  {% endcomment %}
 
-
-        <button type="submit">Зберегти зміни</button>
-        <button type="button" id="cancel-edit-btn">Скасувати</button>
-    </form>
-</div>
-<button id="forecast-btn">Прогнозувати витрати</button>
-<p id="forecast-result"></p>
-
-
-
-{% comment %} <a href="{% url "financew:new_finoperation" budget.id %}">Додати нову фінансову операцію</a> {% endcomment %}
-<button id="add-new-finoperation">Створити нову фіноперацію</button>
-<div id = 'new-finoperation-form' style = "display:none;">
-<form action="{% url 'financew:budget' budget.id %}" method="post" class="new-finoperation-form"> <!-- action - куди відправляється форма-->
-  {% csrf_token %} 
-  {{ new_finoperation_form.as_div }}
-  <button type="submit">Додати фін операцію</button>
-  <button type='button' id="cancel-new-finoperation">Скасувати</button>
-</form>
-</div>
-<br>
-
-{% for finoperation,edit_finoperation_form in finoperations_and_edit_forms %}
-<div style="display: flex; align-items: center; gap: 10px;">
-    <!-- Виведення фінансової операції -->
-    <span>{{ finoperation.get_type_display }} - {{ finoperation.amount }} - {{ finoperation.date_added }} - {{ finoperation.category }}</span>
-
-    <!-- Кнопка для редагування фінансової операції -->
-    <button type='button' class="edit-finoperation-btn" data-finoperation-id="{{ finoperation.id }}">Змінити операцію</button>
-    <!-- Форма для редагування фінансової операції (спочатку прихована) -->
-    <div id="edit-finoperation-form-{{ finoperation.id }}" class="edit-finoperation-form" style="display: none;">
-        <form method="POST" action="{% url 'financew:budget' budget.id %}">
-            {% csrf_token %}
-            {% comment %} <input type="number" name="amount" value="{{ finoperation.amount }}" placeholder="Сума операції" required>
-            <select name="type">
-                <option value="expense" {% if finoperation.type == 'expense' %}selected{% endif %}>Витрата</option>
-                <option value="income" {% if finoperation.type == 'income' %}selected{% endif %}>Прибуток</option>
-            </select> {% endcomment %}
-            {{edit_finoperation_form.as_div}}
-            <button type="submit" >Змінити</button>
-            <button class="cancel-finoperation-btn">Скасувати</button>
         </form>
+        <button id="forecast-btn">Прогнозувати витрати</button>
+<p id="forecast-result"></p> 
     </div>
 
+
+<div class="info-budget">
+
+<!-- Форма для редагування бюджету (спочатку прихована) -->
+
+<!-- <button id="forecast-btn">Прогнозувати витрати</button>
+<p id="forecast-result"></p> -->
+
+
+<div class="ctn-fin-op">
+
+<h1 id="greeting">Інформація стосовно бюджету</h1>
+<div class="dashbord-op">
+    <span>Тип операції</span>
+    <span>Сума</span>
+    <span>Дата проведення операції</span>
+    <span>Категорія</span>
+</div>
+
+{% for finoperation,edit_finoperation_form in finoperations_and_edit_forms %}
+
+<div class="ctn-form-budg">
+    <!-- Виведення фінансової операції -->
+    <div class="info-budget-in-form"> 
+        <span>{{ finoperation.get_type_display }} </span>
+         <span>{{ finoperation.amount }}  </span>
+         <span>{{ finoperation.date_added }}  </span>
+         <span>{{ finoperation.category }}</span>
+        </div>
+        
+    <!-- Кнопка для редагування фінансової операції -->
+    <div class="ctn-btn-edit-dubg">
+    <!-- Кнопка для відкриття модального вікна -->
+<button type='button' class="edit-finoperation-btn" data-finoperation-id="{{ finoperation.id }}">
+    Змінити операцію
+</button>
+
+<!-- Затемнений фон модального вікна -->
+<div id="edit-finoperation-modal-{{ finoperation.id }}" class="modal-overlay" style="display: none;">
+    <div class="modal-window">
+        <button class="close-modal">&times;</button> <!-- Кнопка закриття -->
+        <form method="POST" action="{% url 'financew:budget' budget.id %}">
+            {% csrf_token %}
+            {{ edit_finoperation_form.as_div }}
+            <div class="btn-save-cancel">
+            <button type="submit">Змінити</button>
+            <button type="button" class="cancel-finoperation-btn">Скасувати</button>
+        </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".edit-finoperation-btn").forEach(button => {
+        button.addEventListener("click", function () {
+            const finoperationId = this.getAttribute("data-finoperation-id");
+            document.getElementById(`edit-finoperation-modal-${finoperationId}`).style.display = "flex";
+        });
+    });
+
+    document.querySelectorAll(".close-modal, .cancel-finoperation-btn").forEach(button => {
+        button.addEventListener("click", function () {
+            this.closest(".modal-overlay").style.display = "none";
+        });
+    });
+
+    // Закриття модального вікна при кліку поза ним
+    document.querySelectorAll(".modal-overlay").forEach(modal => {
+        modal.addEventListener("click", function (event) {
+            if (event.target === modal) {
+                modal.style.display = "none";
+            }
+        });
+    });
+});
+</script>
+
+
     <!-- видалення операції -->
-    <a href="{% url 'financew:delete_finoperation' finoperation.id %}" >🗑 Видалити</a>
+    <a class="btn-del-op" "{% url 'financew:delete_finoperation' finoperation.id %}" >🗑 Видалити</a>
+</div>
 </div>
 
 
 {% empty %}
 <p>Нема фінансових операцій</p>
 {% endfor %}
+{% comment %} <a href="{% url "financew:new_finoperation" budget.id %}">Додати нову фінансову операцію</a> {% endcomment %}
+<button id="add-new-finoperation">Створити нову фіноперацію</button>
+<div id = 'new-finoperation-form' style = "display:none;">
+<form action="{% url 'financew:budget' budget.id %}" method="post" class="new-finoperation-form"> <!-- action - куди відправляється форма-->
+  {% csrf_token %} 
+  {{ new_finoperation_form.as_div }}
+  <div>
+  <button type="submit">Додати фін операцію</button>
+  <button type='button' id="cancel-new-finoperation">Скасувати</button></div>
+</form>
+</div>
 
 
+</div>
 
-Трансфери з бюджету в бюджет:
-<table border="1">
+<div class="tbl-trans">
+<h1 id="greeting">Трансфери з бюджету в бюджет:</h1>
+<table class="styled-table">
     <thead>
         <tr>
             <th>Дата</th>
@@ -101,7 +171,7 @@
             <td>
                 {% if transfer.to_budget %}
                     {{ transfer.to_budget.name }}
-                    {% else %}
+                {% else %}
                     {{ transfer.to_goalbudget.name }}
                 {% endif %}
             </td>
@@ -109,38 +179,43 @@
         </tr>
         {% empty %}
         <tr>
-            <td colspan="4">Немає переказів</td>
+            <td colspan="4" class="no-transfers">Немає переказів</td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
 
+</div>
 <!--Форма для трансферу до бюджету-->
 <div>
-<button id="add-budget-transfer">Здійснити транзакцію до бюджету</button>
+<button id="add-budget-transfer">Здійснити трансфер до бюджету</button>
 <div id = 'new-budget-transfer-form' style = "display:none;">
 <form action="{% url 'financew:budget' budget.id %}" method="post">
     {%csrf_token%}
     {{transferbudgetform.as_div}}
+    <div>
     <button type="submit">Здійснити трансфер</button>
-    <button type="button" id="cancel-budget-transfer">Скасувати</button> <!--type="button" - щоб не думало що це submit-->
+    <button type="button" id="cancel-budget-transfer">Скасувати</button></div> <!--type="button" - щоб не думало що це submit-->
 </form>
 </div>
 </div>
 
 <!--Форма для трансферу до бюджету-цілі-->
 <div>
-<button id="add-goalbudget-transfer">Здійснити транзакцію до бюджету-цілі</button>
+<button id="add-goalbudget-transfer">Здійснити трансфер до бюджету-цілі</button>
 <div id = 'new-goalbudget-transfer-form' style = "display:none;">
     <form action="{% url 'financew:budget' budget.id %}" method="post">
         {%csrf_token%}
         {{transfergoalbudgetform.as_div}}
+        <div class="btn-sum-cencel">
         <button type="submit">Здійснити трансфер</button>
-        <button type="button" id="cancel-goalbudget-transfer">Скасувати</button> <!--type="button" - щоб не думало що це submit-->
+        <button type="button" id="cancel-goalbudget-transfer">Скасувати</button>
+        </div> <!--type="button" - щоб не думало що це submit-->
     </form>
     </div>
 </div>
-
+</div>
+</div>
 <script>
     // Отримуємо елементи сторінки для бюджету
     const editBudgetBtn = document.getElementById("edit-budget-btn");
@@ -269,6 +344,33 @@ document.addEventListener("DOMContentLoaded", function() { // "DOMContentLoaded"
                 document.getElementById("forecast-result").innerText = "Щось пішло не так";
             });
     });
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".edit-finoperation-btn").forEach(button => {
+        button.addEventListener("click", function () {
+            const finoperationId = this.getAttribute("data-finoperation-id");
+            document.getElementById(`edit-finoperation-modal-${finoperationId}`).style.display = "flex";
+        });
+    });
+
+    document.querySelectorAll(".close-modal, .cancel-finoperation-btn").forEach(button => {
+        button.addEventListener("click", function () {
+            this.closest(".modal").style.display = "none";
+        });
+    });
+
+    // Закриття модального вікна при кліку поза ним
+    document.querySelectorAll(".modal").forEach(modal => {
+        modal.addEventListener("click", function (event) {
+            if (event.target === modal) {
+                modal.style.display = "none";
+            }
+        });
+    });
+});
+
 </script>
 
 {% endblock content %}
