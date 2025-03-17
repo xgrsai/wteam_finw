@@ -1,67 +1,68 @@
 {% extends 'financew/base.html' %}
 {% block content %}
+{% load static %}
 <!-- Підключення Chart.js та RandomColor-->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/randomcolor@0.5.4/randomColor.min.js"></script>
 
-<!--ВИБІР ГРАФІКА-->
-<div class = "col-md-6">
-<form method="GET">
-{{graphic_type_form.as_div}}
-</form>
+<div class="grafik-container">
+<div class="side-bar">
+    <a  href="{% url 'financew:my' %}"><img src="{% static 'img/acc.svg' %}" alt="">Персональний кабінет</a>
+    <!--Посилання ня на сторінку графіків-->
+    <a style="background-color: #EAF1DF;" href="{% url 'plots:report' %}"><img src="{% static 'img/grafik.svg' %}" alt="">  Візуалізація (чи звіти) </a>
+    <!-- Посилання на сторінку всіх транзакцій -->
+    <a href="{% url 'financew:transactions' %}"> <img src="{% static 'img/euro.svg' %}" alt=""> Переглянути всі транзакції</a>
+    <form method="get" action = {% url 'financew:transactions'%}>
+        <p>{{currencydisplayform.as_div}}</p>
+    </form>
+    
 </div>
 
-{% if graphic_type == "pie"%}
-    <div>
-        <h1>Кругова діаграма</h1>
-        <form method = 'GET'>
-            <div class="mb-3">
-                {{ finoperationtypeform.as_div }}
-            </div>
-            <div class="mb-3">
-                {{ budgetform.as_div }}
-            </div>
-        <button type = "submit">Фільтрувати</button>
+
+<div class = "all-grafik">
+
+    <div class="filter-form">
+        <form method="GET">
+            
+{{ finoperationtypeform.as_div }}
+
+            
+{{ budgetform.as_div }}
+           
+            <button type="submit">Фільтрувати</button>
         </form>
-    </div>    
-    
-    <div style="width: 50%; height: 100%; margin: auto;">
-    <!-- Полотно для графіка -->
-    <canvas id="myPieChart"></canvas>
     </div>
- {%elif graphic_type == "bar"%}
- <div>
- <h1>Стовпчаста діаграма</h1>
- <form method = 'GET'>
-     <div class="mb-3">
-         {{ budgetform.as_div }}
-     </div>
- <button type = "submit">Фільтрувати</button>
- </form>
-</div>    
-    <div style="width: 50%; height: 100%; margin: auto;">
-    <canvas id="myBarChart"></canvas>
-    </div>
-
-    {%elif graphic_type == "line"%}
-    <div>
-    <h1> Лінійна діаграма</h1>
-    <form method = 'GET'>
-        <div class="mb-3">
-            {{ budgetform.as_div }}
+    <div class="display-grafik"></div>
+    <div class="grafik-krug">
+        <h1>Кругова діаграма</h1>
+        <div style="width: 50%; height: 100%; margin: auto;">
+            <!-- Полотно для кругової діаграми -->
+            <canvas id="myPieChart"></canvas>
         </div>
-    <button type = "submit">Фільтрувати</button>
-    </form>
-   </div>    
-       <div style="width: 50%; height: 100%; margin: auto;">
-       <canvas id="myLineChart"></canvas>
-       </div>
-    {%endif%} 
-
+    </div>
+    
+    <div class="grafik-stolb">
+        <h1>Стовпчаста діаграма</h1>
+        <div style="width: 50%; height: 100%; margin: auto;">
+            <!-- Полотно для стовпчастої діаграми -->
+            <canvas id="myBarChart"></canvas>
+        </div>
+    </div>
+    
+    <div class="grafik-lin">
+        <h1>Лінійна діаграма</h1>
+        <div style="width: 50%; height: 100%; margin: auto;">
+            <!-- Полотно для лінійної діаграми -->
+            <canvas id="myLineChart"></canvas>
+        </div>
+    </div>
+    
     <div id="noDataMessage" style="display:none;">
         <p>Немає даних для відображення.</p>
     </div>
-
+    
+</div>
+</div>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             let url;
@@ -200,11 +201,6 @@
     </script>
  
     
-    
-
-
-
-
 {% comment %} ГРАФІК ЗІ SCATTER {% endcomment %}
 {% comment %} <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -298,8 +294,6 @@
             .catch(error => console.error("Помилка завантаження графіка:", error));
     });
 </script>     {% endcomment %}
-
-
 
 
 

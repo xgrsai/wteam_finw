@@ -8,7 +8,8 @@ class FinOperationTypeForm(forms.Form):
     """форма для вибору фільтрів для piechart"""
     finoperation_type = forms.ChoiceField(
         choices=[(key, value) for key, value in FINOPERATION_TYPE.items()],
-        label="Вибір типу фіноперації",
+        
+        label="",
         #initial= # бере першим зі словника
         # widget=forms.Select(attrs={'onchange': 'this.form.submit()'}), 
         # widget=forms.Select(attrs={'class': 'mb-3'}),
@@ -23,13 +24,14 @@ class WhichBudgetForm(forms.Form):
         
         # Створюємо список варіантів для вибору, додавши "ВСІ"
         budgets = Budget.objects.filter(owner=user)
-        budget_dict = {"all": "Всі"}  # Початковий елемент для "ВСІ"
+        budget_dict = {"all": "Вибір бюджету"}  # Початковий елемент для "ВСІ"
+        initial = "all",
         budget_dict.update({budget.id: budget.name for budget in budgets})
         
         # Перетворюємо словник в список кортежів для ChoiceField
         self.fields['budget_type'] = forms.ChoiceField(
             choices=[(key, value) for key, value in budget_dict.items()],
-            label="Вибір бюджету",
+            label="",
             # widget=forms.Select(attrs={'onchange': 'this.form.submit()'})
         )
 

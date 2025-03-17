@@ -443,8 +443,175 @@ li{
   flex-direction: row;
   justify-content: space-between;
   align-items: start;
+  
 }
 
 .all-transactions{
   width: 100%;
+  margin: 10px;
+}
+/* НАлаштування кнопки   */
+
+.dropdown-btn {
+  background-color: #636C59; /* Колір кнопки */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 15px; /* Овальна форма */
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.arrow {
+  font-size: 12px;
+}
+
+.dropdown-btn:hover {
+  background-color: #575e4f; /* Трохи темніше при наведенні */
+}
+
+/* Приховане поле вибору дати */
+.date-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+
+
+.all-transactions form{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin: 10px;
+  padding: 10px;
+  color: #000;
+  text-align: center;
+  overflow-y: auto;
+}
+
+.all-transactions form select{
+  background-color: #D7E6C5; /* Колір кнопки */
+  color: black;
+  border: none;
+  padding: 10px 20px;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 15px; /* Овальна форма */
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  text-align: center;
+  appearance: none
+  
+}
+
+.all-transactions form button{
+  background-color: #636C59; /* Колір кнопки */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 15px; /* Овальна форма */
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  text-align: center;
+
+}
+.all-transactions form button img{
+  width: 18px;
+}
+.reset-button{
+  background-color: #D7E6C5; /* Колір кнопки */
+  color: black;
+  border: none;
+  padding: 10px 20px;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 15px; /* Овальна форма */
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+}
+
+
+/* Grafiki */
+
+
+.grafik-container{
+  display: flex;
+  flex-direction: row;
+  align-items: start;
+}
+
+.filter-form form{
+  width: 50%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin: 10px;
+  padding: 10px;
+  color: #000;
+  text-align: center;
+  overflow-y: auto;
+}
+
+.filter-form form select{
+  background-color: #D7E6C5; /* Колір кнопки */
+  color: black;
+  border: none;
+  padding: 10px 20px;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 15px; /* Овальна форма */
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  text-align: center;
+}
+
+.filter-form form button{
+  background-color: #636C59; /* Колір кнопки */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 15px; /* Овальна форма */
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  text-align: center;
+}
+
+
+.all-grafik{
+  width: 100%;
+  display: flex;  
+  flex-direction: column;  
+  justify-content: space-between;  
+  margin: 10px;
+  padding: 10px;
+  color: #000;
+  overflow-y: auto;
+}
+
+.display-grafik{
+  width: 100%;
+  display: flex;  
+  flex-direction: column;  
+  justify-content: space-between;  
+  margin: 10px;
+  padding: 10px;
+  color: #000;
 }
