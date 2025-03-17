@@ -12,7 +12,8 @@
     <a style="background-color: #EAF1DF;" href="{% url 'plots:report' %}"><img src="{% static 'img/grafik.svg' %}" alt="">  Візуалізація (чи звіти) </a>
     <!-- Посилання на сторінку всіх транзакцій -->
     <a href="{% url 'financew:transactions' %}"> <img src="{% static 'img/euro.svg' %}" alt=""> Переглянути всі транзакції</a>
-    <form method="get" action = {% url 'financew:transactions'%}>
+    <!--Вибір валюти-->
+    <form method="get" action = {% url 'plots:report'%}>
         <p>{{currencydisplayform.as_div}}</p>
     </form>
     
@@ -26,6 +27,7 @@
             
 {{ finoperationtypeform.as_div }}
 
+{{graphic_type_form.as_div}}
             
 {{ budgetform.as_div }}
            
@@ -200,125 +202,5 @@
         });
     </script>
  
-    
-{% comment %} ГРАФІК ЗІ SCATTER {% endcomment %}
-{% comment %} <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        let url;
-        let chartId;
-        let chartType;
-
-        // Перевірка типу графіка і налаштування відповідно URL та ID
-        if ("{{ graphic_type }}" == "pie") {
-            url = "{% url 'plots:piechart-data' %}";  // Запит для кругової діаграми
-            chartId = 'myPieChart'; // ID для canvas кругової діаграми
-            chartType = 'pie'; // Тип діаграми - pie
-        } else if ("{{ graphic_type }}" == "bar") {
-            url = "{% url 'plots:barchart-data' %}";  // Запит для стовпчастої діаграми
-            chartId = 'myBarChart'; // ID для canvas стовпчастої діаграми
-            chartType = 'bar'; // Тип діаграми - bar
-        } 
-        else if ("{{ graphic_type }}" == "scatter") {
-            url = "{% url 'plots:scatterchart-data' %}";  // Запит для scatter діаграми
-            chartId = 'myScatterChart'; // ID для canvas scatter діаграми
-            chartType = 'scatter'; // Тип діаграми - scatter
-        } else {
-            // Якщо тип графіка невідомий
-            console.error("Невідомий тип графіка.");
-            return;
-        }
-
-        // Завантажуємо дані та будуємо графік
-        fetch(url)  // Запит
-            .then(response => response.json())
-            .then(data => {
-                const ctx = document.getElementById(chartId).getContext('2d');
-
-                // Якщо це кругова діаграма
-                if (chartType === 'pie') {
-                    new Chart(ctx, {
-                        type: 'pie',  // Тип графіка: pie
-                        data: {
-                            labels: data.labels,
-                            datasets: [{
-                                label: 'Сума',
-                                data: data.values,
-                                backgroundColor: data.labels.map(() => randomColor()),
-                                borderWidth: 1
-                            }]
-                        }
-                    });
-                }
-
-                // Якщо це стовпчаста діаграма
-                else if (chartType === 'bar') {
-                    new Chart(ctx, {
-                        type: 'bar',  // Тип графіка: bar
-                        data: {
-                            labels: data.labels,
-                            datasets: [{
-                                label: 'Сума',
-                                data: data.values,
-                                backgroundColor: data.labels.map(() => randomColor()),
-                                borderWidth: 1
-                            }]
-                        }
-                    });
-                }
-
-                // Якщо це scatter діаграма
-                else if (chartType === 'scatter') {
-                    new Chart(ctx, {
-                        type: 'scatter',  // Тип графіка: scatter
-                        data: {
-                            datasets: [{
-                                label: 'Точки прогнозу',
-                                data: data.values.map(value => ({
-                                    x: value.x,  // x координати для scatter
-                                    y: value.y,  // y координати для scatter
-                                })),
-                                backgroundColor: 'rgba(75, 192, 192, 0.4)',
-                                borderColor: 'rgba(75, 192, 192, 1)',
-                                borderWidth: 1
-                            }]
-                        },
-                        options: {
-                            scales: {
-                                x: { type: 'linear', position: 'bottom' },
-                                y: { type: 'linear' }
-                            }
-                        }
-                    });
-                }
-            })
-            .catch(error => console.error("Помилка завантаження графіка:", error));
-    });
-</script>     {% endcomment %}
-
-
-
- {% comment %}ЦЕЙ СКРИПТ ТОЧНО ПРАЦЮЄ ТОМУ ЙОГО ЗАЛИШАЮ<script>
-        document.addEventListener("DOMContentLoaded", function () {
-            fetch("{% url 'plots:piechart-data' %}")  // Запит 
-                .then(response => response.json())
-                .then(data => {
-                    const ctx = document.getElementById('myPieChart').getContext('2d');
-                    new Chart(ctx, {
-                        type: 'pie',  // Кругова діаграма
-                        data: {
-                            labels: data.labels,
-                            datasets: [{
-                                label: 'Сума',
-                                data: data.values,
-                                backgroundColor: data.labels.map(() => randomColor()),
-                                borderWidth: 1
-                            }]
-                        }
-                    });
-                })
-                //.catch(error => console.error("Помилка завантаження графіка:", error));
-        });
-        
-</script> {% endcomment %}
 
 {% endblock content %}

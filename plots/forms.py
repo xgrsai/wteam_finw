@@ -24,7 +24,7 @@ class WhichBudgetForm(forms.Form):
         
         # Створюємо список варіантів для вибору, додавши "ВСІ"
         budgets = Budget.objects.filter(owner=user)
-        budget_dict = {"all": "Вибір бюджету"}  # Початковий елемент для "ВСІ"
+        budget_dict = {"all": "Усі"}  # Початковий елемент для "ВСІ"
         initial = "all",
         budget_dict.update({budget.id: budget.name for budget in budgets})
         
