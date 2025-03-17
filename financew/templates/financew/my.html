@@ -1,8 +1,8 @@
 {% extends 'financew/base.html' %} 
 {% load static %} 
-{% load django_bootstrap5 %}
-{% block content %}
 
+{% block content %}
+{% load django_bootstrap5 %}
 
 <div class="container-my-budget">
 
@@ -34,7 +34,7 @@
 <div class="budget-list">
   <h1 id="greeting">Добрий день, {{ user.username }}</h1>
   
-  <div class="my-budget">Мої бюджети
+  <div class="my-budget"><p>Мої бюджети</p>
 {% for budget in budgets%}<!-- воно бере по назві ключа -->
     <li>
         <a href="{% url 'financew:budget' budget.budget.id %}">{{ budget.budget.name }} {{ budget.budget.amount }} {{ budget.budget.currency }} ({{budget.converted_amount}})</a>
@@ -87,7 +87,7 @@
 </div>
 
 <!--бюджетицілі-->
-<div class="goal-budget-list">Мої бюджети-цілі
+<div class="goal-budget-list"><p>Мої бюджети-цілі</p>
 {% for goalbudget in goalbudgets%}<!-- воно бере по назві ключа -->
 <li>
     {{ goalbudget.name }} {{ goalbudget.amount }}/{{ goalbudget.target_amount }} {{ goalbudget.currency }}
@@ -118,7 +118,7 @@
 
 {% comment %} А ТУТ ДОДАТИ ПЕРЕГЛЯД КАТЕГОРІЙ І ТАКОЖ ЇХ ДОДАВАВННЯ {% endcomment %}
 <!--категорії-->
-<div class="category-list">Мої категорії витрат та прибутків
+<div class="category-list"><p>Мої категорії витрат та прибутків</p>
 {% for category in categories%}<!-- воно бере по назві ключа -->
 <li>
     {{ category.name }}

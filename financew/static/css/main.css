@@ -1231,3 +1231,21 @@ body, html {
   background-color: #e0e0e0; /* Зміна фону при наведенні */
   cursor: pointer; /* Зміна курсору при наведенні */
 }
+.goal-budget-list p {
+  text-align: center;
+  margin: 0 auto; /* Це допомагає, якщо є інші стилі, що впливають */
+  font-weight: bold; /* Додає жирний шрифт */
+  font-size: 18px;
+}
+.category-list p {
+  text-align: center;
+  margin: 0 auto; /* Це допомагає, якщо є інші стилі, що впливають */
+  font-weight: bold; /* Додає жирний шрифт */
+  font-size: 18px;
+}
+.my-budget p {
+  text-align: center;
+  margin: 0 auto; /* Це допомагає, якщо є інші стилі, що впливають */
+  font-weight: bold; /* Додає жирний шрифт */
+  font-size: 18px;
+}
