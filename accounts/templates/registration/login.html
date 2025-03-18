@@ -1,0 +1,55 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uk">
+  <!-- вказує що сторінка українською мову -->
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FinW</title>
+    <!-- Підключення стилів -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+    {% load django_bootstrap5 %} {% bootstrap_css %} {% bootstrap_javascript %}
+  </head>
+  
+  <body>
+    <div class="top-left-logo">
+    <a href="{% url 'financew:index' %}"><img src="{% static 'img/SVG.svg' %}" alt="logo">FinanceW</a>
+    </div>
+    
+    <div class="top-right-register">
+        <a href="{% url 'accounts:register' %}">Реєстрація</a>
+    </div>
+
+    <div class="wrapper">
+      <div class="container-left">
+        <img id="image" src="{% static 'img/Image.svg'%}" alt="" />
+      </div>
+      
+      <div class="form-container">
+        <h1>Увійти в кабінет</h1>
+        <form action="{% url 'accounts:login' %}" method="post">
+          {% csrf_token %} {% comment %} {{ form.as_div }} {% endcomment %}
+          <div class="input-container">
+            <label for="{{ form.username.id_for_label }}">Ваше ім'я користувача</label>
+            {{ form.username }}
+          </div>
+          <div class="input-container">
+            <label for="{{ form.password.id_for_label }}">Пароль</label>
+            {{ form.password }}
+          </div>
+           {% if form.errors %}
+          <p>Ваше ім'я користувача або пароль не збігаються. Спробуйте ще раз.</p>
+          {% endif %}
+          <br><button name="submit">Увійти</button>
+        </form>
+       </div>
+    </div>
+  </body>
+
+  </html>

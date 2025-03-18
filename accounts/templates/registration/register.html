@@ -1,0 +1,87 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Registration</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+  {% load django_bootstrap5 %} {% bootstrap_css %} {% bootstrap_javascript %}
+</head>
+
+<body>
+  <!-- Логотип зліва зверху -->
+  <div class="top-left-logo">
+    <a href="{% url 'financew:index' %}">
+      <img src="{% static 'img/SVG.svg' %}" alt="logo"> FinanceW
+    </a>
+  </div>
+
+  <!-- Посилання на логін справа зверху -->
+  <div class="top-right-register">
+    <a href="{% url 'accounts:login' %}">Увійти</a>
+  </div>
+
+  <!-- Основний вміст: зображення + форма -->
+  <div class="wrapper">
+    <div class="container-left">
+      <img id="image" src="{% static 'img/Image.svg'%}" alt="Image" />
+    </div>
+
+    <div class="form-container">
+      <h1>Реєстрація</h1>
+      <form action="{% url 'accounts:register' %}" method="post">
+        {% csrf_token %}
+        {% comment %} {{ form.as_div }} {% endcomment %}
+        <!-- Поле для Username -->
+      <div class="input-container">
+        <label for="{{ form.username.id_for_label }}">Ваше ім'я користувача</label>
+        {{ form.username }}
+        {% if form.username.errors %}
+          <ul class="error-list">
+            {% for error in form.username.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+
+      <!-- Поле для Password1 -->
+      <div class="input-container">
+        <label for="{{ form.password1.id_for_label }}">Пароль</label>
+        {{ form.password1 }}
+        {% if form.password1.errors %}
+          <ul class="error-list">
+            {% for error in form.password1.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+
+      <!-- Поле для Password2 (повтор пароля) -->
+      <div class="input-container">
+        <label for="{{ form.password2.id_for_label }}">Повторіть пароль</label>
+        {{ form.password2 }}
+        {% if form.password2.errors %}
+          <ul class="error-list">
+            {% for error in form.password2.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+
+        {% if form.errors %}
+          <p>Будь ласка, перевірте правильність введених даних.</p>
+        {% endif %}
+        <br><button type="submit">Зареєструватися</button>
+      </form>
+    </div>
+  </div>
+
+</body>
+</html>
