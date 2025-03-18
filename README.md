@@ -62,3 +62,6 @@ In order to access the Django admin panel, you need to create a superuser. This 
 ## 6. Starting the Django server 
 To start the Django server and check the operation of your project, use the command:<br>
 `python manage.py runserver`
+
+### Перегляньте відео:
+[video.mp4](./video/video.mp4)
