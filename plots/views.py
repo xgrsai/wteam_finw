@@ -64,7 +64,8 @@ def get_pie_chart_data(request):
     finoperations = FinOperation.objects.filter(budget__owner=request.user)
     
     """для вибору бюджету"""
-    budget_type = request.session.get('budget_type')
+    budget_type = request.session.get('budget_type', 'all')
+    print(budget_type)
     
     if budget_type == 'all':
         df = pd.DataFrame(list(finoperations.values('amount', 'type', 'category__name', 'budget__currency')))# Перетворюємо в DataFrame
@@ -77,7 +78,7 @@ def get_pie_chart_data(request):
     df['category__name'] = df['category__name'].fillna("Без категорії") # спеціальний метод для заповнення пустих значень
 
     """Переведення за вибраною валютою"""
-    selected_currency = request.session.get('display_currency')
+    selected_currency = request.session.get('display_currency', 'UAH')
     
     df = convert_df_amount(df, selected_currency)
 
@@ -102,7 +103,7 @@ def get_bar_chart_data(request):
     finoperations = FinOperation.objects.filter(budget__owner=request.user)
     
     # Для вибору бюджету
-    budget_type = request.session.get('budget_type')
+    budget_type = request.session.get('budget_type', 'all')
 
     if budget_type == 'all':
         df = pd.DataFrame(list(finoperations.values('amount', 'type', 'budget__name','budget__currency','category__name')))  # Перетворюємо в DataFrame
@@ -113,7 +114,7 @@ def get_bar_chart_data(request):
     df['category__name'] = df['category__name'].fillna("Без категорії") # спеціальний метод для заповнення пустих значень
 
     """зміна валюти"""
-    selected_currency = request.session.get('display_currency')
+    selected_currency = request.session.get('display_currency', 'UAH')
     df = convert_df_amount(df, selected_currency)
     
     # Фільтруємо дані по прибутку та витратах
@@ -150,7 +151,7 @@ def get_line_chart_data(request):
     finoperations = FinOperation.objects.filter(budget__owner=request.user)
 
     # Перевірка на тип бюджету (якщо потрібно)
-    budget_type = request.session.get('budget_type')
+    budget_type = request.session.get('budget_type', 'all')
     if budget_type == 'all':
         df = pd.DataFrame(list(finoperations.values('amount', 'type', 'date_added', 'budget__currency','category__name')))  # Перетворюємо в DataFrame
     else:
@@ -163,7 +164,7 @@ def get_line_chart_data(request):
     df['category__name'] = df['category__name'].fillna("Без категорії") # спеціальний метод для заповнення пустих значень
 
     """зміна валюти"""
-    selected_currency = request.session.get('display_currency')
+    selected_currency = request.session.get('display_currency', 'UAH')
     df = convert_df_amount(df, selected_currency)
 
     # Додаємо колонку з датами (можна форматувати дату для групування)
