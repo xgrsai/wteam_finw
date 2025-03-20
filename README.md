@@ -30,7 +30,9 @@ Personal finance management platform (FinW) - helps users track expenses, foreca
 ## 5. Створення superuser
 Для того щоб отримати доступ до адмін-панелі Django, потрібно створити суперкористувача. Це можна зробити за допомогою наступної команди:<br>
 `python manage.py createsuperuser`
-## 6. Запуск сервера Django 
+## 6.1 Виконайте команду перед першим `runserver`!!!
+`python manage.py update_exchange_rates`
+## 6.2. Запуск сервера Django 
 Щоб запустити сервер Django і перевірити роботу вашого проєкту, скористайтеся командою:<br>
 `python manage.py runserver`
 
@@ -59,7 +61,9 @@ And then:<br>
 ## 5. Creating a superuser
 In order to access the Django admin panel, you need to create a superuser. This can be done with the following command:<br>
 `python manage.py createsuperuser`
-## 6. Starting the Django server 
+## 6.1. Execute the command before very first `runserver`!!!
+`python manage.py update_exchange_rates`
+## 6.2. Starting the Django server 
 To start the Django server and check the operation of your project, use the command:<br>
 `python manage.py runserver`
 
