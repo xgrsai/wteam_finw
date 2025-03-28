@@ -5,7 +5,7 @@
 (ENG)
 Personal finance management platform (FinW) - helps users track expenses, forecast budgets, and analyze financial habits.
 
-# Installation (UA)
+# Встановлення (UA)
 ## 1. Клонування репозиторію 
 Перш за все, вам потрібно клонувати репозиторій проєкту на ваш локальний комп'ютер. Використовуйте команду git clone:<br>
 `git clone <URL репозиторію>`
@@ -36,7 +36,7 @@ Personal finance management platform (FinW) - helps users track expenses, foreca
 Щоб запустити сервер Django і перевірити роботу вашого проєкту, скористайтеся командою:<br>
 `python manage.py runserver`
 
-# Installation (ENG)
+# Setup (ENG)
 ## 1. Cloning the repository 
 First of all, you need to clone the project repository to your local computer. Use the git clone command:<br>
 `git clone <repository URL>`
